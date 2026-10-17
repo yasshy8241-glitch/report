@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReportFlow - 週次・月次 定例報告トピック管理ツール</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        /* Custom scrollbar for preview and horizontal tabs */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        textarea {
+            resize: vertical;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-100 selection:text-indigo-900">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-100 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-bold tracking-tight text-slate-900">ReportFlow</h1>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">店舗・売場定例報告</span>
+                    </div>
+                    <p class="text-xs text-slate-500 hidden sm:block">Weekly & Monthly トピック管理・提出フォーマット自動生成</p>
+                </div>
+            </div>
+
+            <!-- Auto-save status & Utility buttons -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div id="saveStatus" class="flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg transition-all">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>自動保存済み</span>
+                </div>
+
+                <button id="loadSampleBtn" type="button" class="text-xs font-medium text-slate-600 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5" title="現在の月に記入例を読み込みます">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span class="hidden md:inline">サンプル読込</span>
+                </button>
+
+                <button id="clearMonthBtn" type="button" class="text-xs font-medium text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-1" title="当月の入力をクリア">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    <span class="hidden md:inline">当月リセット</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Month Switcher & Archive Tabs Bar -->
+    <div class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <!-- Year / Month Selector Controls -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1">対象年月:</span>
+                <button id="prevMonthBtn" type="button" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors" title="前月へ">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
+                    <select id="yearSelect" class="bg-transparent text-sm font-bold text-slate-800 focus:outline-none pr-1 cursor-pointer">
+                        <!-- Populated via JS -->
+                    </select>
+                    <span class="text-sm font-medium text-slate-500 mr-2">年</span>
+                    <select id="monthSelect" class="bg-transparent text-sm font-bold text-indigo-600 focus:outline-none pr-1 cursor-pointer">
+                        <!-- Populated via JS -->
+                    </select>
+                    <span class="text-sm font-medium text-slate-500">月</span>
+                </div>
+
+                <button id="nextMonthBtn" type="button" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors" title="翌月へ">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Saved / Recent Months Quick Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+                <span class="text-xs font-medium text-slate-400 shrink-0 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    月切替タブ:
+                </span>
+                <div id="monthTabsContainer" class="flex items-center gap-1.5">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Dashboard -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- Left Column: Input Forms (Monthly & Weekly) -->
+            <div class="lg:col-span-7 xl:col-span-7 space-y-6">
+
+                <!-- 1. Monthly Section Card -->
+                <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 bg-gradient-to-r from-indigo-50/70 via-white to-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">M</span>
+                            <div>
+                                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                    <span>【Monthly】月次トピック管理</span>
+                                    <span id="monthlyCountBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">0件</span>
+                                </h2>
+                                <p class="text-xs text-slate-500">月全体の重要トピック・施策成果・売場変更点などを箇条書きでストックします</p>
+                            </div>
+                        </div>
+
+                        <button id="toggleHintBtn" type="button" class="text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                            <span>Weeklyから要約ヒント</span>
+                        </button>
+                    </div>
+
+                    <!-- Weekly to Monthly Summary Hint Drawer -->
+                    <div id="summaryHintPanel" class="hidden bg-amber-50/70 border-b border-amber-200 px-5 py-4 fade-in">
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded-md">要約アシスタント</span>
+                                <h3 class="text-xs font-bold text-amber-900">Weeklyの記録からMonthlyトピックへ昇格・要約するポイント</h3>
+                            </div>
+                            <button id="closeHintBtn" type="button" class="text-amber-700 hover:text-amber-900 p-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs text-amber-900 mb-3">
+                            <div class="bg-white/90 p-2.5 rounded-xl border border-amber-200/80">
+                                <div class="font-bold text-indigo-700 mb-0.5">1. 施策・キャンペーン</div>
+                                <p class="text-slate-600 leading-relaxed">複数週にまたがるフェアや販促施策の最終着地・反響を1行に集約</p>
+                            </div>
+                            <div class="bg-white/90 p-2.5 rounded-xl border border-amber-200/80">
+                                <div class="font-bold text-emerald-700 mb-0.5">2. 什器・売場運用</div>
+                                <p class="text-slate-600 leading-relaxed">レイアウト変更や導線改善、什器導入によるオペレーション変化を抜粋</p>
+                            </div>
+                            <div class="bg-white/90 p-2.5 rounded-xl border border-amber-200/80">
+                                <div class="font-bold text-rose-700 mb-0.5">3. 定量実績・好調要因</div>
+                                <p class="text-slate-600 leading-relaxed">特に売上・客数に貢献した週の数値エビデンス（前月比・目標比）を記載</p>
+                            </div>
+                        </div>
+                        <!-- Extracted lines from current Weekly logs -->
+                        <div class="bg-white rounded-xl border border-amber-200 p-3">
+                            <div class="text-xs font-semibold text-slate-700 mb-2 flex items-center justify-between">
+                                <span>現在の【Weekly】からワンクリックで【Monthly】へ取り込み（行単位抽出）:</span>
+                                <span class="text-[11px] text-slate-400">クリックで追加</span>
+                            </div>
+                            <div id="weeklyCandidateList" class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
+                                <!-- Populated dynamically from Weekly text -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add New Monthly Topic Form -->
+                    <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+                        <form id="addMonthlyForm" class="space-y-3">
+                            <div class="flex flex-col sm:flex-row gap-2.5">
+                                <div class="sm:w-40 shrink-0">
+                                    <label for="newTopicCategory" class="block text-[11px] font-semibold text-slate-500 mb-1">カテゴリ/タグ (任意)</label>
+                                    <select id="newTopicCategory" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none transition-all">
+                                        <option value="">タグなし</option>
+                                        <option value="施策">施策</option>
+                                        <option value="什器/運用">什器/運用</option>
+                                        <option value="実績">実績</option>
+                                        <option value="課題/改善">課題/改善</option>
+                                        <option value="共有事項">共有事項</option>
+                                    </select>
+                                </div>
+                                <div class="flex-1">
+                                    <label for="newTopicInput" class="block text-[11px] font-semibold text-slate-500 mb-1">月次トピック内容</label>
+                                    <div class="flex gap-2">
+                                        <input id="newTopicInput" type="text" placeholder="例: 秋物プロモーション展開により主力カテゴリー売上が前月比115%で推移" class="flex-1 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none transition-all">
+                                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm shadow-indigo-100 transition-all flex items-center gap-1.5 shrink-0">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                            </svg>
+                                            <span>追加</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Monthly Topics List -->
+                    <div class="p-5">
+                        <ul id="monthlyListContainer" class="space-y-2.5">
+                            <!-- Populated via JS -->
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 2. Weekly Section Card -->
+                <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 bg-gradient-to-r from-emerald-50/70 via-white to-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">W</span>
+                            <div>
+                                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                    <span>【Weekly】週次トピック・振り返り</span>
+                                    <span id="weeklyCountBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">5週</span>
+                                </h2>
+                                <p class="text-xs text-slate-500">週ごとの日付範囲（自動計算または手動調整）と、その週のメモ・実績を入力します</p>
+                            </div>
+                        </div>
+
+                        <!-- Auto-calculate date ranges toolbar -->
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <select id="weekStartDaySelect" class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500" title="週の開始曜日">
+                                <option value="1">月曜始まり (例: 9/28〜10/4)</option>
+                                <option value="0">日曜始まり (例: 9/27〜10/3)</option>
+                            </select>
+                            <button id="autoCalcDatesBtn" type="button" class="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1" title="選択中の年月に合わせて週の日付範囲を再計算します（入力メモは保持されます）">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>日付範囲を自動セット</span>
+                            </button>
+                            <button id="addWeekCardBtn" type="button" class="text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                <span>週枠を追加</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Cards Container -->
+                    <div id="weeklyCardsContainer" class="p-5 space-y-4">
+                        <!-- Populated via JS -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Real-time Preview & One-click Copy (Sticky on Desktop) -->
+            <div class="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-20 space-y-4">
+                <section class="bg-slate-900 text-slate-100 rounded-2xl shadow-xl border border-slate-800 overflow-hidden">
+                    <!-- Top Header of Preview Card -->
+                    <div class="px-5 py-4 bg-slate-800/80 border-b border-slate-700/80 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            <h2 class="text-sm font-bold tracking-wide text-white">提出用フォーマット プレビュー</h2>
+                        </div>
+                        <span id="charCountLabel" class="text-xs font-mono text-slate-400">0 文字</span>
+                    </div>
+
+                    <!-- Format Customization Toggles -->
+                    <div class="px-5 py-3 bg-slate-800/40 border-b border-slate-800 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-300">
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+                            <input id="includeCategoryToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700">
+                            <span>Monthlyに[タグ]を表示</span>
+                        </label>
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+                            <input id="skipEmptyWeeksToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700">
+                            <span>未入力の週を出力しない</span>
+                        </label>
+                    </div>
+
+                    <!-- Formatted Output Textarea / Pre -->
+                    <div class="p-5">
+                        <div class="relative">
+                            <textarea id="outputPreviewText" readonly rows="18" class="w-full rounded-xl bg-slate-950/90 border border-slate-800 p-4 font-mono text-sm leading-relaxed text-slate-100 focus:outline-none focus:border-indigo-500 selection:bg-indigo-500 selection:text-white"></textarea>
+                        </div>
+
+                        <!-- Primary Action Button: One-Click Copy -->
+                        <div class="mt-4 flex flex-col sm:flex-row gap-2.5">
+                            <button id="copyOutputBtn" type="button" class="flex-1 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 active:scale-[0.99] text-white font-bold text-sm py-3.5 px-5 rounded-xl shadow-lg shadow-indigo-950/50 transition-all flex items-center justify-center gap-2">
+                                <svg id="copyBtnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                                </svg>
+                                <span id="copyBtnText">クリップボードにコピー</span>
+                            </button>
+
+                            <button id="downloadTxtBtn" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs py-3.5 px-4 rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-1.5" title="テキストファイル(.txt)として保存">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                <span>.txt保存</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Usage Guide Card -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-xs text-slate-600 space-y-2">
+                    <div class="font-bold text-slate-800 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>使い方のヒント</span>
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 text-slate-500 leading-relaxed">
+                        <li>日々の出来事や数値はまず<strong>【Weekly】</strong>の各週カードにメモします。</li>
+                        <li>各週カードの<strong>「Monthlyへ引用」</strong>ボタンや上部の<strong>「Weeklyから要約ヒント」</strong>を使うと、重要トピックを素早く月次まとめへ昇格できます。</li>
+                        <li>すべての変更はお使いのブラウザ（localStorage）へ<strong>月別に自動保存</strong>されます。</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Custom Confirmation Modal (No native confirm/alert) -->
+    <div id="customModalOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 fade-in">
+            <h3 id="modalTitle" class="text-base font-bold text-slate-900 mb-2">確認</h3>
+            <p id="modalMessage" class="text-sm text-slate-600 mb-6 leading-relaxed"></p>
+            <div class="flex items-center justify-end gap-2.5">
+                <button id="modalCancelBtn" type="button" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors">キャンセル</button>
+                <button id="modalConfirmBtn" type="button" class="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors">実行する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const STORAGE_KEY = 'reportflow_store_v1';
+            const DEFAULT_YEAR = 2026;
+            const DEFAULT_MONTH = 10;
+
+            // Category styling map
+            const CATEGORY_STYLES = {
+                '施策': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                '什器/運用': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                '実績': 'bg-amber-50 text-amber-800 border-amber-200',
+                '課題/改善': 'bg-rose-50 text-rose-700 border-rose-200',
+                '共有事項': 'bg-slate-100 text-slate-700 border-slate-300'
+            };
+
+            // Application State
+            let appState = {
+                currentYear: DEFAULT_YEAR,
+                currentMonth: DEFAULT_MONTH,
+                weekStartDay: 1, // 1: Monday, 0: Sunday
+                includeCategoryInOutput: false,
+                skipEmptyWeeksInOutput: false,
+                records: {} // Keyed by "YYYY-MM"
+            };
+
+            // Generate realistic initial sample data for 2026-10 & 2026-09
+            function createSampleRecordFor2026_10() {
+                return {
+                    year: 2026,
+                    month: 10,
+                    monthlyTopics: [
+                        {
+                            id: 'm-1',
+                            category: '施策',
+                            content: 'オータムフェア＆ハロウィン特設売場の展開により、季節催事カテゴリー売上が前月比118%を達成'
+                        },
+                        {
+                            id: 'm-2',
+                            category: '什器/運用',
+                            content: 'メイン通路エンド什器の高さを135cmへ統一し、売場奥までの視認性と回遊導線を改善'
+                        },
+                        {
+                            id: 'm-3',
+                            category: '実績',
+                            content: '週末タイムセール時のレジ応援体制見直しにより、ピーク時間帯の待ち時間を平均35%短縮'
+                        }
+                    ],
+                    weeklyItems: [
+                        {
+                            id: 'w-1',
+                            range: '9/28〜10/4',
+                            memo: '・月末棚卸しおよび10月度オータムフェア売場への切り替え完了\n・メイン通路エンド什器のPOP刷新、初週の立ち寄り客数が前週比112%'
+                        },
+                        {
+                            id: 'w-2',
+                            range: '10/5〜10/11',
+                            memo: '・気温低下に伴い秋冬シーズン商材の動きが本格化（週間売上予算比108%）\n・エンド什器の高さを135cmへ統一し、売場奥までの視認性と回遊導線を改善'
+                        },
+                        {
+                            id: 'w-3',
+                            range: '10/12〜10/18',
+                            memo: '・3連休イベント施策の実施、ファミリー層中心に客単価が向上\n・週末タイムセール時のレジ応援体制見直しにより、ピーク時間帯の待ち時間を平均35%短縮'
+                        },
+                        {
+                            id: 'w-4',
+                            range: '10/19〜10/25',
+                            memo: '・ハロウィン直前需要に向けた関連ギフト・まとめ買い陳列の強化\n・欠品防止のためバックヤード在庫の朝夕2回補充ルールを徹底'
+                        },
+                        {
+                            id: 'w-5',
+                            range: '10/26〜11/1',
+                            memo: '・10月最終週の駆け込み需要対応と11月冬物プロモーションの事前準備\n・月間を通じた季節催事カテゴリー売上が前月比118%で着地見込み'
+                        }
+                    ]
+                };
+            }
+
+            function createSampleRecordFor2026_09() {
+                return {
+                    year: 2026,
+                    month: 9,
+                    monthlyTopics: [
+                        {
+                            id: 'm-901',
+                            category: '施策',
+                            content: '敬老の日ギフト特設コーナーの早期立ち上げにより、ギフト需要の取り込みに成功（前年比110%）'
+                        },
+                        {
+                            id: 'm-902',
+                            category: '什器/運用',
+                            content: '新規プライスカードホルダー導入による売場メンテナンス作業の効率化'
+                        }
+                    ],
+                    weeklyItems: [
+                        {
+                            id: 'w-901',
+                            range: '8/31〜9/6',
+                            memo: '・夏物最終クリアランス撤去と秋物新商品の初期導入完了'
+                        },
+                        {
+                            id: 'w-902',
+                            range: '9/7〜9/13',
+                            memo: '・敬老の日ギフト特設コーナーの接客強化、ラッピングオペレーションの確認'
+                        },
+                        {
+                            id: 'w-903',
+                            range: '9/14〜9/20',
+                            memo: '・シルバーウィーク連休対策として主力商品のフェース拡大を実施'
+                        },
+                        {
+                            id: 'w-904',
+                            range: '9/21〜9/27',
+                            memo: '・10月オータムフェアに向けた什器レイアウト図の確定と発注確認'
+                        }
+                    ]
+                };
+            }
+
+            /**
+             * Calculate week date ranges covering a given Year and Month
+             * @param {number} year - e.g. 2026
+             * @param {number} month - 1..12
+             * @param {number} weekStartDay - 1 for Monday, 0 for Sunday
+             * @returns {Array<string>} Array of strings like ["9/28〜10/4", "10/5〜10/11", ...]
+             */
+            function calculateMonthWeekRanges(year, month, weekStartDay = 1) {
+                const firstDayOfMonth = new Date(year, month - 1, 1);
+                const lastDayOfMonth = new Date(year, month, 0);
+
+                // Find start of first week that includes the 1st of the month
+                const startCursor = new Date(firstDayOfMonth);
+                const dayOfWeek = startCursor.getDay(); // 0(Sun) .. 6(Sat)
+                const diff = (dayOfWeek - weekStartDay + 7) % 7;
+                startCursor.setDate(startCursor.getDate() - diff);
+
+                const ranges = [];
+                while (startCursor <= lastDayOfMonth && ranges.length < 6) {
+                    const weekEnd = new Date(startCursor);
+                    weekEnd.setDate(weekEnd.getDate() + 6);
+
+                    const startStr = `${startCursor.getMonth() + 1}/${startCursor.getDate()}`;
+                    const endStr = `${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+                    ranges.push(`${startStr}〜${endStr}`);
+
+                    startCursor.setDate(startCursor.getDate() + 7);
+                }
+                return ranges;
+            }
+
+            function getMonthKey(year, month) {
+                return `${year}-${String(month).padStart(2, '0')}`;
+            }
+
+            function createDefaultRecord(year, month, weekStartDay = 1) {
+                const ranges = calculateMonthWeekRanges(year, month, weekStartDay);
+                return {
+                    year: Number(year),
+                    month: Number(month),
+                    monthlyTopics: [],
+                    weeklyItems: ranges.map((range, idx) => ({
+                        id: `w-${Date.now()}-${idx}`,
+                        range: range,
+                        memo: ''
+                    }))
+                };
+            }
+
+            function loadStateFromStorage() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && typeof parsed === 'object') {
+                            appState = Object.assign(appState, parsed);
+                        }
+                    } else {
+                        // First time launch: seed sample records for 2026-10 and 2026-09
+                        appState.records['2026-10'] = createSampleRecordFor2026_10();
+                        appState.records['2026-09'] = createSampleRecordFor2026_09();
+                        saveStateToStorage(false);
+                    }
+                } catch (err) {
+                    console.error('Failed to load state from localStorage:', err);
+                }
+
+                // Ensure current month record exists
+                ensureCurrentRecordExists();
+            }
+
+            function ensureCurrentRecordExists() {
+                const key = getMonthKey(appState.currentYear, appState.currentMonth);
+                if (!appState.records[key]) {
+                    appState.records[key] = createDefaultRecord(
+                        appState.currentYear,
+                        appState.currentMonth,
+                        appState.weekStartDay
+                    );
+                }
+            }
+
+            function getCurrentRecord() {
+                ensureCurrentRecordExists();
+                return appState.records[getMonthKey(appState.currentYear, appState.currentMonth)];
+            }
+
+            let saveIndicatorTimeout = null;
+            function saveStateToStorage(animateIndicator = true) {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                    if (animateIndicator) {
+                        const statusEl = document.getElementById('saveStatus');
+                        if (statusEl) {
+                            statusEl.innerHTML = `
+                                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                                <span>保存中...</span>
+                            `;
+                            clearTimeout(saveIndicatorTimeout);
+                            saveIndicatorTimeout = setTimeout(() => {
+                                statusEl.innerHTML = `
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span>自動保存済み</span>
+                                `;
+                            }, 450);
+                        }
+                    }
+                } catch (err) {
+                    console.error('Failed to save to localStorage:', err);
+                }
+            }
+
+            function showToast(message, type = 'success') {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                const colorClasses = type === 'success'
+                    ? 'bg-slate-900 text-white border-slate-700'
+                    : 'bg-indigo-600 text-white border-indigo-500';
+
+                toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border ${colorClasses} text-xs font-semibold fade-in`;
+                toast.innerHTML = `
+                    <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>${escapeHtml(message)}</span>
+                `;
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.25s ease';
+                    setTimeout(() => toast.remove(), 250);
+                }, 2600);
+            }
+
+            let modalConfirmCallback = null;
+            function openConfirmModal(title, message, onConfirm) {
+                const overlay = document.getElementById('customModalOverlay');
+                const titleEl = document.getElementById('modalTitle');
+                const msgEl = document.getElementById('modalMessage');
+                titleEl.textContent = title;
+                msgEl.textContent = message;
+                modalConfirmCallback = onConfirm;
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            }
+
+            function closeConfirmModal() {
+                const overlay = document.getElementById('customModalOverlay');
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+                modalConfirmCallback = null;
+            }
+
+            function escapeHtml(str) {
+                return String(str || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            /**
+             * Build the exact formatted text required:
+             * {年}年
+             * 【Monthly】
+             * {月}月
+             * ・ {Monthlyトピック1}
+             * ・ {Monthlyトピック2}
+             *
+             * 【Weekly】
+             * ・{週1の日付範囲}
+             * {週1のメモ・実績}
+             */
+            function generateFormattedReport() {
+                const record = getCurrentRecord();
+                const lines = [];
+
+                lines.push(`${record.year}年`);
+                lines.push(`【Monthly】`);
+                lines.push(`${record.month}月`);
+
+                if (record.monthlyTopics.length === 0) {
+                    lines.push(`・ `);
+                } else {
+                    record.monthlyTopics.forEach(topic => {
+                        const tagPrefix = (appState.includeCategoryInOutput && topic.category)
+                            ? `[${topic.category}] `
+                            : '';
+                        lines.push(`・ ${tagPrefix}${topic.content}`);
+                    });
+                }
+
+                lines.push('');
+                lines.push(`【Weekly】`);
+
+                const weeksToOutput = appState.skipEmptyWeeksInOutput
+                    ? record.weeklyItems.filter(w => (w.memo || '').trim().length > 0)
+                    : record.weeklyItems;
+
+                weeksToOutput.forEach(week => {
+                    const rangeText = (week.range || '').trim() || '日付未設定';
+                    lines.push(`・${rangeText}`);
+                    const memoText = (week.memo || '').trim();
+                    if (memoText) {
+                        lines.push(memoText);
+                    }
+                });
+
+                return lines.join('\n');
+            }
+
+            function updatePreviewAndSummaryHints() {
+                const outputText = generateFormattedReport();
+                const previewEl = document.getElementById('outputPreviewText');
+                const charCountEl = document.getElementById('charCountLabel');
+
+                if (previewEl) {
+                    previewEl.value = outputText;
+                }
+                if (charCountEl) {
+                    charCountEl.textContent = `${outputText.length} 文字`;
+                }
+
+                renderWeeklyCandidatesInHintPanel();
+                renderMonthTabs();
+            }
+
+            function renderYearMonthSelectors() {
+                const yearSelect = document.getElementById('yearSelect');
+                const monthSelect = document.getElementById('monthSelect');
+                const weekStartSelect = document.getElementById('weekStartDaySelect');
+                const includeCatToggle = document.getElementById('includeCategoryToggle');
+                const skipEmptyToggle = document.getElementById('skipEmptyWeeksToggle');
+
+                yearSelect.innerHTML = '';
+                for (let y = 2024; y <= 2030; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = String(y);
+                    opt.textContent = String(y);
+                    if (y === Number(appState.currentYear)) opt.selected = true;
+                    yearSelect.appendChild(opt);
+                }
+
+                monthSelect.innerHTML = '';
+                for (let m = 1; m <= 12; m++) {
+                    const opt = document.createElement('option');
+                    opt.value = String(m);
+                    opt.textContent = String(m);
+                    if (m === Number(appState.currentMonth)) opt.selected = true;
+                    monthSelect.appendChild(opt);
+                }
+
+                weekStartSelect.value = String(appState.weekStartDay);
+                includeCatToggle.checked = Boolean(appState.includeCategoryInOutput);
+                skipEmptyToggle.checked = Boolean(appState.skipEmptyWeeksInOutput);
+            }
+
+            function renderMonthTabs() {
+                const container = document.getElementById('monthTabsContainer');
+                if (!container) return;
+
+                const currentKey = getMonthKey(appState.currentYear, appState.currentMonth);
+
+                // Collect keys that have data OR are adjacent to current month
+                const keysSet = new Set(Object.keys(appState.records));
+                keysSet.add(currentKey);
+
+                const sortedKeys = Array.from(keysSet).filter(k => {
+                    if (k === currentKey) return true;
+                    const rec = appState.records[k];
+                    if (!rec) return false;
+                    const hasMonthly = rec.monthlyTopics && rec.monthlyTopics.length > 0;
+                    const hasWeekly = rec.weeklyItems && rec.weeklyItems.some(w => (w.memo || '').trim().length > 0);
+                    return hasMonthly || hasWeekly;
+                }).sort().reverse();
+
+                container.innerHTML = '';
+                sortedKeys.forEach(key => {
+                    const rec = appState.records[key];
+                    if (!rec) return;
+                    const isActive = key === currentKey;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = isActive
+                        ? 'px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs transition-all shrink-0'
+                        : 'px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all shrink-0';
+                    btn.textContent = `${rec.year}年${rec.month}月`;
+                    btn.addEventListener('click', () => {
+                        switchYearMonth(rec.year, rec.month);
+                    });
+                    container.appendChild(btn);
+                });
+            }
+
+            function renderMonthlySection() {
+                const record = getCurrentRecord();
+                const listContainer = document.getElementById('monthlyListContainer');
+                const countBadge = document.getElementById('monthlyCountBadge');
+
+                countBadge.textContent = `${record.monthlyTopics.length}件`;
+                listContainer.innerHTML = '';
+
+                if (record.monthlyTopics.length === 0) {
+                    listContainer.innerHTML = `
+                        <li class="text-center py-8 px-4 rounded-xl border border-dashed border-slate-200 bg-slate-50/50">
+                            <p class="text-xs font-medium text-slate-500">まだ月次トピックが登録されていません。</p>
+                            <p class="text-[11px] text-slate-400 mt-1">上の入力欄から追加するか、「Weeklyから要約ヒント」で週次メモから取り込めます。</p>
+                        </li>
+                    `;
+                    return;
+                }
+
+                record.monthlyTopics.forEach((topic, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'group flex flex-col sm:flex-row sm:items-center gap-2 p-3 rounded-xl border border-slate-200 bg-white hover:border-indigo-200 hover:shadow-xs transition-all';
+
+                    const badgeStyle = CATEGORY_STYLES[topic.category] || 'bg-slate-100 text-slate-500 border-slate-200';
+
+                    li.innerHTML = `
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-xs font-bold text-indigo-500 select-none">・</span>
+                            <select data-action="change-category" data-index="${index}" class="text-xs font-semibold px-2 py-1 rounded-lg border ${badgeStyle} focus:outline-none cursor-pointer">
+                                <option value="" ${!topic.category ? 'selected' : ''}>タグなし</option>
+                                <option value="施策" ${topic.category === '施策' ? 'selected' : ''}>施策</option>
+                                <option value="什器/運用" ${topic.category === '什器/運用' ? 'selected' : ''}>什器/運用</option>
+                                <option value="実績" ${topic.category === '実績' ? 'selected' : ''}>実績</option>
+                                <option value="課題/改善" ${topic.category === '課題/改善' ? 'selected' : ''}>課題/改善</option>
+                                <option value="共有事項" ${topic.category === '共有事項' ? 'selected' : ''}>共有事項</option>
+                            </select>
+                        </div>
+                        <input
+                            type="text"
+                            data-action="edit-content"
+                            data-index="${index}"
+                            value="${escapeHtml(topic.content)}"
+                            placeholder="トピック内容を入力..."
+                            class="flex-1 text-sm text-slate-800 bg-transparent border-b border-transparent focus:border-indigo-400 focus:bg-slate-50/70 px-2 py-1 rounded-md focus:outline-none transition-colors"
+                        />
+                        <div class="flex items-center justify-end gap-1 shrink-0">
+                            <button type="button" data-action="move-up" data-index="${index}" ${index === 0 ? 'disabled' : ''} class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30 transition-colors" title="上へ移動">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                </svg>
+                            </button>
+                            <button type="button" data-action="move-down" data-index="${index}" ${index === record.monthlyTopics.length - 1 ? 'disabled' : ''} class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30 transition-colors" title="下へ移動">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <button type="button" data-action="delete-topic" data-index="${index}" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="削除">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    listContainer.appendChild(li);
+                });
+            }
+
+            function renderWeeklySection() {
+                const record = getCurrentRecord();
+                const container = document.getElementById('weeklyCardsContainer');
+                const badge = document.getElementById('weeklyCountBadge');
+
+                badge.textContent = `${record.weeklyItems.length}週`;
+                container.innerHTML = '';
+
+                record.weeklyItems.forEach((week, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'rounded-xl border border-slate-200 bg-slate-50/60 p-4 hover:border-emerald-300/80 transition-all space-y-3';
+
+                    card.innerHTML = `
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 flex-1 min-w-[220px]">
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 shrink-0">第${index + 1}週</span>
+                                <div class="flex items-center bg-white border border-slate-300 rounded-xl px-3 py-1.5 flex-1 max-w-xs focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-100">
+                                    <span class="text-xs text-slate-400 mr-1.5 select-none">・</span>
+                                    <input
+                                        type="text"
+                                        data-week-action="edit-range"
+                                        data-index="${index}"
+                                        value="${escapeHtml(week.range)}"
+                                        placeholder="例: 9/28〜10/4"
+                                        class="w-full text-sm font-bold text-slate-800 bg-transparent focus:outline-none"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-1.5">
+                                <button
+                                    type="button"
+                                    data-week-action="promote-to-monthly"
+                                    data-index="${index}"
+                                    class="text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                    title="この週のメモをMonthlyトピックへ引用追加します"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                                    </svg>
+                                    <span>Monthlyへ引用</span>
+                                </button>
+
+                                ${record.weeklyItems.length > 1 ? `
+                                <button
+                                    type="button"
+                                    data-week-action="remove-week"
+                                    data-index="${index}"
+                                    class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                    title="この週枠を削除"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div>
+                            <textarea
+                                rows="3"
+                                data-week-action="edit-memo"
+                                data-index="${index}"
+                                placeholder="その週の実施事項・売場変更・数値実績・振り返りメモを入力..."
+                                class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 focus:outline-none transition-all leading-relaxed"
+                            >${escapeHtml(week.memo)}</textarea>
+                        </div>
+                    `;
+
+                    container.appendChild(card);
+                });
+            }
+
+            // Populate clickable chips in the Summary Hint panel from Weekly lines
+            function renderWeeklyCandidatesInHintPanel() {
+                const candidateContainer = document.getElementById('weeklyCandidateList');
+                if (!candidateContainer) return;
+
+                const record = getCurrentRecord();
+                const candidates = [];
+
+                record.weeklyItems.forEach((week, idx) => {
+                    const rawLines = (week.memo || '').split('\n');
+                    rawLines.forEach(line => {
+                        const cleaned = line.replace(/^[・\-*•\s]+/, '').trim();
+                        if (cleaned.length >= 4) {
+                            candidates.push({
+                                weekLabel: week.range || `第${idx + 1}週`,
+                                text: cleaned
+                            });
+                        }
+                    });
+                });
+
+                candidateContainer.innerHTML = '';
+                if (candidates.length === 0) {
+                    candidateContainer.innerHTML = `<span class="text-xs text-slate-400">Weeklyにメモを入力すると、ここに抽出候補が表示されます。</span>`;
+                    return;
+                }
+
+                candidates.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'text-left text-xs bg-amber-50/90 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-amber-200 hover:border-indigo-300 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 max-w-full';
+                    btn.innerHTML = `
+                        <span class="font-bold text-[10px] px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-200 shrink-0">${escapeHtml(item.weekLabel)}</span>
+                        <span class="truncate">${escapeHtml(item.text)}</span>
+                        <span class="text-indigo-600 font-bold shrink-0">＋</span>
+                    `;
+                    btn.addEventListener('click', () => {
+                        addMonthlyTopic(item.text, '');
+                        showToast('Monthlyトピックに取り込みました');
+                    });
+                    candidateContainer.appendChild(btn);
+                });
+            }
+
+            function renderAll() {
+                renderYearMonthSelectors();
+                renderMonthlySection();
+                renderWeeklySection();
+                updatePreviewAndSummaryHints();
+            }
+
+            function switchYearMonth(year, month) {
+                appState.currentYear = Number(year);
+                appState.currentMonth = Number(month);
+                ensureCurrentRecordExists();
+                saveStateToStorage(true);
+                renderAll();
+            }
+
+            function addMonthlyTopic(content, category = '') {
+                const trimmed = (content || '').trim().replace(/^[・\s]+/, '');
+                if (!trimmed) return;
+
+                const record = getCurrentRecord();
+                record.monthlyTopics.push({
+                    id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                    category: category,
+                    content: trimmed
+                });
+
+                saveStateToStorage(true);
+                renderMonthlySection();
+                updatePreviewAndSummaryHints();
+            }
+
+            function copyReportToClipboard() {
+                const previewEl = document.getElementById('outputPreviewText');
+                if (!previewEl) return;
+
+                previewEl.focus();
+                previewEl.select();
+                previewEl.setSelectionRange(0, previewEl.value.length);
+
+                let copied = false;
+                try {
+                    copied = document.execCommand('copy');
+                } catch (err) {
+                    copied = false;
+                }
+
+                // Clear selection highlight gracefully
+                if (window.getSelection) {
+                    window.getSelection().removeAllRanges();
+                }
+
+                if (copied) {
+                    const copyBtnText = document.getElementById('copyBtnText');
+                    const originalText = copyBtnText.textContent;
+                    copyBtnText.textContent = 'コピー完了しました！';
+                    showToast('提出用フォーマットをクリップボードにコピーしました');
+                    setTimeout(() => {
+                        copyBtnText.textContent = originalText;
+                    }, 2000);
+                } else {
+                    showToast('テキストを選択しました。Ctrl+C / Cmd+C でコピーしてください', 'info');
+                }
+            }
+
+            function downloadReportAsTxt() {
+                const record = getCurrentRecord();
+                const content = generateFormattedReport();
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `定例報告_${record.year}年${record.month}月.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('テキストファイルをダウンロードしました');
+            }
+
+            function setupEventListeners() {
+                // Year & Month change
+                document.getElementById('yearSelect').addEventListener('change', (e) => {
+                    switchYearMonth(Number(e.target.value), appState.currentMonth);
+                });
+
+                document.getElementById('monthSelect').addEventListener('change', (e) => {
+                    switchYearMonth(appState.currentYear, Number(e.target.value));
+                });
+
+                document.getElementById('prevMonthBtn').addEventListener('click', () => {
+                    let y = appState.currentYear;
+                    let m = appState.currentMonth - 1;
+                    if (m < 1) { m = 12; y -= 1; }
+                    switchYearMonth(y, m);
+                });
+
+                document.getElementById('nextMonthBtn').addEventListener('click', () => {
+                    let y = appState.currentYear;
+                    let m = appState.currentMonth + 1;
+                    if (m > 12) { m = 1; y += 1; }
+                    switchYearMonth(y, m);
+                });
+
+                // Toggle Summary Hint Panel
+                const hintPanel = document.getElementById('summaryHintPanel');
+                document.getElementById('toggleHintBtn').addEventListener('click', () => {
+                    hintPanel.classList.toggle('hidden');
+                });
+                document.getElementById('closeHintBtn').addEventListener('click', () => {
+                    hintPanel.classList.add('hidden');
+                });
+
+                // Add Monthly Topic form submit
+                document.getElementById('addMonthlyForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const inputEl = document.getElementById('newTopicInput');
+                    const catEl = document.getElementById('newTopicCategory');
+                    if (!inputEl.value.trim()) return;
+
+                    addMonthlyTopic(inputEl.value, catEl.value);
+                    inputEl.value = '';
+                    inputEl.focus();
+                });
+
+                // Monthly List delegation (edit, category change, move, delete)
+                const monthlyList = document.getElementById('monthlyListContainer');
+                monthlyList.addEventListener('input', (e) => {
+                    const target = e.target;
+                    if (target.dataset.action === 'edit-content') {
+                        const idx = Number(target.dataset.index);
+                        const record = getCurrentRecord();
+                        if (record.monthlyTopics[idx]) {
+                            record.monthlyTopics[idx].content = target.value;
+                            saveStateToStorage(true);
+                            updatePreviewAndSummaryHints();
+                        }
+                    }
+                });
+
+                monthlyList.addEventListener('change', (e) => {
+                    const target = e.target;
+                    if (target.dataset.action === 'change-category') {
+                        const idx = Number(target.dataset.index);
+                        const record = getCurrentRecord();
+                        if (record.monthlyTopics[idx]) {
+                            record.monthlyTopics[idx].category = target.value;
+                            saveStateToStorage(true);
+                            renderMonthlySection();
+                            updatePreviewAndSummaryHints();
+                        }
+                    }
+                });
+
+                monthlyList.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-action]');
+                    if (!btn) return;
+                    const action = btn.dataset.action;
+                    const idx = Number(btn.dataset.index);
+                    const record = getCurrentRecord();
+
+                    if (action === 'delete-topic') {
+                        record.monthlyTopics.splice(idx, 1);
+                        saveStateToStorage(true);
+                        renderMonthlySection();
+                        updatePreviewAndSummaryHints();
+                    } else if (action === 'move-up' && idx > 0) {
+                        const temp = record.monthlyTopics[idx - 1];
+                        record.monthlyTopics[idx - 1] = record.monthlyTopics[idx];
+                        record.monthlyTopics[idx] = temp;
+                        saveStateToStorage(true);
+                        renderMonthlySection();
+                        updatePreviewAndSummaryHints();
+                    } else if (action === 'move-down' && idx < record.monthlyTopics.length - 1) {
+                        const temp = record.monthlyTopics[idx + 1];
+                        record.monthlyTopics[idx + 1] = record.monthlyTopics[idx];
+                        record.monthlyTopics[idx] = temp;
+                        saveStateToStorage(true);
+                        renderMonthlySection();
+                        updatePreviewAndSummaryHints();
+                    }
+                });
+
+                // Weekly Section Controls
+                document.getElementById('weekStartDaySelect').addEventListener('change', (e) => {
+                    appState.weekStartDay = Number(e.target.value);
+                    saveStateToStorage(true);
+                });
+
+                document.getElementById('autoCalcDatesBtn').addEventListener('click', () => {
+                    const record = getCurrentRecord();
+                    const newRanges = calculateMonthWeekRanges(record.year, record.month, appState.weekStartDay);
+
+                    // Update existing cards' ranges while preserving memos
+                    newRanges.forEach((rangeStr, idx) => {
+                        if (record.weeklyItems[idx]) {
+                            record.weeklyItems[idx].range = rangeStr;
+                        } else {
+                            record.weeklyItems.push({
+                                id: `w-${Date.now()}-${idx}`,
+                                range: rangeStr,
+                                memo: ''
+                            });
+                        }
+                    });
+
+                    saveStateToStorage(true);
+                    renderWeeklySection();
+                    updatePreviewAndSummaryHints();
+                    showToast(`${record.year}年${record.month}月の日付範囲を自動計算しました`);
+                });
+
+                document.getElementById('addWeekCardBtn').addEventListener('click', () => {
+                    const record = getCurrentRecord();
+                    record.weeklyItems.push({
+                        id: `w-${Date.now()}`,
+                        range: `${record.month}/〜`,
+                        memo: ''
+                    });
+                    saveStateToStorage(true);
+                    renderWeeklySection();
+                    updatePreviewAndSummaryHints();
+                });
+
+                // Weekly Cards delegation
+                const weeklyContainer = document.getElementById('weeklyCardsContainer');
+                weeklyContainer.addEventListener('input', (e) => {
+                    const target = e.target;
+                    const action = target.dataset.weekAction;
+                    if (!action) return;
+
+                    const idx = Number(target.dataset.index);
+                    const record = getCurrentRecord();
+                    if (!record.weeklyItems[idx]) return;
+
+                    if (action === 'edit-range') {
+                        record.weeklyItems[idx].range = target.value;
+                    } else if (action === 'edit-memo') {
+                        record.weeklyItems[idx].memo = target.value;
+                    }
+                    saveStateToStorage(true);
+                    updatePreviewAndSummaryHints();
+                });
+
+                weeklyContainer.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-week-action]');
+                    if (!btn) return;
+                    const action = btn.dataset.weekAction;
+                    const idx = Number(btn.dataset.index);
+                    const record = getCurrentRecord();
+                    const weekItem = record.weeklyItems[idx];
+                    if (!weekItem) return;
+
+                    if (action === 'remove-week') {
+                        record.weeklyItems.splice(idx, 1);
+                        saveStateToStorage(true);
+                        renderWeeklySection();
+                        updatePreviewAndSummaryHints();
+                    } else if (action === 'promote-to-monthly') {
+                        const rawMemo = (weekItem.memo || '').trim();
+                        if (!rawMemo) {
+                            showToast('引用する週次メモが入力されていません', 'info');
+                            return;
+                        }
+                        // Split lines and add non-empty lines as Monthly topics
+                        const lines = rawMemo.split('\n').map(l => l.replace(/^[・\-*•\s]+/, '').trim()).filter(Boolean);
+                        lines.forEach(line => addMonthlyTopic(line, ''));
+                        showToast(`第${idx + 1}週のメモ（${lines.length}件）をMonthlyへ追加しました`);
+                    }
+                });
+
+                // Output Format Toggles
+                document.getElementById('includeCategoryToggle').addEventListener('change', (e) => {
+                    appState.includeCategoryInOutput = e.target.checked;
+                    saveStateToStorage(true);
+                    updatePreviewAndSummaryHints();
+                });
+
+                document.getElementById('skipEmptyWeeksToggle').addEventListener('change', (e) => {
+                    appState.skipEmptyWeeksInOutput = e.target.checked;
+                    saveStateToStorage(true);
+                    updatePreviewAndSummaryHints();
+                });
+
+                // Copy & Download Buttons
+                document.getElementById('copyOutputBtn').addEventListener('click', copyReportToClipboard);
+                document.getElementById('downloadTxtBtn').addEventListener('click', downloadReportAsTxt);
+
+                // Sample Load & Reset Current Month Buttons
+                document.getElementById('loadSampleBtn').addEventListener('click', () => {
+                    openConfirmModal(
+                        '記入例サンプルの読み込み',
+                        `${appState.currentYear}年${appState.currentMonth}月に店舗・売場向けの定例報告サンプルデータを読み込みますか？（現在の当月データは上書きされます）`,
+                        () => {
+                            const key = getMonthKey(appState.currentYear, appState.currentMonth);
+                            const sample = createSampleRecordFor2026_10();
+                            sample.year = appState.currentYear;
+                            sample.month = appState.currentMonth;
+                            const calcRanges = calculateMonthWeekRanges(appState.currentYear, appState.currentMonth, appState.weekStartDay);
+                            sample.weeklyItems.forEach((w, i) => {
+                                if (calcRanges[i]) w.range = calcRanges[i];
+                            });
+                            appState.records[key] = sample;
+                            saveStateToStorage(true);
+                            renderAll();
+                            showToast('サンプルデータを読み込みました');
+                        }
+                    );
+                });
+
+                document.getElementById('clearMonthBtn').addEventListener('click', () => {
+                    openConfirmModal(
+                        '当月データのリセット',
+                        `${appState.currentYear}年${appState.currentMonth}月の【Monthly】および【Weekly】の入力内容をすべてクリアしますか？`,
+                        () => {
+                            const key = getMonthKey(appState.currentYear, appState.currentMonth);
+                            appState.records[key] = createDefaultRecord(
+                                appState.currentYear,
+                                appState.currentMonth,
+                                appState.weekStartDay
+                            );
+                            saveStateToStorage(true);
+                            renderAll();
+                            showToast('当月の入力内容をリセットしました');
+                        }
+                    );
+                });
+
+                // Modal Buttons
+                document.getElementById('modalCancelBtn').addEventListener('click', closeConfirmModal);
+                document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+                    if (typeof modalConfirmCallback === 'function') {
+                        modalConfirmCallback();
+                    }
+                    closeConfirmModal();
+                });
+            }
+
+            window.addEventListener('DOMContentLoaded', () => {
+                loadStateFromStorage();
+                setupEventListeners();
+                renderAll();
+            });
+        })();
+    </script>
+</body>
+</html>
