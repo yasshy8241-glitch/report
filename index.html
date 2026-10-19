@@ -448,8 +448,12 @@
          SCRIPT BLOCK 1: 定数・祝日/連休判定エンジン・天気取得エンジン・状態管理・一括解析
          ===================================================================== -->
     <script>
-        const STORAGE_KEY = 'periodic_report_topic_manager_v6';
-        const LEGACY_STORAGE_KEYS = ['periodic_report_topic_manager_v5', 'periodic_report_topic_manager_v4'];
+        const STORAGE_KEY = 'periodic_report_topic_manager_v7';
+        const LEGACY_STORAGE_KEYS = [
+            'periodic_report_topic_manager_v6',
+            'periodic_report_topic_manager_v5',
+            'periodic_report_topic_manager_v4'
+        ];
         const DEFAULT_YEAR = 2026;
         const DEFAULT_MONTH = 10;
 
@@ -590,7 +594,6 @@
                 map[key] = name;
             };
 
-            // 固定祝日
             addH(1, 1, '元日');
             addH(2, 11, '建国記念の日');
             addH(2, 23, '天皇誕生日');
@@ -602,19 +605,17 @@
             addH(11, 3, '文化の日');
             addH(11, 23, '勤労感謝の日');
 
-            // ハッピーマンデー
             addH(1, getNthMonday(y, 1, 2), '成人の日');
             addH(7, getNthMonday(y, 7, 3), '海の日');
             addH(9, getNthMonday(y, 9, 3), '敬老の日');
             addH(10, getNthMonday(y, 10, 2), 'スポーツの日');
 
-            // 春分の日・秋分の日
             const vernal = Math.floor(20.8431 + 0.242194 * (y - 1980)) - Math.floor((y - 1980) / 4);
             const autumnal = Math.floor(23.2488 + 0.242194 * (y - 1980)) - Math.floor((y - 1980) / 4);
             addH(3, vernal, '春分の日');
             addH(9, autumnal, '秋分の日');
 
-            // 国民の休日（祝日と祝日に挟まれた平日: 例 2026年9月22日）
+            // 国民の休日（祝日と祝日に挟まれた平日）
             const startCheck = new Date(y, 0, 2);
             const endCheck = new Date(y, 11, 30);
             for (let cur = new Date(startCheck); cur <= endCheck; cur.setDate(cur.getDate() + 1)) {
@@ -628,7 +629,7 @@
                 }
             }
 
-            // 振替休日（日曜が祝日の場合、直後の祝日でない平日を振替休日にする）
+            // 振替休日
             const baseKeys = Object.keys(map).sort();
             baseKeys.forEach(k => {
                 const parts = k.split('-').map(Number);
@@ -658,7 +659,6 @@
             return dow === 0 || dow === 6 || Boolean(getHolidayName(dateObj));
         }
 
-        // 週の文字列 (例: "9/28〜10/4") から7日分のDate配列を生成
         function parseWeekRangeToDates(year, month, rangeStr) {
             const y = Number(year);
             const m = Number(month);
@@ -683,83 +683,85 @@
             return dates;
         }
 
-        // 7日間の祝日・連休（週をまたぐ3連休等も含む）を解析
         function analyzeWeekCalendar(year, month, rangeStr) {
-            const dates = parseWeekRangeToDates(year, month, rangeStr);
-            if (dates.length === 0) {
-                return { dates: [], daysInfo: [], holidays: [],連休List: [], summaryBadges: [] };
-            }
-
-            const daysInfo = dates.map(d => {
-                const dateKey = formatDateKey(d);
-                const dow = d.getDay();
-                const holidayName = getHolidayName(d);
-                return {
-                    date: d,
-                    dateKey,
-                    month: d.getMonth() + 1,
-                    day: d.getDate(),
-                    dow,
-                    dowLabel: DAY_NAMES_JA[dow],
-                    holidayName,
-                    isWeekendOrHoliday: dow === 0 || dow === 6 || Boolean(holidayName)
-                };
-            });
-
-            const holidays = daysInfo.filter(d => Boolean(d.holidayName));
-
-            // 週の前後3日を含めた計13日間で連続休日ブロック（3連休以上）を検出
-            const extStart = new Date(dates[0]);
-            extStart.setDate(extStart.getDate() - 3);
-            const extDays = [];
-            for (let i = 0; i < 13; i++) {
-                const d = new Date(extStart);
-                d.setDate(extStart.getDate() + i);
-                extDays.push({
-                    date: d,
-                    dateKey: formatDateKey(d),
-                    isOff: isOffDay(d),
-                    holidayName: getHolidayName(d)
-                });
-            }
-
-            const weekDateKeys = new Set(daysInfo.map(d => d.dateKey));
-            const blocks = [];
-            let currentBlock = [];
-
-            extDays.forEach(ed => {
-                if (ed.isOff) {
-                    currentBlock.push(ed);
-                } else {
-                    if (currentBlock.length >= 3) blocks.push(currentBlock);
-                    currentBlock = [];
+            try {
+                const dates = parseWeekRangeToDates(year, month, rangeStr);
+                if (dates.length === 0) {
+                    return { dates: [], daysInfo: [], holidays: [], holidayStreaks: [] };
                 }
-            });
-            if (currentBlock.length >= 3) blocks.push(currentBlock);
 
-            // 当該週と重なり、かつ祝日を1日以上含む3連休以上のブロックを抽出
-            const連休List = blocks.filter(blk =>
-                blk.some(b => weekDateKeys.has(b.dateKey)) &&
-                blk.some(b => Boolean(b.holidayName))
-            ).map(blk => {
-                const first = blk[0].date;
-                const last = blk[blk.length - 1].date;
-                const hNames = [...new Set(blk.map(b => b.holidayName).filter(Boolean))];
-                const spanStr = `${first.getMonth() + 1}/${first.getDate()}〜${last.getMonth() + 1}/${last.getDate()}`;
+                const daysInfo = dates.map(d => {
+                    const dateKey = formatDateKey(d);
+                    const dow = d.getDay();
+                    const holidayName = getHolidayName(d);
+                    return {
+                        date: d,
+                        dateKey,
+                        month: d.getMonth() + 1,
+                        day: d.getDate(),
+                        dow,
+                        dowLabel: DAY_NAMES_JA[dow],
+                        holidayName,
+                        isWeekendOrHoliday: dow === 0 || dow === 6 || Boolean(holidayName)
+                    };
+                });
+
+                const holidays = daysInfo.filter(d => Boolean(d.holidayName));
+
+                const extStart = new Date(dates[0]);
+                extStart.setDate(extStart.getDate() - 3);
+                const extDays = [];
+                for (let i = 0; i < 13; i++) {
+                    const d = new Date(extStart);
+                    d.setDate(extStart.getDate() + i);
+                    extDays.push({
+                        date: d,
+                        dateKey: formatDateKey(d),
+                        isOff: isOffDay(d),
+                        holidayName: getHolidayName(d)
+                    });
+                }
+
+                const weekDateKeys = new Set(daysInfo.map(d => d.dateKey));
+                const blocks = [];
+                let currentBlock = [];
+
+                extDays.forEach(ed => {
+                    if (ed.isOff) {
+                        currentBlock.push(ed);
+                    } else {
+                        if (currentBlock.length >= 3) blocks.push(currentBlock);
+                        currentBlock = [];
+                    }
+                });
+                if (currentBlock.length >= 3) blocks.push(currentBlock);
+
+                const holidayStreaks = blocks.filter(blk =>
+                    blk.some(b => weekDateKeys.has(b.dateKey)) &&
+                    blk.some(b => Boolean(b.holidayName))
+                ).map(blk => {
+                    const first = blk[0].date;
+                    const last = blk[blk.length - 1].date;
+                    const hNames = [...new Set(blk.map(b => b.holidayName).filter(Boolean))];
+                    const spanStr = `${first.getMonth() + 1}/${first.getDate()}〜${last.getMonth() + 1}/${last.getDate()}`;
+                    return {
+                        length: blk.length,
+                        spanStr,
+                        holidayNames: hNames,
+                        label: `${blk.length}連休 (${spanStr}${hNames.length ? ' ' + hNames.join('・') : ''})`
+                    };
+                });
+
                 return {
-                    length: blk.length,
-                    spanStr,
-                    holidayNames: hNames,
-                    label: `${blk.length}連休 (${spanStr}${hNames.length ? ' ' + hNames.join('・') : ''})`
+                    dates,
+                    daysInfo,
+                    holidays,
+                    holidayStreaks
                 };
-            });
-
-            return {
-                dates,
-                daysInfo,
-                holidays,
-                連休List
-            };
+            } catch (err) {
+                console.warn('analyzeWeekCalendar error:', err);
+                return { dates: [], daysInfo: [], holidays: [], holidayStreaks: [] };
+            }
         }
 
         // =========================================================
@@ -780,10 +782,8 @@
             return { icon: '⛅', label: '曇', tone: 'cloudy' };
         }
 
-        // サンプル期間（2026年9月・10月 横浜店）の初期天気プリセット（オフライン時でも即座に表示）
         function createDefaultSampleWeatherCache() {
             const sampleYokohama = {
-                // 9/14〜9/20 (シルバーウィーク前半好調)
                 '2026-09-14': { code: 1, max: 29, min: 22, precip: 0 },
                 '2026-09-15': { code: 1, max: 28, min: 21, precip: 0 },
                 '2026-09-16': { code: 2, max: 27, min: 21, precip: 0 },
@@ -791,7 +791,6 @@
                 '2026-09-18': { code: 2, max: 27, min: 20, precip: 0.5 },
                 '2026-09-19': { code: 0, max: 29, min: 21, precip: 0 },
                 '2026-09-20': { code: 1, max: 28, min: 21, precip: 0 },
-                // 9/21〜9/27 (連休後半・台風悪天候を含む週)
                 '2026-09-21': { code: 2, max: 26, min: 19, precip: 0 },
                 '2026-09-22': { code: 3, max: 24, min: 18, precip: 2.0 },
                 '2026-09-23': { code: 63, max: 21, min: 17, precip: 18.5 },
@@ -799,7 +798,6 @@
                 '2026-09-25': { code: 61, max: 22, min: 16, precip: 12.0 },
                 '2026-09-26': { code: 2, max: 25, min: 17, precip: 0 },
                 '2026-09-27': { code: 3, max: 23, min: 17, precip: 1.5 },
-                // 9/28〜10/4 (10月1W: 9月末悪天候・10/1好調)
                 '2026-09-28': { code: 61, max: 20, min: 15, precip: 9.5 },
                 '2026-09-29': { code: 63, max: 19, min: 14, precip: 16.0 },
                 '2026-09-30': { code: 3, max: 22, min: 15, precip: 2.0 },
@@ -807,7 +805,6 @@
                 '2026-10-02': { code: 1, max: 24, min: 16, precip: 0 },
                 '2026-10-03': { code: 2, max: 23, min: 15, precip: 0 },
                 '2026-10-04': { code: 61, max: 19, min: 14, precip: 7.5 },
-                // 10/5〜10/11 (10月2W: 3連休前半・好天)
                 '2026-10-05': { code: 1, max: 23, min: 15, precip: 0 },
                 '2026-10-06': { code: 1, max: 24, min: 15, precip: 0 },
                 '2026-10-07': { code: 2, max: 22, min: 14, precip: 0 },
@@ -815,14 +812,20 @@
                 '2026-10-09': { code: 1, max: 22, min: 14, precip: 0 },
                 '2026-10-10': { code: 0, max: 24, min: 15, precip: 0 },
                 '2026-10-11': { code: 1, max: 23, min: 15, precip: 0 },
-                // 10/12〜10/18 (10月3W: スポーツの日祝日〜週末)
                 '2026-10-12': { code: 1, max: 23, min: 14, precip: 0 },
                 '2026-10-13': { code: 2, max: 22, min: 14, precip: 0 },
                 '2026-10-14': { code: 3, max: 20, min: 13, precip: 0 },
                 '2026-10-15': { code: 61, max: 18, min: 12, precip: 6.5 },
                 '2026-10-16': { code: 1, max: 21, min: 13, precip: 0 },
                 '2026-10-17': { code: 2, max: 21, min: 13, precip: 0 },
-                '2026-10-18': { code: 61, max: 17, min: 12, precip: 8.0 }
+                '2026-10-18': { code: 61, max: 17, min: 12, precip: 8.0 },
+                '2026-10-19': { code: 1, max: 21, min: 13, precip: 0 },
+                '2026-10-20': { code: 1, max: 22, min: 13, precip: 0 },
+                '2026-10-21': { code: 2, max: 20, min: 12, precip: 0 },
+                '2026-10-22': { code: 3, max: 19, min: 12, precip: 1.0 },
+                '2026-10-23': { code: 1, max: 21, min: 13, precip: 0 },
+                '2026-10-24': { code: 0, max: 22, min: 13, precip: 0 },
+                '2026-10-25': { code: 1, max: 21, min: 13, precip: 0 }
             };
             const cache = {};
             Object.keys(sampleYokohama).forEach(dateStr => {
@@ -1041,6 +1044,11 @@
         function hasWeekAnyText(week) {
             if (!week) return false;
             return WEEKLY_TEXT_FIELD_DEFS.some(f => Boolean(week[f.key] && String(week[f.key]).trim()));
+        }
+
+        function hasWeekAnyMetric(week) {
+            if (!week || !week.metrics) return false;
+            return WEEKLY_METRIC_DEFS.some(d => parseMetricNum(week.metrics[d.key]) !== null);
         }
 
         function createSampleMonthlyMetrics2026_10() {
@@ -1403,6 +1411,24 @@
                         });
                     }
                 });
+
+                // 前回エラー発生時にテストクリックで追加された未入力の重複週（6W以降の "10/1〜10/7" 等）を自動クリーンアップ
+                const placeholderRange = `${Number(month)}/1〜${Number(month)}/7`;
+                safe.weeklyItems = safe.weeklyItems.filter((w, idx) => {
+                    if (idx >= 5 && w.range === placeholderRange && !hasWeekAnyMetric(w) && !hasWeekAnyText(w)) {
+                        return false;
+                    }
+                    return true;
+                });
+
+                // 2026年10月の3Wのサンプル初期データが空になっていた場合は復元補完
+                if (Number(year) === 2026 && Number(month) === 10 && safe.weeklyItems[2]) {
+                    const w3 = safe.weeklyItems[2];
+                    if (!hasWeekAnyMetric(w3) && !hasWeekAnyText(w3)) {
+                        const sample10 = createSampleRecord2026_10();
+                        safe.weeklyItems[2] = sample10.weeklyItems[2];
+                    }
+                }
             }
 
             return safe;
@@ -1649,29 +1675,26 @@
         function getWeatherEntryForDate(locKey, dateKey) {
             const direct = appState.weatherCache?.[`${locKey}_${dateKey}`];
             if (direct) return direct;
-            // 横浜のプリセットがある場合は他関東エリア等の初期フォールバックとしても利用可能
             const fallbackYokohama = appState.weatherCache?.[`yokohama_${dateKey}`];
             return fallbackYokohama || null;
         }
 
-        // 各週の「天気・祝日・連休コンテキストバー」HTMLと分析サマリー文を生成
-        function buildWeekWeatherAndCalendarHtml(record, week, idx) {
+        function buildWeekWeatherAndCalendarHtml(record, week) {
             const cal = analyzeWeekCalendar(record.year, record.month, week.range);
-            if (cal.daysInfo.length === 0) return '';
+            if (!cal || cal.daysInfo.length === 0) return '';
 
             const locObj = WEATHER_LOCATIONS.find(l => l.key === appState.weatherLocationKey) || WEATHER_LOCATIONS[0];
 
-            // 連休・祝日バッジの生成
             const badgesHtml = [];
-            cal.連休List.forEach(renkyu => {
+            cal.holidayStreaks.forEach(streak => {
                 badgesHtml.push(`
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs">
-                        <span>🎉 ${escapeHtml(renkyu.label)}</span>
+                        <span>🎉 ${escapeHtml(streak.label)}</span>
                     </span>
                 `);
             });
 
-            if (cal.連休List.length === 0 && cal.holidays.length > 0) {
+            if (cal.holidayStreaks.length === 0 && cal.holidays.length > 0) {
                 const hText = cal.holidays.map(h => `${h.month}/${h.day}(${h.holidayName})`).join('・');
                 badgesHtml.push(`
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-50 text-rose-700 border border-rose-200">
@@ -1680,7 +1703,6 @@
                 `);
             }
 
-            // 天気データの集計（週末・祝日の雨天判定など）
             let hasAnyWeather = false;
             const weekendOrHolidayRainDays = [];
             const allRainDays = [];
@@ -1748,7 +1770,6 @@
                 `;
             }).join('');
 
-            // 天気サマリーバッジの追加
             if (hasAnyWeather) {
                 if (weekendOrHolidayRainDays.length > 0) {
                     const rNames = weekendOrHolidayRainDays.map(r => r.dayDesc).join('・');
@@ -1774,10 +1795,9 @@
                 }
             }
 
-            // 「数値の変化理由」へ1タップ挿入する分析文の組み立て
             const insightParts = [];
-            if (cal.連休List.length > 0) {
-                insightParts.push(`${cal.連休List.map(r => r.label).join('、')}のカレンダー要因`);
+            if (cal.holidayStreaks.length > 0) {
+                insightParts.push(`${cal.holidayStreaks.map(r => r.label).join('、')}のカレンダー要因`);
             } else if (cal.holidays.length > 0) {
                 insightParts.push(`祝日（${cal.holidays.map(h => `${h.month}/${h.day} ${h.holidayName}`).join('・')}）`);
             }
@@ -2202,6 +2222,13 @@
             const container = document.getElementById('weekFocusTabsContainer');
             if (!container) return;
 
+            if (appState.selectedWeekFilter !== 'all') {
+                const idxNum = Number(appState.selectedWeekFilter);
+                if (!Number.isInteger(idxNum) || idxNum < 0 || idxNum >= record.weeklyItems.length) {
+                    appState.selectedWeekFilter = 'all';
+                }
+            }
+
             const isAll = appState.selectedWeekFilter === 'all';
             let html = `
                 <button type="button" data-week-filter="all"
@@ -2212,14 +2239,14 @@
 
             record.weeklyItems.forEach((w, idx) => {
                 const active = String(appState.selectedWeekFilter) === String(idx);
-                const hasData = Boolean(hasWeekAnyText(w) || WEEKLY_METRIC_DEFS.some(d => parseMetricNum(w.metrics?.[d.key]) !== null));
+                const hasData = Boolean(hasWeekAnyText(w) || hasWeekAnyMetric(w));
                 const cal = analyzeWeekCalendar(record.year, record.month, w.range);
-                const hasHolidayOrRenkyu = cal.連休List.length > 0 || cal.holidays.length > 0;
+                const hasHolidayOrStreak = cal.holidayStreaks.length > 0 || cal.holidays.length > 0;
                 html += `
                     <button type="button" data-week-filter="${idx}"
                         class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${active ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}">
                         <span>${idx + 1}W (${escapeHtml(w.range)})</span>
-                        ${hasHolidayOrRenkyu ? `<span class="text-[10px] ${active ? 'text-rose-200' : 'text-rose-600'}" title="祝日・連休あり">🎌</span>` : ''}
+                        ${hasHolidayOrStreak ? `<span class="text-[10px] ${active ? 'text-rose-200' : 'text-rose-600'}" title="祝日・連休あり">🎌</span>` : ''}
                         ${hasData ? `<span class="w-1.5 h-1.5 rounded-full ${active ? 'bg-white' : 'bg-emerald-500'}"></span>` : ''}
                     </button>
                 `;
@@ -2321,8 +2348,7 @@
             renderWeeklyMetricsMatrix();
 
             const filledCount = record.weeklyItems.filter(w =>
-                hasWeekAnyText(w) ||
-                WEEKLY_METRIC_DEFS.some(d => parseMetricNum(w.metrics?.[d.key]) !== null)
+                hasWeekAnyText(w) || hasWeekAnyMetric(w)
             ).length;
 
             if (filledBadge) {
@@ -2337,7 +2363,7 @@
 
                 const prevCtx = getPreviousWeekContext(record, idx);
                 const isMetricsCollapsed = Boolean(appState.collapsedMetricsWeeks[week.id]);
-                const weatherCalendarBarHtml = buildWeekWeatherAndCalendarHtml(record, week, idx);
+                const weatherCalendarBarHtml = buildWeekWeatherAndCalendarHtml(record, week);
 
                 const metricRowsHtml = WEEKLY_METRIC_DEFS.map(def => {
                     const currRaw = week.metrics ? week.metrics[def.key] : '';
@@ -2527,7 +2553,7 @@
 
             record.weeklyItems.forEach((week, idx) => {
                 const hasText = hasWeekAnyText(week);
-                const hasMetrics = WEEKLY_METRIC_DEFS.some(d => parseMetricNum(week.metrics?.[d.key]) !== null);
+                const hasMetrics = hasWeekAnyMetric(week);
                 if (appState.skipEmptyWeeksInOutput && !hasText && !hasMetrics) {
                     return;
                 }
@@ -2781,7 +2807,6 @@
             }, 2500);
         }
 
-        // Open-Meteo API から当月すべての週の天気を取得（過去アーカイブAPI ＆ 予報API 自動切替）
         async function fetchWeatherForCurrentMonth(silent = false) {
             const record = getCurrentRecord();
             const locObj = WEATHER_LOCATIONS.find(l => l.key === appState.weatherLocationKey) || WEATHER_LOCATIONS[0];
@@ -3166,7 +3191,6 @@
                 showToast('2026年10月・9月のサンプルデータを復元しました');
             });
 
-            // 天気エリア切替・取得ボタン
             document.getElementById('weatherLocationSelect').addEventListener('change', (e) => {
                 appState.weatherLocationKey = e.target.value;
                 saveStateToStorage();
@@ -3480,6 +3504,10 @@
                         });
                     }
                 });
+                // 余分な空の週があればカレンダー週数に合わせて整理
+                if (record.weeklyItems.length > ranges.length) {
+                    record.weeklyItems = record.weeklyItems.filter((w, idx) => idx < ranges.length || hasWeekAnyMetric(w) || hasWeekAnyText(w));
+                }
                 saveStateToStorage();
                 renderWeeklySection();
                 updatePreviewAndSummaryHints();
@@ -3488,9 +3516,21 @@
 
             document.getElementById('addWeekCardBtn').addEventListener('click', () => {
                 const record = getCurrentRecord();
+                let nextRange = `${record.month}/1〜${record.month}/7`;
+                const lastWeek = record.weeklyItems[record.weeklyItems.length - 1];
+                if (lastWeek) {
+                    const lastDates = parseWeekRangeToDates(record.year, record.month, lastWeek.range);
+                    if (lastDates.length === 7) {
+                        const s = new Date(lastDates[6]);
+                        s.setDate(s.getDate() + 1);
+                        const e = new Date(s);
+                        e.setDate(s.getDate() + 6);
+                        nextRange = `${s.getMonth() + 1}/${s.getDate()}〜${e.getMonth() + 1}/${e.getDate()}`;
+                    }
+                }
                 record.weeklyItems.push({
                     id: `w-${Date.now()}`,
-                    range: `${record.month}/1〜${record.month}/7`,
+                    range: nextRange,
                     metrics: createEmptyWeeklyMetrics(),
                     changeReason: '',
                     topics: '',
@@ -3500,6 +3540,7 @@
                 saveStateToStorage();
                 renderWeeklySection();
                 updatePreviewAndSummaryHints();
+                showToast(`新しい週（${nextRange}）を追加しました`);
             });
 
             document.getElementById('weekFocusTabsContainer').addEventListener('click', (e) => {
@@ -3569,7 +3610,6 @@
                 }
             });
 
-            // 日付範囲inputの変更完了時にカレンダー・祝日バーを再描画
             weeklyContainer.addEventListener('change', (e) => {
                 if (e.target.dataset.weekAction === 'edit-range') {
                     renderWeeklySection();
