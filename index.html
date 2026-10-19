@@ -12,7 +12,7 @@
                     screens: {
                         'xs': '420px',
                         'fold': '680px',
-                        'uw': '1850px'
+                        'uw': '1800px'
                     },
                     fontFamily: {
                         sans: ['"Inter"', '"Hiragino Kaku Gothic ProN"', '"Noto Sans JP"', 'sans-serif'],
@@ -50,27 +50,44 @@
             -webkit-appearance: none;
             margin: 0;
         }
-        /* ウルトラワイド検知時の専用最適化スタイル */
+        /* ウルトラワイド検知時の専用最適化スタイル（週カードは縦1列のまま、内部のコンテンツ比率を最適化） */
+        body.is-ultrawide .uw-container {
+            max-width: 2160px;
+        }
+        body.is-ultrawide .uw-weekly-body-row {
+            align-items: stretch !important;
+        }
+        body.is-ultrawide .uw-weekly-metrics-col {
+            width: 430px !important;
+        }
         body.is-ultrawide .uw-weekly-fields-grid {
             display: grid !important;
             grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            gap: 0.85rem !important;
+            gap: 1rem !important;
+            align-content: stretch !important;
         }
         body.is-ultrawide .uw-weekly-fields-grid > div {
             margin-top: 0 !important;
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
         body.is-ultrawide .uw-weekly-fields-grid textarea {
             flex: 1;
-            min-height: 120px;
+            min-height: 220px;
+            font-size: 0.875rem;
+            line-height: 1.65;
+        }
+        body.is-ultrawide .uw-day-pill {
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col pb-20 md:pb-8">
 
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
-        <div class="w-full max-w-[2400px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
+        <div class="w-full uw-container max-w-[1920px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
             <!-- Brand, Title & Store Switcher -->
             <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
                 <div class="flex items-center gap-2">
@@ -84,7 +101,7 @@
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>自動保存済
                             </span>
                             <span id="ultrawideBadge" class="hidden items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 shrink-0">
-                                🖥️ ウルトラワイド最適化中
+                                🖥️ ワイド画面比率最適化中
                             </span>
                         </div>
                         <p class="text-[11px] text-slate-500 hidden md:block">店舗別管理・Monthly（定量実績・達成評価）＆ Weekly（先週比・スパークライン・天気/祝日分析）</p>
@@ -141,7 +158,7 @@
 
         <!-- Secondary Sub-bar: Main View Tabs & Saved Month Quick Tabs -->
         <div class="w-full border-t border-slate-200/80 bg-slate-50/95">
-            <div class="w-full max-w-[2400px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2">
+            <div class="w-full uw-container max-w-[1920px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2">
                 <!-- Primary Tab Navigation -->
                 <div class="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl text-xs font-extrabold overflow-x-auto max-w-full custom-scrollbar">
                     <button type="button" data-section-filter="all" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
@@ -167,7 +184,7 @@
         </div>
     </header>
 
-    <main class="w-full max-w-[2400px] mx-auto px-2 sm:px-6 lg:px-8 pt-3 sm:pt-4 flex-1">
+    <main class="w-full uw-container max-w-[1920px] mx-auto px-2 sm:px-6 lg:px-8 pt-3 sm:pt-4 flex-1">
 
         <!-- WORKSPACE CONTAINER -->
         <div id="editorPaneContainer" class="grid grid-cols-1 gap-4 sm:gap-5 items-start min-w-0">
@@ -288,7 +305,7 @@
                                 <span id="weeklyStoreLabelBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200"></span>
                                 <span id="weeklyFilledBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0">0/5週</span>
                             </h2>
-                            <p class="text-[11px] text-slate-500 hidden xs:block">週間天気・祝日/連休の自動判定と、「変化理由」「トピック」「課題解決アクション」を週ごとに管理</p>
+                            <p class="text-[11px] text-slate-500 hidden xs:block">週間天気・祝日/連休の自動判定と、「変化理由」「トピック」「課題解決アクション」を週ごとに縦並びで管理</p>
                         </div>
                     </div>
 
@@ -336,8 +353,8 @@
                     <span class="text-[11px] text-slate-400 shrink-0 hidden md:inline">※各入力欄の横にある「×」で個別クリア、「値リセット」で週の数値を一括クリアできます</span>
                 </div>
 
-                <!-- Weekly Cards List -->
-                <div id="weeklyCardsContainer" class="p-2 sm:p-5 grid grid-cols-1 gap-4"></div>
+                <!-- Weekly Cards List (Always stacked vertically in 1 column) -->
+                <div id="weeklyCardsContainer" class="p-2 sm:p-5 space-y-4"></div>
             </section>
         </div>
 
@@ -401,7 +418,7 @@
         </section>
     </main>
 
-    <!-- STORE MANAGEMENT MODAL (複数店舗の登録・切り替え・編集・削除) -->
+    <!-- STORE MANAGEMENT MODAL -->
     <div id="storeManagerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div class="px-4 sm:px-5 py-3.5 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2">
@@ -535,8 +552,9 @@
          SCRIPT BLOCK 1: 定数・複数店舗状態管理・祝日/天気エンジン・一括解析ロジック
          ===================================================================== -->
     <script>
-        const STORAGE_KEY = 'periodic_report_topic_manager_v9';
+        const STORAGE_KEY = 'periodic_report_topic_manager_v10';
         const LEGACY_STORAGE_KEYS = [
+            'periodic_report_topic_manager_v9',
             'periodic_report_topic_manager_v8',
             'periodic_report_topic_manager_v7',
             'periodic_report_topic_manager_v6',
@@ -661,9 +679,6 @@
             return `${y}-${m}-${d}`;
         }
 
-        // =========================================================
-        // 日本の祝日・振替休日・国民の休日・連休 判定エンジン
-        // =========================================================
         const holidayMapCache = {};
 
         function getNthMonday(year, month, nth) {
@@ -1577,7 +1592,6 @@
                 console.warn('localStorage load error:', err);
             }
 
-            // 旧バージョンの単一店舗 records を storeRecords['store-yokohama'] に移行
             if (!Array.isArray(appState.stores) || appState.stores.length === 0) {
                 appState.stores = [
                     { id: 'store-yokohama', name: '横浜店', weatherLocationKey: appState.weatherLocationKey || 'yokohama' }
@@ -1800,7 +1814,7 @@
         }
     </script>
     <!-- =====================================================================
-         SCRIPT BLOCK 2: UI描画（インライン・スパークライン生成・ウルトラワイド最適化・店舗描画）
+         SCRIPT BLOCK 2: UI描画（インライン・スパークライン・縦1列ウルトラワイド最適化・店舗描画）
          ===================================================================== -->
     <script>
         function getWeatherEntryForDate(locKey, dateKey) {
@@ -1811,7 +1825,7 @@
         }
 
         // 週次推移マトリクス用 インライン・スパークライン（折れ線＋ミニバー）SVG生成
-        function buildInlineSparklineHtml(values, type) {
+        function buildInlineSparklineHtml(values) {
             const validEntries = values
                 .map((v, idx) => ({ val: parseMetricNum(v), idx }))
                 .filter(e => e.val !== null);
@@ -1826,7 +1840,6 @@
             const maxVal = Math.max(...nums);
             const span = maxVal - minVal > 0.0001 ? maxVal - minVal : 1;
 
-            // 1. ミニ折れ線（エリア塗りつぶし付き）SVG (幅78px x 高さ26px)
             const w = 78;
             const h = 26;
             const padX = 5;
@@ -1856,7 +1869,6 @@
                 return `<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="${isLast ? strokeColor : '#ffffff'}" stroke="${strokeColor}" stroke-width="1.4" />`;
             }).join('');
 
-            // 2. ミニバーSVG (幅60px x 高さ24px)
             const bw = 60;
             const bh = 24;
             const slotW = bw / totalSlots;
@@ -1946,9 +1958,9 @@
                         : '';
 
                     weatherHtml = `
-                        <div class="flex items-center justify-center gap-0.5 mt-0.5">
+                        <div class="flex items-center justify-center gap-1 mt-0.5">
                             <span class="text-xs sm:text-sm leading-none" title="${escapeHtml(meta.label)}">${meta.icon}</span>
-                            <span class="text-[10px] font-mono font-bold text-slate-700">${Math.round(w.max)}°<span class="text-slate-400 font-normal">/${Math.round(w.min)}°</span></span>
+                            <span class="text-[10px] sm:text-[11px] font-mono font-bold text-slate-700">${Math.round(w.max)}°<span class="text-slate-400 font-normal">/${Math.round(w.min)}°</span></span>
                         </div>
                         <div class="h-3.5 flex items-center justify-center mt-0.5">
                             ${precipBadge || `<span class="text-[9px] text-slate-400 truncate max-w-full">${escapeHtml(meta.label)}</span>`}
@@ -1971,8 +1983,8 @@
                             : 'bg-white border-slate-200/90';
 
                 return `
-                    <div class="w-[62px] shrink-0 fold:w-auto fold:flex-1 rounded-lg border ${cardBgClass} px-1 py-1 text-center flex flex-col justify-between">
-                        <div class="flex items-center justify-center gap-0.5 text-[10px] ${dayColorClass} leading-tight whitespace-nowrap">
+                    <div class="uw-day-pill w-[62px] shrink-0 fold:w-auto fold:flex-1 rounded-lg border ${cardBgClass} px-1.5 py-1 text-center flex flex-col justify-between">
+                        <div class="flex items-center justify-center gap-0.5 text-[10px] sm:text-[11px] ${dayColorClass} leading-tight whitespace-nowrap">
                             <span class="font-mono">${d.month}/${d.day}</span>
                             <span>(${d.dowLabel})</span>
                         </div>
@@ -2467,7 +2479,6 @@
             container.innerHTML = html;
         }
 
-        // 週次推移マトリクス ＋ 右端の「インライン・スパークライン（折れ線＋ミニバー）」列描画
         function renderWeeklyMetricsMatrix() {
             const panel = document.getElementById('weeklyMetricsMatrixPanel');
             const container = document.getElementById('weeklyMetricsMatrixContainer');
@@ -2515,7 +2526,7 @@
 
                 const sparklineCell = `
                     <td class="px-2 py-1 text-center bg-white align-middle">
-                        ${buildInlineSparklineHtml(seriesValues, def.type)}
+                        ${buildInlineSparklineHtml(seriesValues)}
                     </td>
                 `;
 
@@ -2563,7 +2574,7 @@
                             title="「${escapeHtml(fieldDef.defaultCategory)}」タグでMonthlyトピックに追加"
                         >
                             <span class="font-bold text-indigo-600 shrink-0">＋</span>
-                            <span class="truncate max-w-[180px] xs:max-w-[240px] sm:max-w-[340px]">${escapeHtml(line)}</span>
+                            <span class="truncate max-w-[180px] xs:max-w-[240px] sm:max-w-[300px]">${escapeHtml(line)}</span>
                         </button>
                     `).join('')}
                 </div>
@@ -2616,10 +2627,10 @@
 
                     return `
                         <tr class="border-b border-slate-200/80 last:border-b-0 hover:bg-slate-50/70 group">
-                            <td class="px-1.5 sm:px-2 py-1.5 font-bold text-slate-700 text-[11px] sm:text-xs truncate" title="${escapeHtml(def.label)}">${escapeHtml(def.label)}</td>
+                            <td class="px-1.5 sm:px-2.5 py-1.5 font-bold text-slate-700 text-[11px] sm:text-xs truncate" title="${escapeHtml(def.label)}">${escapeHtml(def.label)}</td>
                             <td class="px-1 sm:px-1.5 py-1.5 text-right font-mono text-[11px] sm:text-xs text-slate-500 whitespace-nowrap">${formatWeeklyMetricValue(prevRaw, def.type)}</td>
                             <td class="px-1 sm:px-1.5 py-1 text-right">
-                                <div class="inline-flex items-center justify-end gap-0.5 w-full max-w-[92px] ml-auto">
+                                <div class="inline-flex items-center justify-end gap-0.5 w-full max-w-[96px] ml-auto">
                                     <input
                                         type="text"
                                         inputmode="decimal"
@@ -2640,7 +2651,7 @@
                                     >✕</button>
                                 </div>
                             </td>
-                            <td data-weekly-diff-cell="${week.id}-${def.key}" class="px-1 sm:px-1.5 py-1.5 text-right font-mono text-[10px] sm:text-[11px]">
+                            <td data-weekly-diff-cell="${week.id}-${def.key}" class="px-1 sm:px-2 py-1.5 text-right font-mono text-[10px] sm:text-[11px]">
                                 <span class="inline-block px-1 sm:px-1.5 py-0.5 rounded-md border ${badgeClass} text-[9px] xs:text-[10px] whitespace-nowrap max-w-full truncate">
                                     ${escapeHtml(diff.text)}
                                 </span>
@@ -2652,21 +2663,21 @@
                 const threeFieldsHtml = WEEKLY_TEXT_FIELD_DEFS.map(fieldDef => {
                     const val = week[fieldDef.key] || '';
                     return `
-                        <div class="rounded-xl border border-slate-200/90 bg-slate-50/50 p-2.5 sm:p-3 space-y-1.5">
+                        <div class="rounded-xl border border-slate-200/90 bg-slate-50/50 p-2.5 sm:p-3.5 space-y-1.5">
                             <div class="flex items-center justify-between gap-1.5 flex-wrap">
-                                <label class="inline-flex items-center gap-1 text-xs font-extrabold text-slate-800">
+                                <label class="inline-flex items-center gap-1 text-xs sm:text-[13px] font-extrabold text-slate-800">
                                     <span>${fieldDef.icon}</span>
                                     <span>${escapeHtml(fieldDef.label)}</span>
                                 </label>
                                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${fieldDef.badgeClass}">${escapeHtml(fieldDef.defaultCategory)}</span>
                             </div>
                             <textarea
-                                rows="3"
+                                rows="4"
                                 data-week-action="edit-text-field"
                                 data-week-id="${week.id}"
                                 data-week-field="${fieldDef.key}"
                                 placeholder="${escapeHtml(fieldDef.placeholder)}"
-                                class="w-full rounded-lg border border-slate-300 bg-white p-2 sm:p-2.5 text-xs sm:text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 ${fieldDef.borderFocusClass} focus:outline-none transition-colors"
+                                class="w-full rounded-lg border border-slate-300 bg-white p-2.5 sm:p-3 text-xs sm:text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 ${fieldDef.borderFocusClass} focus:outline-none transition-colors"
                             >${escapeHtml(val)}</textarea>
                             <div data-week-chips-container="${week.id}-${fieldDef.key}">
                                 ${buildWeeklyPromoteChipsHtml(week, fieldDef)}
@@ -2676,7 +2687,7 @@
                 }).join('');
 
                 return `
-                    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col">
+                    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <!-- Card Header -->
                         <div class="px-2.5 sm:px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-col xs:flex-row xs:items-center justify-between gap-2">
                             <div class="flex items-center justify-between xs:justify-start gap-1.5">
@@ -2724,21 +2735,21 @@
                         </div>
 
                         <!-- Card Body -->
-                        <div class="p-2.5 sm:p-5 flex-1">
+                        <div class="p-2.5 sm:p-5">
                             <!-- 週間カレンダー（祝日・連休）＆ 天気コンテキストバー -->
                             ${weatherCalendarBarHtml}
 
-                            <div class="flex flex-col lg:flex-row gap-3.5 lg:gap-5 items-stretch lg:items-start">
+                            <div class="uw-weekly-body-row flex flex-col lg:flex-row gap-3.5 lg:gap-5 items-stretch lg:items-start">
                                 <!-- Metrics Table -->
-                                <div class="${isMetricsCollapsed ? 'hidden' : 'w-full lg:w-[375px] xl:w-[395px] shrink-0'} min-w-0">
-                                    <div class="w-full rounded-xl border border-slate-200 overflow-x-auto bg-white custom-scrollbar">
+                                <div class="${isMetricsCollapsed ? 'hidden' : 'uw-weekly-metrics-col w-full lg:w-[380px] xl:w-[400px] shrink-0'} min-w-0">
+                                    <div class="w-full h-full rounded-xl border border-slate-200 overflow-x-auto bg-white custom-scrollbar">
                                         <table class="w-full table-fixed border-collapse text-xs">
                                             <thead>
                                                 <tr class="bg-slate-100 border-b border-slate-200 text-[10px] sm:text-[11px] font-extrabold text-slate-700">
-                                                    <th class="w-[30%] sm:w-[114px] px-1.5 sm:px-2 py-2 text-left truncate">項目</th>
-                                                    <th class="w-[16%] sm:w-[56px] px-1 sm:px-1.5 py-2 text-right truncate">先週</th>
-                                                    <th class="w-[27%] sm:w-[98px] px-1 sm:px-1.5 py-2 text-right text-emerald-800 truncate">今週の値</th>
-                                                    <th class="w-[27%] sm:w-[104px] px-1 sm:px-1.5 py-2 text-right truncate">先週比</th>
+                                                    <th class="w-[30%] sm:w-[116px] px-1.5 sm:px-2.5 py-2 text-left truncate">項目</th>
+                                                    <th class="w-[16%] sm:w-[58px] px-1 sm:px-1.5 py-2 text-right truncate">先週</th>
+                                                    <th class="w-[27%] sm:w-[100px] px-1 sm:px-1.5 py-2 text-right text-emerald-800 truncate">今週の値</th>
+                                                    <th class="w-[27%] sm:w-[106px] px-1 sm:px-2 py-2 text-right truncate">先週比</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -2748,7 +2759,7 @@
                                     </div>
                                 </div>
 
-                                <!-- 3 Divided Weekly Input Fields (Automatically becomes 3-col side-by-side on Ultrawide monitors) -->
+                                <!-- 3 Divided Weekly Input Fields (Side-by-side 3 columns on Ultrawide while keeping cards stacked vertically) -->
                                 <div class="uw-weekly-fields-grid flex-1 min-w-0 w-full space-y-2.5 sm:space-y-3">
                                     ${threeFieldsHtml}
                                 </div>
@@ -3039,7 +3050,7 @@
             }).join('');
         }
 
-        // ウルトラワイドモニターの比率・横幅検知＆自動レイアウト調整
+        // ウルトラワイドモニターの比率・横幅検知（週カードは常に縦1列に配置し、内部コンテンツのサイズ比率のみを自動調整）
         function applyLayoutAndSectionFilters() {
             const monthlyCard = document.getElementById('monthlySectionCard');
             const weeklyCard = document.getElementById('weeklySectionCard');
@@ -3047,15 +3058,14 @@
             const previewPane = document.getElementById('previewPaneContainer');
             const evalContainer = document.getElementById('monthlyEvalCardsContainer');
             const layoutModeGroup = document.getElementById('layoutModeGroup');
-            const weeklyCardsContainer = document.getElementById('weeklyCardsContainer');
             const ultrawideBadge = document.getElementById('ultrawideBadge');
 
             const vw = window.innerWidth || 1024;
             const vh = window.innerHeight || 768;
             const aspect = vw / Math.max(vh, 1);
 
-            // ウルトラワイド判定 (横幅1850px以上、または 横幅1550px以上 かつ アスペクト比1.95以上)
-            const isUltrawide = vw >= 1850 || (vw >= 1550 && aspect >= 1.95);
+            const isSplitBoth = appState.layoutMode === 'split' && appState.sectionFilter === 'all';
+            const isUltrawide = !isSplitBoth && (vw >= 1750 || (vw >= 1480 && aspect >= 1.9));
             document.body.classList.toggle('is-ultrawide', isUltrawide);
 
             if (ultrawideBadge) {
@@ -3087,17 +3097,6 @@
                 }
                 if (monthlyCard) monthlyCard.classList.toggle('hidden', appState.sectionFilter === 'weekly');
                 if (weeklyCard) weeklyCard.classList.toggle('hidden', appState.sectionFilter === 'monthly');
-            }
-
-            // 超ワイドモニター（2250px以上）で「全週表示」かつ分割でない場合は週カードを2列グリッド化
-            if (weeklyCardsContainer) {
-                const isSingleWeekFocused = appState.selectedWeekFilter !== 'all';
-                const isSplitAll = appState.layoutMode === 'split' && appState.sectionFilter === 'all';
-                if (vw >= 2250 && !isSingleWeekFocused && !isSplitAll) {
-                    weeklyCardsContainer.className = 'p-2 sm:p-5 grid grid-cols-1 xl:grid-cols-2 gap-5 items-start';
-                } else {
-                    weeklyCardsContainer.className = 'p-2 sm:p-5 grid grid-cols-1 gap-4';
-                }
             }
 
             document.querySelectorAll('.section-filter-btn').forEach(btn => {
@@ -3501,7 +3500,6 @@
         }
 
         function bindEvents() {
-            // Store Selector & Store Manager Modal
             document.getElementById('storeSelect').addEventListener('change', (e) => {
                 switchStore(e.target.value);
             });
@@ -3697,7 +3695,6 @@
 
             window.addEventListener('resize', applyLayoutAndSectionFilters);
 
-            // Bulk Paste Modal Events
             document.getElementById('openMonthlyBulkPasteBtn').addEventListener('click', () => {
                 openBulkPasteModal('monthly', { monthlyTarget: 'all_auto' });
             });
