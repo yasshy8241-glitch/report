@@ -11,7 +11,8 @@
                 extend: {
                     screens: {
                         'xs': '420px',
-                        'fold': '680px'
+                        'fold': '680px',
+                        'uw': '1850px'
                     },
                     fontFamily: {
                         sans: ['"Inter"', '"Hiragino Kaku Gothic ProN"', '"Noto Sans JP"', 'sans-serif'],
@@ -49,25 +50,54 @@
             -webkit-appearance: none;
             margin: 0;
         }
+        /* ウルトラワイド検知時の専用最適化スタイル */
+        body.is-ultrawide .uw-weekly-fields-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 0.85rem !important;
+        }
+        body.is-ultrawide .uw-weekly-fields-grid > div {
+            margin-top: 0 !important;
+            display: flex;
+            flex-direction: column;
+        }
+        body.is-ultrawide .uw-weekly-fields-grid textarea {
+            flex: 1;
+            min-height: 120px;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col pb-20 md:pb-8">
 
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
-        <div class="w-full px-2.5 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
-            <!-- Brand & Title -->
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-sm font-extrabold text-xs sm:text-sm shrink-0">
-                    定例
-                </div>
-                <div class="min-w-0">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <h1 class="text-xs xs:text-sm sm:text-base font-extrabold text-slate-900 tracking-tight truncate">定例報告トピック管理＆出力ツール</h1>
-                        <span id="saveStatusBadge" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>自動保存済
-                        </span>
+        <div class="w-full max-w-[2400px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            <!-- Brand, Title & Store Switcher -->
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-sm font-extrabold text-xs sm:text-sm shrink-0">
+                        定例
                     </div>
-                    <p class="text-[11px] text-slate-500 hidden md:block">Monthly（定量実績・昨対比・達成評価・トピック）＆ Weekly（先週比・天気/祝日分析・3項目メモ）を一元管理</p>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <h1 class="text-xs xs:text-sm sm:text-base font-extrabold text-slate-900 tracking-tight truncate">定例報告トピック管理＆出力ツール</h1>
+                            <span id="saveStatusBadge" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>自動保存済
+                            </span>
+                            <span id="ultrawideBadge" class="hidden items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 shrink-0">
+                                🖥️ ウルトラワイド最適化中
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 hidden md:block">店舗別管理・Monthly（定量実績・達成評価）＆ Weekly（先週比・スパークライン・天気/祝日分析）</p>
+                    </div>
+                </div>
+
+                <!-- Store Selector & Store Manager Button -->
+                <div class="flex items-center bg-indigo-50/80 border border-indigo-200/90 rounded-xl p-1 gap-1">
+                    <span class="text-xs pl-1.5">🏬</span>
+                    <select id="storeSelect" class="bg-transparent font-extrabold text-xs sm:text-sm text-indigo-950 focus:outline-none cursor-pointer pr-1 max-w-[140px] sm:max-w-[200px] truncate" title="表示・編集する店舗を切り替え"></select>
+                    <button id="openStoreModalBtn" type="button" class="text-[11px] font-bold text-indigo-700 bg-white hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded-lg transition-colors shrink-0 shadow-2xs" title="店舗の追加・名前変更・削除">
+                        店舗管理
+                    </button>
                 </div>
             </div>
 
@@ -102,7 +132,7 @@
                         <span class="hidden xs:inline">フォーマットを</span><span>コピー</span>
                     </button>
 
-                    <button id="restoreSampleBtn" type="button" class="text-[11px] font-semibold text-slate-600 hover:text-indigo-700 bg-white hover:bg-indigo-50 border border-slate-200 px-2 sm:px-2.5 py-1.5 rounded-xl transition-colors" title="横浜店のサンプルデータ（2026年9月・10月）を初期状態に復元します">
+                    <button id="restoreSampleBtn" type="button" class="text-[11px] font-semibold text-slate-600 hover:text-indigo-700 bg-white hover:bg-indigo-50 border border-slate-200 px-2 sm:px-2.5 py-1.5 rounded-xl transition-colors" title="選択中の店舗にサンプルデータ（2026年9月・10月）を復元します">
                         サンプル復元
                     </button>
                 </div>
@@ -110,34 +140,36 @@
         </div>
 
         <!-- Secondary Sub-bar: Main View Tabs & Saved Month Quick Tabs -->
-        <div class="w-full px-2.5 sm:px-6 lg:px-8 py-2 bg-slate-50/95 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
-            <!-- Primary Tab Navigation (Switches Monthly / Weekly / Preview) -->
-            <div class="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl text-xs font-extrabold overflow-x-auto max-w-full custom-scrollbar">
-                <button type="button" data-section-filter="all" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
-                    📋 すべて表示
-                </button>
-                <button type="button" data-section-filter="monthly" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
-                    📊 Monthly
-                </button>
-                <button type="button" data-section-filter="weekly" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
-                    📅 Weekly
-                </button>
-                <button type="button" data-section-filter="preview" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap flex items-center gap-1">
-                    <span>📄 提出フォーマット プレビュー</span>
-                </button>
-            </div>
+        <div class="w-full border-t border-slate-200/80 bg-slate-50/95">
+            <div class="w-full max-w-[2400px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2">
+                <!-- Primary Tab Navigation -->
+                <div class="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl text-xs font-extrabold overflow-x-auto max-w-full custom-scrollbar">
+                    <button type="button" data-section-filter="all" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                        📋 すべて表示
+                    </button>
+                    <button type="button" data-section-filter="monthly" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                        📊 Monthly
+                    </button>
+                    <button type="button" data-section-filter="weekly" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                        📅 Weekly
+                    </button>
+                    <button type="button" data-section-filter="preview" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap flex items-center gap-1">
+                        <span>📄 提出フォーマット プレビュー</span>
+                    </button>
+                </div>
 
-            <!-- Saved Month Quick Tabs (Ordered Oldest -> Newest: 9月 -> 10月 -> 11月) -->
-            <div class="flex items-center gap-1.5 overflow-x-auto max-w-full custom-scrollbar py-0.5">
-                <span class="text-[11px] font-bold text-slate-400 shrink-0">記録月:</span>
-                <div id="monthTabsContainer" class="flex items-center gap-1 shrink-0"></div>
+                <!-- Saved Month Quick Tabs (Oldest -> Newest: 9月 -> 10月 -> 11月) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto max-w-full custom-scrollbar py-0.5">
+                    <span class="text-[11px] font-bold text-slate-400 shrink-0">記録月:</span>
+                    <div id="monthTabsContainer" class="flex items-center gap-1 shrink-0"></div>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="w-full px-2 sm:px-6 lg:px-8 pt-3 sm:pt-4 flex-1">
+    <main class="w-full max-w-[2400px] mx-auto px-2 sm:px-6 lg:px-8 pt-3 sm:pt-4 flex-1">
 
-        <!-- WORKSPACE CONTAINER: Hidden completely when Preview Tab is selected -->
+        <!-- WORKSPACE CONTAINER -->
         <div id="editorPaneContainer" class="grid grid-cols-1 gap-4 sm:gap-5 items-start min-w-0">
 
             <!-- 1. MONTHLY SECTION CARD -->
@@ -149,6 +181,7 @@
                         <div>
                             <h2 class="text-xs xs:text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-1.5 flex-wrap">
                                 <span>【Monthly】月次トピック・定量実績・目標達成評価</span>
+                                <span id="monthlyStoreLabelBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200"></span>
                                 <span id="monthlyCountBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">0件</span>
                             </h2>
                             <p class="text-[11px] text-slate-500 hidden xs:block">定量実績の自動計算（昨対比・達成有無）と月次トピックの一元管理</p>
@@ -252,6 +285,7 @@
                         <div class="min-w-0">
                             <h2 class="text-xs xs:text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-1.5 flex-wrap">
                                 <span>【Weekly】週次実績・天気/祝日・3項目メモ</span>
+                                <span id="weeklyStoreLabelBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200"></span>
                                 <span id="weeklyFilledBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0">0/5週</span>
                             </h2>
                             <p class="text-[11px] text-slate-500 hidden xs:block">週間天気・祝日/連休の自動判定と、「変化理由」「トピック」「課題解決アクション」を週ごとに管理</p>
@@ -262,14 +296,14 @@
                         <!-- Weather Location & Fetch Controls -->
                         <div class="flex items-center bg-sky-50/90 border border-sky-200 rounded-xl p-0.5 gap-1 max-w-full">
                             <span class="text-[11px] pl-1.5 font-bold text-sky-800 shrink-0">📍</span>
-                            <select id="weatherLocationSelect" class="text-[11px] sm:text-xs font-bold bg-transparent text-sky-950 py-1 pr-1 focus:outline-none cursor-pointer max-w-[115px] xs:max-w-[160px] truncate" title="天気を取得する店舗エリアを選択"></select>
+                            <select id="weatherLocationSelect" class="text-[11px] sm:text-xs font-bold bg-transparent text-sky-950 py-1 pr-1 focus:outline-none cursor-pointer max-w-[115px] xs:max-w-[160px] truncate" title="この店舗の天気取得エリアを選択"></select>
                             <button id="fetchWeatherBtn" type="button" class="text-[11px] font-extrabold text-white bg-sky-600 hover:bg-sky-700 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-2xs shrink-0" title="Open-Meteoから当月各週の天気・気温・降水量を自動取得します">
                                 <span id="fetchWeatherBtnLabel">⛅ 天気取得</span>
                             </button>
                         </div>
 
                         <button id="toggleMetricsMatrixBtn" type="button" class="text-[11px] sm:text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded-xl transition-colors flex items-center gap-1">
-                            <span>📊 推移表</span>
+                            <span>📈 推移表＆スパークライン</span>
                         </button>
                         <select id="weekStartDaySelect" class="text-[11px] sm:text-xs font-semibold bg-slate-100 border border-slate-200 rounded-xl px-2 py-1.5 text-slate-700 focus:outline-none">
                             <option value="1">月曜始</option>
@@ -284,10 +318,13 @@
                     </div>
                 </div>
 
-                <!-- Weekly Cross-Week Comparison Matrix Drawer -->
+                <!-- Weekly Cross-Week Comparison Matrix Drawer (With Inline Sparklines) -->
                 <div id="weeklyMetricsMatrixPanel" class="hidden border-b border-slate-200 bg-slate-50 p-2.5 sm:p-5 space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs sm:text-sm font-extrabold text-slate-800">📊 週次推移マトリクス（前月最終週〜当月各週の今週の値＆先週比）</h3>
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-xs sm:text-sm font-extrabold text-slate-800">📈 週次推移マトリクス ＆ インライン・スパークライン</h3>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">右端に折れ線＋ミニバー自動描画</span>
+                        </div>
                         <button id="closeMetricsMatrixBtn" type="button" class="text-xs font-bold text-slate-500 hover:text-slate-800 px-2 py-0.5 rounded">閉じる ✕</button>
                     </div>
                     <div id="weeklyMetricsMatrixContainer" class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm custom-scrollbar"></div>
@@ -296,15 +333,15 @@
                 <!-- Week Focus Filter Tabs (All Weeks vs 1W, 2W, 3W...) -->
                 <div class="px-2.5 sm:px-5 py-2 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto custom-scrollbar">
                     <div id="weekFocusTabsContainer" class="flex items-center gap-1 shrink-0"></div>
-                    <span class="text-[11px] text-slate-400 shrink-0 hidden md:inline">※天気・祝日バーから変化理由への1タップ引用も可能</span>
+                    <span class="text-[11px] text-slate-400 shrink-0 hidden md:inline">※各入力欄の横にある「×」で個別クリア、「値リセット」で週の数値を一括クリアできます</span>
                 </div>
 
                 <!-- Weekly Cards List -->
-                <div id="weeklyCardsContainer" class="p-2 sm:p-5 space-y-3.5 sm:space-y-4"></div>
+                <div id="weeklyCardsContainer" class="p-2 sm:p-5 grid grid-cols-1 gap-4"></div>
             </section>
         </div>
 
-        <!-- 3. TAB-SWITCHED PREVIEW PANE (Displayed exclusively when Preview Tab is active) -->
+        <!-- 3. TAB-SWITCHED PREVIEW PANE -->
         <section id="previewPaneContainer" class="hidden min-w-0">
             <div class="bg-slate-900 text-slate-100 rounded-2xl border border-slate-800 shadow-lg overflow-hidden flex flex-col">
                 <!-- Preview Header -->
@@ -330,6 +367,10 @@
 
                 <!-- Format Customization Toggles -->
                 <div class="px-3.5 sm:px-6 py-3 bg-slate-800/50 border-b border-slate-800 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm text-slate-300">
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input id="includeStoreNameToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
+                        <span>冒頭に店舗名を出力</span>
+                    </label>
                     <label class="inline-flex items-center gap-2 cursor-pointer select-none">
                         <input id="includeCategoryToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
                         <span>Monthlyに[タグ]を表示</span>
@@ -359,6 +400,53 @@
             </div>
         </section>
     </main>
+
+    <!-- STORE MANAGEMENT MODAL (複数店舗の登録・切り替え・編集・削除) -->
+    <div id="storeManagerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-4 sm:px-5 py-3.5 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white font-extrabold text-xs">店舗管理</span>
+                    <h3 class="text-sm sm:text-base font-extrabold text-slate-900">複数店舗の登録・切り替え・設定</h3>
+                </div>
+                <button id="closeStoreModalBtn" type="button" class="text-slate-400 hover:text-slate-700 font-bold text-sm px-2 py-1 rounded-lg">✕</button>
+            </div>
+
+            <div class="p-4 sm:p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1">
+                <!-- Add New Store Form -->
+                <form id="addStoreForm" class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
+                    <label class="block text-xs font-extrabold text-slate-700">＋ 新しい店舗を追加</label>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input
+                            id="newStoreNameInput"
+                            type="text"
+                            placeholder="例: 池袋店 / 梅田店 / 川崎店..."
+                            class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
+                        />
+                        <select id="newStoreWeatherSelect" class="rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs font-bold text-slate-700 focus:border-indigo-500 focus:outline-none"></select>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-xs transition-colors shrink-0">
+                            追加する
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Registered Stores List -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-slate-700">登録済み店舗一覧（店舗名・天気エリアの変更可）</span>
+                        <span id="storeCountText" class="text-[11px] font-bold text-slate-400"></span>
+                    </div>
+                    <div id="storeListContainer" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <div class="px-4 sm:px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-end">
+                <button id="doneStoreModalBtn" type="button" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold transition-colors">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- BULK PASTE MODAL -->
     <div id="bulkPasteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
@@ -444,11 +532,12 @@
     </div>
 
     <!-- =====================================================================
-         SCRIPT BLOCK 1: 定数・祝日/連休判定エンジン・天気取得エンジン・状態管理・一括解析
+         SCRIPT BLOCK 1: 定数・複数店舗状態管理・祝日/天気エンジン・一括解析ロジック
          ===================================================================== -->
     <script>
-        const STORAGE_KEY = 'periodic_report_topic_manager_v8';
+        const STORAGE_KEY = 'periodic_report_topic_manager_v9';
         const LEGACY_STORAGE_KEYS = [
+            'periodic_report_topic_manager_v8',
             'periodic_report_topic_manager_v7',
             'periodic_report_topic_manager_v6',
             'periodic_report_topic_manager_v5',
@@ -573,7 +662,7 @@
         }
 
         // =========================================================
-        // 日本の祝日・振替休日・国民の休日・連休 判定エンジン (完全オフライン)
+        // 日本の祝日・振替休日・国民の休日・連休 判定エンジン
         // =========================================================
         const holidayMapCache = {};
 
@@ -761,9 +850,6 @@
             }
         }
 
-        // =========================================================
-        // 天気コード変換・横浜サンプル気象データ＆Open-Meteo取得エンジン
-        // =========================================================
         function getWeatherMetaFromWmo(code, precip = 0) {
             const c = Number(code);
             if (c === 0) return { icon: '☀️', label: '快晴', tone: 'sunny' };
@@ -1322,11 +1408,19 @@
         }
 
         let appState = {
+            currentStoreId: 'store-yokohama',
+            stores: [
+                { id: 'store-yokohama', name: '横浜店', weatherLocationKey: 'yokohama' }
+            ],
+            storeRecords: {
+                'store-yokohama': {}
+            },
             currentYear: DEFAULT_YEAR,
             currentMonth: DEFAULT_MONTH,
             weekStartDay: 1,
             weatherLocationKey: 'yokohama',
             weatherCache: createDefaultSampleWeatherCache(),
+            includeStoreNameInOutput: false,
             includeCategoryInOutput: false,
             includeMonthlyMetricsInOutput: false,
             includeWeeklyMetricsInOutput: false,
@@ -1336,15 +1430,36 @@
             selectedWeekFilter: 'all',
             sectionFilter: 'all',
             layoutMode: 'auto',
-            collapsedMetricsWeeks: {},
-            records: {}
+            collapsedMetricsWeeks: {}
         };
+
+        function getCurrentStore() {
+            if (!Array.isArray(appState.stores) || appState.stores.length === 0) {
+                appState.stores = [{ id: 'store-yokohama', name: '横浜店', weatherLocationKey: 'yokohama' }];
+            }
+            let found = appState.stores.find(s => s.id === appState.currentStoreId);
+            if (!found) {
+                found = appState.stores[0];
+                appState.currentStoreId = found.id;
+            }
+            return found;
+        }
+
+        function getActiveStoreRecordsMap() {
+            const store = getCurrentStore();
+            if (!appState.storeRecords || typeof appState.storeRecords !== 'object') {
+                appState.storeRecords = {};
+            }
+            if (!appState.storeRecords[store.id] || typeof appState.storeRecords[store.id] !== 'object') {
+                appState.storeRecords[store.id] = {};
+            }
+            return appState.storeRecords[store.id];
+        }
 
         function getRecordKey(year, month) {
             return `${Number(year)}-${String(Number(month)).padStart(2, '0')}`;
         }
 
-        // ユーザーの消去・編集操作を上書きしない安全な正規化関数
         function sanitizeRecord(rec, year, month) {
             const safe = rec && typeof rec === 'object' ? rec : createDefaultRecord(year, month, appState.weekStartDay);
             safe.year = Number(year);
@@ -1388,7 +1503,6 @@
                     if (!w.id) w.id = `w-${year}-${month}-${idx}`;
                     if (typeof w.range !== 'string') w.range = `${idx + 1}W`;
 
-                    // 旧バージョンの単一 `memo` フィールドが残っている場合は初回のみ移行して削除する
                     const hasNewFields = typeof w.changeReason === 'string' || typeof w.topics === 'string' || typeof w.actionItems === 'string';
                     if (!hasNewFields && typeof w.memo === 'string') {
                         w.changeReason = '';
@@ -1419,22 +1533,25 @@
         }
 
         function ensureCurrentRecordExists() {
+            const store = getCurrentStore();
+            const recordsMap = getActiveStoreRecordsMap();
             const key = getRecordKey(appState.currentYear, appState.currentMonth);
-            if (!appState.records[key]) {
-                if (key === '2026-10') {
-                    appState.records[key] = createSampleRecord2026_10();
-                } else if (key === '2026-09') {
-                    appState.records[key] = createSampleRecord2026_09();
+            if (!recordsMap[key]) {
+                if (store.id === 'store-yokohama' && key === '2026-10') {
+                    recordsMap[key] = createSampleRecord2026_10();
+                } else if (store.id === 'store-yokohama' && key === '2026-09') {
+                    recordsMap[key] = createSampleRecord2026_09();
                 } else {
-                    appState.records[key] = createDefaultRecord(appState.currentYear, appState.currentMonth, appState.weekStartDay);
+                    recordsMap[key] = createDefaultRecord(appState.currentYear, appState.currentMonth, appState.weekStartDay);
                 }
-                appState.records[key] = sanitizeRecord(appState.records[key], appState.currentYear, appState.currentMonth);
+                recordsMap[key] = sanitizeRecord(recordsMap[key], appState.currentYear, appState.currentMonth);
             }
         }
 
         function getCurrentRecord() {
             ensureCurrentRecordExists();
-            return appState.records[getRecordKey(appState.currentYear, appState.currentMonth)];
+            const recordsMap = getActiveStoreRecordsMap();
+            return recordsMap[getRecordKey(appState.currentYear, appState.currentMonth)];
         }
 
         function loadStateFromStorage() {
@@ -1460,41 +1577,51 @@
                 console.warn('localStorage load error:', err);
             }
 
-            if (!appState.weatherLocationKey) appState.weatherLocationKey = 'yokohama';
+            // 旧バージョンの単一店舗 records を storeRecords['store-yokohama'] に移行
+            if (!Array.isArray(appState.stores) || appState.stores.length === 0) {
+                appState.stores = [
+                    { id: 'store-yokohama', name: '横浜店', weatherLocationKey: appState.weatherLocationKey || 'yokohama' }
+                ];
+            }
+            if (!appState.storeRecords || typeof appState.storeRecords !== 'object') {
+                appState.storeRecords = {};
+            }
+            if (appState.records && typeof appState.records === 'object' && Object.keys(appState.records).length > 0) {
+                if (!appState.storeRecords['store-yokohama']) {
+                    appState.storeRecords['store-yokohama'] = appState.records;
+                }
+                delete appState.records;
+            }
+
+            if (!appState.storeRecords['store-yokohama']) {
+                appState.storeRecords['store-yokohama'] = {};
+            }
+            if (!appState.storeRecords['store-yokohama']['2026-10']) {
+                appState.storeRecords['store-yokohama']['2026-10'] = createSampleRecord2026_10();
+            }
+            if (!appState.storeRecords['store-yokohama']['2026-09']) {
+                appState.storeRecords['store-yokohama']['2026-09'] = createSampleRecord2026_09();
+            }
+
             if (!appState.weatherCache || typeof appState.weatherCache !== 'object') {
                 appState.weatherCache = createDefaultSampleWeatherCache();
             } else {
                 appState.weatherCache = Object.assign(createDefaultSampleWeatherCache(), appState.weatherCache);
             }
 
-            if (!appState.records || typeof appState.records !== 'object') {
-                appState.records = {};
-            }
-            if (!appState.records['2026-10']) {
-                appState.records['2026-10'] = createSampleRecord2026_10();
-            }
-            if (!appState.records['2026-09']) {
-                appState.records['2026-09'] = createSampleRecord2026_09();
-            }
-
-            Object.keys(appState.records).forEach(k => {
-                const parts = k.split('-');
-                const y = Number(parts[0]) || DEFAULT_YEAR;
-                const m = Number(parts[1]) || DEFAULT_MONTH;
-                const rec = sanitizeRecord(appState.records[k], y, m);
-
-                // 旧ストレージからの移行時のみ、バグ発生時に増えた6W以降の空の重複週を1回だけ整理
-                if (loadedFromLegacy && Array.isArray(rec.weeklyItems) && rec.weeklyItems.length > 5) {
-                    const placeholderRange = `${m}/1〜${m}/7`;
-                    rec.weeklyItems = rec.weeklyItems.filter((w, idx) => {
-                        if (idx >= 5 && w.range === placeholderRange && !hasWeekAnyMetric(w) && !hasWeekAnyText(w)) {
-                            return false;
-                        }
-                        return true;
-                    });
-                }
-                appState.records[k] = rec;
+            Object.keys(appState.storeRecords).forEach(storeId => {
+                const recMap = appState.storeRecords[storeId];
+                if (!recMap || typeof recMap !== 'object') return;
+                Object.keys(recMap).forEach(k => {
+                    const parts = k.split('-');
+                    const y = Number(parts[0]) || DEFAULT_YEAR;
+                    const m = Number(parts[1]) || DEFAULT_MONTH;
+                    recMap[k] = sanitizeRecord(recMap[k], y, m);
+                });
             });
+
+            const activeStore = getCurrentStore();
+            appState.weatherLocationKey = activeStore.weatherLocationKey || 'yokohama';
 
             ensureCurrentRecordExists();
             if (loadedFromLegacy) {
@@ -1633,7 +1760,8 @@
                 prevYear -= 1;
             }
             const prevKey = getRecordKey(prevYear, prevMonth);
-            const prevRec = appState.records[prevKey];
+            const recordsMap = getActiveStoreRecordsMap();
+            const prevRec = recordsMap[prevKey];
             if (prevRec && Array.isArray(prevRec.weeklyItems) && prevRec.weeklyItems.length > 0) {
                 for (let i = prevRec.weeklyItems.length - 1; i >= 0; i--) {
                     const candidate = prevRec.weeklyItems[i];
@@ -1672,7 +1800,7 @@
         }
     </script>
     <!-- =====================================================================
-         SCRIPT BLOCK 2: UI描画（スマホ最適化対応の週間天気＆祝日バー・Monthly・Weekly・プレビュー）
+         SCRIPT BLOCK 2: UI描画（インライン・スパークライン生成・ウルトラワイド最適化・店舗描画）
          ===================================================================== -->
     <script>
         function getWeatherEntryForDate(locKey, dateKey) {
@@ -1680,6 +1808,87 @@
             if (direct) return direct;
             const fallbackYokohama = appState.weatherCache?.[`yokohama_${dateKey}`];
             return fallbackYokohama || null;
+        }
+
+        // 週次推移マトリクス用 インライン・スパークライン（折れ線＋ミニバー）SVG生成
+        function buildInlineSparklineHtml(values, type) {
+            const validEntries = values
+                .map((v, idx) => ({ val: parseMetricNum(v), idx }))
+                .filter(e => e.val !== null);
+
+            if (validEntries.length === 0) {
+                return `<div class="text-[10px] text-slate-300 font-mono text-center">—</div>`;
+            }
+
+            const totalSlots = Math.max(values.length, 2);
+            const nums = validEntries.map(e => e.val);
+            const minVal = Math.min(...nums);
+            const maxVal = Math.max(...nums);
+            const span = maxVal - minVal > 0.0001 ? maxVal - minVal : 1;
+
+            // 1. ミニ折れ線（エリア塗りつぶし付き）SVG (幅78px x 高さ26px)
+            const w = 78;
+            const h = 26;
+            const padX = 5;
+            const padY = 4;
+            const innerW = w - padX * 2;
+            const innerH = h - padY * 2;
+
+            const coords = validEntries.map(e => {
+                const x = padX + (totalSlots === 1 ? innerW / 2 : (e.idx / (totalSlots - 1)) * innerW);
+                const norm = maxVal === minVal ? 0.5 : (e.val - minVal) / span;
+                const y = padY + innerH - norm * innerH;
+                return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)), val: e.val };
+            });
+
+            const pointsAttr = coords.map(c => `${c.x},${c.y}`).join(' ');
+            const firstPt = coords[0];
+            const lastPt = coords[coords.length - 1];
+            const areaPoints = `${firstPt.x},${h - 2} ${pointsAttr} ${lastPt.x},${h - 2}`;
+
+            const trendUp = lastPt.val >= firstPt.val;
+            const strokeColor = trendUp ? '#0284c7' : '#e11d48';
+            const fillColor = trendUp ? 'rgba(2, 132, 199, 0.14)' : 'rgba(225, 29, 72, 0.12)';
+
+            const dotsSvg = coords.map((c, i) => {
+                const isLast = i === coords.length - 1;
+                const r = isLast ? 2.6 : 1.8;
+                return `<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="${isLast ? strokeColor : '#ffffff'}" stroke="${strokeColor}" stroke-width="1.4" />`;
+            }).join('');
+
+            // 2. ミニバーSVG (幅60px x 高さ24px)
+            const bw = 60;
+            const bh = 24;
+            const slotW = bw / totalSlots;
+            const barW = Math.max(4, Math.min(9, slotW - 2.5));
+
+            const barsSvg = values.map((v, idx) => {
+                const num = parseMetricNum(v);
+                const x = idx * slotW + (slotW - barW) / 2;
+                if (num === null) {
+                    return `<rect x="${x.toFixed(1)}" y="${bh - 3}" width="${barW.toFixed(1)}" height="2" rx="1" fill="#e2e8f0" />`;
+                }
+                const ratio = maxVal === minVal ? 0.65 : 0.22 + ((num - minVal) / span) * 0.78;
+                const barH = Math.max(3, Math.round(ratio * (bh - 4)));
+                const y = bh - 1 - barH;
+                const isMax = num === maxVal && validEntries.length > 1;
+                const isMin = num === minVal && validEntries.length > 2 && minVal !== maxVal;
+                const barFill = isMax ? '#10b981' : isMin ? '#f43f5e' : '#38bdf8';
+                return `<rect x="${x.toFixed(1)}" y="${y}" width="${barW.toFixed(1)}" height="${barH}" rx="1.5" fill="${barFill}" />`;
+            }).join('');
+
+            return `
+                <div class="inline-flex items-center justify-center gap-2 px-1 py-0.5 bg-slate-50/80 rounded-lg border border-slate-200/80">
+                    <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="overflow-visible shrink-0" aria-label="推移折れ線">
+                        ${coords.length > 1 ? `<polygon points="${areaPoints}" fill="${fillColor}" />` : ''}
+                        ${coords.length > 1 ? `<polyline fill="none" stroke="${strokeColor}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${pointsAttr}" />` : ''}
+                        ${dotsSvg}
+                    </svg>
+                    <svg width="${bw}" height="${bh}" viewBox="0 0 ${bw} ${bh}" class="shrink-0" aria-label="推移ミニバー">
+                        ${barsSvg}
+                    </svg>
+                </div>
+            `;
         }
 
         function buildWeekWeatherAndCalendarHtml(record, week) {
@@ -1761,7 +1970,6 @@
                             ? 'bg-blue-50/40 border-slate-200'
                             : 'bg-white border-slate-200/90';
 
-                // 通常スマホでは w-[62px] shrink-0 で横スクロール可能にし、折りたたみスマホ/PC (fold:680px以上) では均等7分割
                 return `
                     <div class="w-[62px] shrink-0 fold:w-auto fold:flex-1 rounded-lg border ${cardBgClass} px-1 py-1 text-center flex flex-col justify-between">
                         <div class="flex items-center justify-center gap-0.5 text-[10px] ${dayColorClass} leading-tight whitespace-nowrap">
@@ -1843,7 +2051,6 @@
                         </button>
                     </div>
 
-                    <!-- 7-Day Mini Calendar & Weather Strip (Smooth horizontal scroll on narrow mobile, full width on fold/PC) -->
                     <div class="flex items-stretch gap-1 sm:gap-1.5 overflow-x-auto custom-scrollbar pb-0.5">
                         ${dayPillsHtml}
                     </div>
@@ -2008,7 +2215,7 @@
                             <thead>
                                 <tr class="border-b border-slate-300">
                                     <th class="px-2 py-2 text-center text-xs font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 min-w-[110px]">
-                                        項目
+                                        ${escapeHtml(getCurrentStore().name)}
                                     </th>
                                     ${headerCells}
                                 </tr>
@@ -2167,12 +2374,13 @@
             renderCategoryQuickPills();
 
             const record = getCurrentRecord();
+            const store = getCurrentStore();
             const listContainer = document.getElementById('monthlyListContainer');
             const badge = document.getElementById('monthlyCountBadge');
+            const storeBadge = document.getElementById('monthlyStoreLabelBadge');
 
-            if (badge) {
-                badge.textContent = `${record.monthlyTopics.length}件`;
-            }
+            if (storeBadge) storeBadge.textContent = `🏬 ${store.name}`;
+            if (badge) badge.textContent = `${record.monthlyTopics.length}件`;
             if (!listContainer) return;
 
             if (record.monthlyTopics.length === 0) {
@@ -2259,6 +2467,7 @@
             container.innerHTML = html;
         }
 
+        // 週次推移マトリクス ＋ 右端の「インライン・スパークライン（折れ線＋ミニバー）」列描画
         function renderWeeklyMetricsMatrix() {
             const panel = document.getElementById('weeklyMetricsMatrixPanel');
             const container = document.getElementById('weeklyMetricsMatrixContainer');
@@ -2272,31 +2481,49 @@
                 colHeaders.push(`<th class="px-2 py-2 text-center bg-slate-100 border-r border-slate-200 text-[11px] font-bold text-slate-600 min-w-[92px]">前月最終<br><span class="font-mono text-[10px]">${escapeHtml(prevCtx.item.range)}</span></th>`);
             }
             record.weeklyItems.forEach((w, idx) => {
-                colHeaders.push(`<th class="px-2 py-2 text-center bg-emerald-50/70 border-r border-slate-200 last:border-r-0 text-[11px] font-extrabold text-emerald-950 min-w-[105px]">${idx + 1}W<br><span class="font-mono text-[10px] font-semibold">${escapeHtml(w.range)}</span></th>`);
+                colHeaders.push(`<th class="px-2 py-2 text-center bg-emerald-50/70 border-r border-slate-200 text-[11px] font-extrabold text-emerald-950 min-w-[102px]">${idx + 1}W<br><span class="font-mono text-[10px] font-semibold">${escapeHtml(w.range)}</span></th>`);
             });
+            colHeaders.push(`
+                <th class="px-3 py-2 text-center bg-indigo-50/80 text-[11px] font-extrabold text-indigo-950 min-w-[165px]">
+                    推移スパークライン<br><span class="text-[9px] font-semibold text-indigo-700">折れ線 ＆ ミニバー</span>
+                </th>
+            `);
 
             const rowsHtml = WEEKLY_METRIC_DEFS.map(def => {
                 const cells = [];
+                const seriesValues = [];
+
                 if (prevCtx.item) {
-                    cells.push(`<td class="px-2 py-1.5 text-center font-mono text-xs text-slate-600 bg-slate-50/70 border-r border-slate-200">${formatWeeklyMetricValue(prevCtx.item.metrics?.[def.key], def.type)}</td>`);
+                    const pVal = prevCtx.item.metrics?.[def.key];
+                    seriesValues.push(pVal);
+                    cells.push(`<td class="px-2 py-1.5 text-center font-mono text-xs text-slate-600 bg-slate-50/70 border-r border-slate-200">${formatWeeklyMetricValue(pVal, def.type)}</td>`);
                 }
                 record.weeklyItems.forEach((w, idx) => {
                     const pCtx = getPreviousWeekContext(record, idx);
                     const currVal = w.metrics?.[def.key];
+                    seriesValues.push(currVal);
                     const prevVal = pCtx.item ? pCtx.item.metrics?.[def.key] : null;
                     const diff = computeWeeklyDiff(currVal, prevVal, def.type);
                     const diffCls = diff.tone === 'up' ? 'text-blue-600' : diff.tone === 'down' ? 'text-rose-600' : 'text-slate-400';
                     cells.push(`
-                        <td class="px-2 py-1.5 text-center font-mono border-r border-slate-200 last:border-r-0">
+                        <td class="px-2 py-1.5 text-center font-mono border-r border-slate-200">
                             <div class="text-xs font-bold text-slate-900">${formatWeeklyMetricValue(currVal, def.type)}</div>
                             <div class="text-[10px] font-semibold ${diffCls}">${escapeHtml(diff.text)}</div>
                         </td>
                     `);
                 });
+
+                const sparklineCell = `
+                    <td class="px-2 py-1 text-center bg-white align-middle">
+                        ${buildInlineSparklineHtml(seriesValues, def.type)}
+                    </td>
+                `;
+
                 return `
-                    <tr class="border-b border-slate-200 last:border-b-0">
-                        <th class="px-2 py-1.5 text-left text-[11px] sm:text-xs font-bold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">${escapeHtml(def.label)}</th>
+                    <tr class="border-b border-slate-200 last:border-b-0 hover:bg-slate-50/60">
+                        <th class="px-2.5 py-1.5 text-left text-[11px] sm:text-xs font-bold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">${escapeHtml(def.label)}</th>
                         ${cells.join('')}
+                        ${sparklineCell}
                     </tr>
                 `;
             }).join('');
@@ -2305,7 +2532,7 @@
                 <table class="w-full border-collapse text-xs">
                     <thead>
                         <tr class="border-b border-slate-300">
-                            <th class="px-2 py-2 text-left text-xs font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10">項目</th>
+                            <th class="px-2.5 py-2 text-left text-xs font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10">項目</th>
                             ${colHeaders.join('')}
                         </tr>
                     </thead>
@@ -2345,8 +2572,12 @@
 
         function renderWeeklySection() {
             const record = getCurrentRecord();
+            const store = getCurrentStore();
             const container = document.getElementById('weeklyCardsContainer');
             const filledBadge = document.getElementById('weeklyFilledBadge');
+            const storeBadge = document.getElementById('weeklyStoreLabelBadge');
+
+            if (storeBadge) storeBadge.textContent = `🏬 ${store.name}`;
 
             renderWeekFocusTabs();
             renderWeeklyMetricsMatrix();
@@ -2373,6 +2604,7 @@
                     const currRaw = week.metrics ? week.metrics[def.key] : '';
                     const prevRaw = prevCtx.item && prevCtx.item.metrics ? prevCtx.item.metrics[def.key] : '';
                     const diff = computeWeeklyDiff(currRaw, prevRaw, def.type);
+                    const hasCurrValue = currRaw !== '' && currRaw !== null && currRaw !== undefined;
 
                     const badgeClass = !diff.hasDiff
                         ? 'text-slate-400 bg-slate-50 border-slate-200'
@@ -2383,11 +2615,11 @@
                                 : 'text-slate-600 bg-slate-100 border-slate-200';
 
                     return `
-                        <tr class="border-b border-slate-200/80 last:border-b-0 hover:bg-slate-50/70">
+                        <tr class="border-b border-slate-200/80 last:border-b-0 hover:bg-slate-50/70 group">
                             <td class="px-1.5 sm:px-2 py-1.5 font-bold text-slate-700 text-[11px] sm:text-xs truncate" title="${escapeHtml(def.label)}">${escapeHtml(def.label)}</td>
                             <td class="px-1 sm:px-1.5 py-1.5 text-right font-mono text-[11px] sm:text-xs text-slate-500 whitespace-nowrap">${formatWeeklyMetricValue(prevRaw, def.type)}</td>
                             <td class="px-1 sm:px-1.5 py-1 text-right">
-                                <div class="inline-flex items-center justify-end gap-0.5 w-full max-w-[76px] sm:max-w-[84px] ml-auto">
+                                <div class="inline-flex items-center justify-end gap-0.5 w-full max-w-[92px] ml-auto">
                                     <input
                                         type="text"
                                         inputmode="decimal"
@@ -2398,6 +2630,14 @@
                                         class="w-full min-w-0 text-right font-mono text-[11px] sm:text-xs font-bold text-slate-900 bg-white border border-slate-200 focus:border-emerald-500 rounded-md px-1 sm:px-1.5 py-1 focus:outline-none"
                                     />
                                     ${def.type === 'percent' ? '<span class="text-[9px] sm:text-[10px] font-mono text-slate-400 shrink-0">%</span>' : ''}
+                                    <button
+                                        type="button"
+                                        data-week-action="clear-single-metric"
+                                        data-week-id="${week.id}"
+                                        data-weekly-metric-key="${def.key}"
+                                        class="text-[10px] text-slate-300 hover:text-rose-600 px-0.5 leading-none transition-opacity ${hasCurrValue ? 'opacity-90' : 'opacity-0 pointer-events-none'}"
+                                        title="${escapeHtml(def.label)}の値をクリア"
+                                    >✕</button>
                                 </div>
                             </td>
                             <td data-weekly-diff-cell="${week.id}-${def.key}" class="px-1 sm:px-1.5 py-1.5 text-right font-mono text-[10px] sm:text-[11px]">
@@ -2436,8 +2676,8 @@
                 }).join('');
 
                 return `
-                    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                        <!-- Card Header (Optimized for narrow mobile & PC) -->
+                    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col">
+                        <!-- Card Header -->
                         <div class="px-2.5 sm:px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-col xs:flex-row xs:items-center justify-between gap-2">
                             <div class="flex items-center justify-between xs:justify-start gap-1.5">
                                 <div class="flex items-center gap-1.5">
@@ -2462,6 +2702,11 @@
                                     class="text-[10px] sm:text-[11px] font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 px-2 sm:px-2.5 py-1 rounded-lg shadow-2xs transition-colors flex items-center gap-1">
                                     <span>📋 一括貼付</span>
                                 </button>
+                                <button type="button" data-week-action="reset-week-metrics" data-week-id="${week.id}"
+                                    class="text-[10px] sm:text-[11px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-2 py-1 rounded-lg transition-colors"
+                                    title="この週の「今週の値」9項目をすべて空にリセットします">
+                                    🔄 値リセット
+                                </button>
                                 <button type="button" data-week-action="toggle-metrics" data-week-id="${week.id}"
                                     class="text-[10px] sm:text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 sm:px-2.5 py-1 rounded-lg transition-colors">
                                     今週の値 ${isMetricsCollapsed ? '▼' : '▲'}
@@ -2479,21 +2724,21 @@
                         </div>
 
                         <!-- Card Body -->
-                        <div class="p-2.5 sm:p-5">
+                        <div class="p-2.5 sm:p-5 flex-1">
                             <!-- 週間カレンダー（祝日・連休）＆ 天気コンテキストバー -->
                             ${weatherCalendarBarHtml}
 
                             <div class="flex flex-col lg:flex-row gap-3.5 lg:gap-5 items-stretch lg:items-start">
-                                <!-- Metrics Table: Percentage width on narrow mobile so it never overflows, fixed 380px on PC -->
-                                <div class="${isMetricsCollapsed ? 'hidden' : 'w-full lg:w-[370px] xl:w-[390px] shrink-0'} min-w-0">
+                                <!-- Metrics Table -->
+                                <div class="${isMetricsCollapsed ? 'hidden' : 'w-full lg:w-[375px] xl:w-[395px] shrink-0'} min-w-0">
                                     <div class="w-full rounded-xl border border-slate-200 overflow-x-auto bg-white custom-scrollbar">
                                         <table class="w-full table-fixed border-collapse text-xs">
                                             <thead>
                                                 <tr class="bg-slate-100 border-b border-slate-200 text-[10px] sm:text-[11px] font-extrabold text-slate-700">
-                                                    <th class="w-[31%] sm:w-[116px] px-1.5 sm:px-2 py-2 text-left truncate">項目</th>
-                                                    <th class="w-[17%] sm:w-[60px] px-1 sm:px-1.5 py-2 text-right truncate">先週</th>
-                                                    <th class="w-[24%] sm:w-[88px] px-1 sm:px-1.5 py-2 text-right text-emerald-800 truncate">今週の値</th>
-                                                    <th class="w-[28%] sm:w-[106px] px-1 sm:px-1.5 py-2 text-right truncate">先週比</th>
+                                                    <th class="w-[30%] sm:w-[114px] px-1.5 sm:px-2 py-2 text-left truncate">項目</th>
+                                                    <th class="w-[16%] sm:w-[56px] px-1 sm:px-1.5 py-2 text-right truncate">先週</th>
+                                                    <th class="w-[27%] sm:w-[98px] px-1 sm:px-1.5 py-2 text-right text-emerald-800 truncate">今週の値</th>
+                                                    <th class="w-[27%] sm:w-[104px] px-1 sm:px-1.5 py-2 text-right truncate">先週比</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -2503,8 +2748,8 @@
                                     </div>
                                 </div>
 
-                                <!-- 3 Divided Weekly Input Fields -->
-                                <div class="flex-1 min-w-0 w-full space-y-2.5 sm:space-y-3">
+                                <!-- 3 Divided Weekly Input Fields (Automatically becomes 3-col side-by-side on Ultrawide monitors) -->
+                                <div class="uw-weekly-fields-grid flex-1 min-w-0 w-full space-y-2.5 sm:space-y-3">
                                     ${threeFieldsHtml}
                                 </div>
                             </div>
@@ -2524,8 +2769,12 @@
 
         function generateFormattedReport() {
             const record = getCurrentRecord();
+            const store = getCurrentStore();
             const lines = [];
 
+            if (appState.includeStoreNameInOutput) {
+                lines.push(`【${store.name}】`);
+            }
             lines.push(`${record.year}年`);
             lines.push(`【Monthly】`);
             lines.push(`${record.month}月`);
@@ -2610,7 +2859,8 @@
             }
             if (statsText) {
                 const record = getCurrentRecord();
-                statsText.textContent = `${record.year}年${record.month}月 / Monthly ${record.monthlyTopics.length}件 / ${text.length}文字`;
+                const store = getCurrentStore();
+                statsText.textContent = `${store.name} / ${record.year}年${record.month}月 / Monthly ${record.monthlyTopics.length}件 / ${text.length}文字`;
             }
 
             const hintList = document.getElementById('summaryHintList');
@@ -2650,11 +2900,78 @@
             }
         }
 
+        function renderStoreSelectors() {
+            const storeSelect = document.getElementById('storeSelect');
+            const activeStore = getCurrentStore();
+
+            if (storeSelect) {
+                storeSelect.innerHTML = appState.stores.map(s =>
+                    `<option value="${escapeHtml(s.id)}" ${s.id === activeStore.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`
+                ).join('');
+            }
+        }
+
+        function renderStoreManagerModalList() {
+            const listEl = document.getElementById('storeListContainer');
+            const countEl = document.getElementById('storeCountText');
+            const newWeatherSelect = document.getElementById('newStoreWeatherSelect');
+
+            if (newWeatherSelect && !newWeatherSelect.innerHTML) {
+                newWeatherSelect.innerHTML = WEATHER_LOCATIONS.map(l =>
+                    `<option value="${escapeHtml(l.key)}">📍 ${escapeHtml(l.label)}</option>`
+                ).join('');
+            }
+
+            if (countEl) {
+                countEl.textContent = `全 ${appState.stores.length} 店舗`;
+            }
+            if (!listEl) return;
+
+            listEl.innerHTML = appState.stores.map(store => {
+                const isCurrent = store.id === appState.currentStoreId;
+                const locOptions = WEATHER_LOCATIONS.map(l =>
+                    `<option value="${escapeHtml(l.key)}" ${l.key === store.weatherLocationKey ? 'selected' : ''}>📍 ${escapeHtml(l.label)}</option>`
+                ).join('');
+
+                return `
+                    <div class="p-3 rounded-xl border ${isCurrent ? 'border-indigo-400 bg-indigo-50/40' : 'border-slate-200 bg-white'} flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 flex-1 min-w-[180px]">
+                            <button type="button" data-store-action="select" data-store-id="${escapeHtml(store.id)}"
+                                class="px-2.5 py-1 rounded-lg text-xs font-extrabold transition-colors shrink-0 ${isCurrent ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+                                ${isCurrent ? '選択中' : '切替'}
+                            </button>
+                            <input
+                                type="text"
+                                data-store-action="rename"
+                                data-store-id="${escapeHtml(store.id)}"
+                                value="${escapeHtml(store.name)}"
+                                class="flex-1 min-w-[100px] text-xs sm:text-sm font-bold text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-1 focus:border-indigo-500 focus:outline-none"
+                            />
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select data-store-action="change-weather" data-store-id="${escapeHtml(store.id)}"
+                                class="text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg px-2 py-1 focus:outline-none">
+                                ${locOptions}
+                            </select>
+                            ${appState.stores.length > 1 ? `
+                                <button type="button" data-store-action="delete" data-store-id="${escapeHtml(store.id)}"
+                                    class="text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg transition-colors" title="この店舗を削除">
+                                    削除
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function renderYearMonthSelectors() {
             const yearSelect = document.getElementById('yearSelect');
             const monthSelect = document.getElementById('monthSelect');
             const weekStartSelect = document.getElementById('weekStartDaySelect');
             const locSelect = document.getElementById('weatherLocationSelect');
+
+            renderStoreSelectors();
 
             if (yearSelect) {
                 yearSelect.innerHTML = '';
@@ -2685,6 +3002,7 @@
                 ).join('');
             }
 
+            document.getElementById('includeStoreNameToggle').checked = Boolean(appState.includeStoreNameInOutput);
             document.getElementById('includeCategoryToggle').checked = Boolean(appState.includeCategoryInOutput);
             document.getElementById('includeMonthlyMetricsToggle').checked = Boolean(appState.includeMonthlyMetricsInOutput);
             document.getElementById('includeWeeklyMetricsToggle').checked = Boolean(appState.includeWeeklyMetricsInOutput);
@@ -2692,16 +3010,16 @@
             document.getElementById('skipEmptyWeeksToggle').checked = Boolean(appState.skipEmptyWeeksInOutput);
         }
 
-        // 記録月タブ：左から右へ「古い月 → 新しい月（例: 9月 → 10月 → 11月）」の昇順で並べる
         function renderMonthTabs() {
             const container = document.getElementById('monthTabsContainer');
             if (!container) return;
 
+            const recordsMap = getActiveStoreRecordsMap();
             const currentKey = getRecordKey(appState.currentYear, appState.currentMonth);
-            const keys = Object.keys(appState.records).sort();
+            const keys = Object.keys(recordsMap).sort();
 
             container.innerHTML = keys.map(key => {
-                const rec = appState.records[key];
+                const rec = recordsMap[key];
                 const isActive = key === currentKey;
                 const count = (rec.monthlyTopics?.length || 0);
                 return `
@@ -2721,6 +3039,7 @@
             }).join('');
         }
 
+        // ウルトラワイドモニターの比率・横幅検知＆自動レイアウト調整
         function applyLayoutAndSectionFilters() {
             const monthlyCard = document.getElementById('monthlySectionCard');
             const weeklyCard = document.getElementById('weeklySectionCard');
@@ -2728,6 +3047,21 @@
             const previewPane = document.getElementById('previewPaneContainer');
             const evalContainer = document.getElementById('monthlyEvalCardsContainer');
             const layoutModeGroup = document.getElementById('layoutModeGroup');
+            const weeklyCardsContainer = document.getElementById('weeklyCardsContainer');
+            const ultrawideBadge = document.getElementById('ultrawideBadge');
+
+            const vw = window.innerWidth || 1024;
+            const vh = window.innerHeight || 768;
+            const aspect = vw / Math.max(vh, 1);
+
+            // ウルトラワイド判定 (横幅1850px以上、または 横幅1550px以上 かつ アスペクト比1.95以上)
+            const isUltrawide = vw >= 1850 || (vw >= 1550 && aspect >= 1.95);
+            document.body.classList.toggle('is-ultrawide', isUltrawide);
+
+            if (ultrawideBadge) {
+                ultrawideBadge.classList.toggle('hidden', !isUltrawide);
+                ultrawideBadge.classList.toggle('inline-flex', isUltrawide);
+            }
 
             const isPreviewTab = appState.sectionFilter === 'preview';
 
@@ -2753,6 +3087,17 @@
                 }
                 if (monthlyCard) monthlyCard.classList.toggle('hidden', appState.sectionFilter === 'weekly');
                 if (weeklyCard) weeklyCard.classList.toggle('hidden', appState.sectionFilter === 'monthly');
+            }
+
+            // 超ワイドモニター（2250px以上）で「全週表示」かつ分割でない場合は週カードを2列グリッド化
+            if (weeklyCardsContainer) {
+                const isSingleWeekFocused = appState.selectedWeekFilter !== 'all';
+                const isSplitAll = appState.layoutMode === 'split' && appState.sectionFilter === 'all';
+                if (vw >= 2250 && !isSingleWeekFocused && !isSplitAll) {
+                    weeklyCardsContainer.className = 'p-2 sm:p-5 grid grid-cols-1 xl:grid-cols-2 gap-5 items-start';
+                } else {
+                    weeklyCardsContainer.className = 'p-2 sm:p-5 grid grid-cols-1 gap-4';
+                }
             }
 
             document.querySelectorAll('.section-filter-btn').forEach(btn => {
@@ -2799,7 +3144,7 @@
     </script>
 
     <!-- =====================================================================
-         SCRIPT BLOCK 3: イベント制御・Open-Meteo天気取得・一括貼付モーダル・初期化
+         SCRIPT BLOCK 3: イベント制御・店舗管理・項目リセット・天気取得・一括貼付
          ===================================================================== -->
     <script>
         let toastTimer = null;
@@ -2815,6 +3160,19 @@
                 container.classList.add('opacity-0', 'translate-y-2');
                 container.classList.remove('opacity-100', 'translate-y-0');
             }, 2500);
+        }
+
+        function switchStore(storeId) {
+            const target = appState.stores.find(s => s.id === storeId);
+            if (!target) return;
+            appState.currentStoreId = target.id;
+            appState.weatherLocationKey = target.weatherLocationKey || 'yokohama';
+            appState.selectedWeekFilter = 'all';
+            ensureCurrentRecordExists();
+            saveStateToStorage();
+            renderAll();
+            fetchWeatherForCurrentMonth(true);
+            showToast(`「${target.name}」に切り替えました`);
         }
 
         async function fetchWeatherForCurrentMonth(silent = false) {
@@ -2922,11 +3280,12 @@
             const textarea = document.getElementById('bulkPasteTextarea');
 
             const record = getCurrentRecord();
+            const store = getCurrentStore();
             bulkPasteModalState.mode = mode;
 
             if (mode === 'monthly') {
                 bulkPasteModalState.monthlyTarget = options.monthlyTarget || 'all_auto';
-                badge.textContent = 'Monthly 定量実績';
+                badge.textContent = `${store.name} Monthly`;
                 badge.className = 'px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white font-extrabold text-xs';
                 header.className = 'px-4 sm:px-5 py-3 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2';
                 applyBtn.className = 'px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-colors flex items-center gap-1.5';
@@ -2945,7 +3304,7 @@
             } else {
                 const defaultWeekId = options.weekId || (record.weeklyItems[0] && record.weeklyItems[0].id);
                 bulkPasteModalState.weekId = defaultWeekId;
-                badge.textContent = 'Weekly 今週の値';
+                badge.textContent = `${store.name} Weekly`;
                 badge.className = 'px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white font-extrabold text-xs';
                 header.className = 'px-4 sm:px-5 py-3 bg-emerald-50/90 border-b border-slate-200 flex items-center justify-between gap-2';
                 applyBtn.className = 'px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-colors flex items-center gap-1.5';
@@ -3142,6 +3501,109 @@
         }
 
         function bindEvents() {
+            // Store Selector & Store Manager Modal
+            document.getElementById('storeSelect').addEventListener('change', (e) => {
+                switchStore(e.target.value);
+            });
+
+            const storeModal = document.getElementById('storeManagerModal');
+            document.getElementById('openStoreModalBtn').addEventListener('click', () => {
+                renderStoreManagerModalList();
+                storeModal.classList.remove('hidden');
+            });
+            document.getElementById('closeStoreModalBtn').addEventListener('click', () => {
+                storeModal.classList.add('hidden');
+            });
+            document.getElementById('doneStoreModalBtn').addEventListener('click', () => {
+                storeModal.classList.add('hidden');
+            });
+            storeModal.addEventListener('click', (e) => {
+                if (e.target.id === 'storeManagerModal') storeModal.classList.add('hidden');
+            });
+
+            document.getElementById('addStoreForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nameInput = document.getElementById('newStoreNameInput');
+                const weatherSelect = document.getElementById('newStoreWeatherSelect');
+                const name = nameInput.value.trim();
+                if (!name) {
+                    showToast('店舗名を入力してください');
+                    return;
+                }
+                const newId = `store-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`;
+                const weatherKey = weatherSelect.value || 'yokohama';
+                appState.stores.push({
+                    id: newId,
+                    name,
+                    weatherLocationKey: weatherKey
+                });
+                appState.storeRecords[newId] = {};
+                nameInput.value = '';
+                switchStore(newId);
+                renderStoreManagerModalList();
+                showToast(`新規店舗「${name}」を追加・選択しました！`);
+            });
+
+            const storeListEl = document.getElementById('storeListContainer');
+            storeListEl.addEventListener('click', (e) => {
+                const btn = e.target.closest('button[data-store-action]');
+                if (!btn) return;
+                const action = btn.dataset.storeAction;
+                const storeId = btn.dataset.storeId;
+
+                if (action === 'select') {
+                    switchStore(storeId);
+                    renderStoreManagerModalList();
+                } else if (action === 'delete') {
+                    if (appState.stores.length <= 1) {
+                        showToast('最低1店舗は必要です');
+                        return;
+                    }
+                    const target = appState.stores.find(s => s.id === storeId);
+                    appState.stores = appState.stores.filter(s => s.id !== storeId);
+                    delete appState.storeRecords[storeId];
+                    if (appState.currentStoreId === storeId) {
+                        appState.currentStoreId = appState.stores[0].id;
+                        appState.weatherLocationKey = appState.stores[0].weatherLocationKey || 'yokohama';
+                    }
+                    saveStateToStorage();
+                    renderAll();
+                    renderStoreManagerModalList();
+                    showToast(`「${target ? target.name : '店舗'}」を削除しました`);
+                }
+            });
+
+            storeListEl.addEventListener('input', (e) => {
+                const target = e.target;
+                if (target.dataset.storeAction === 'rename') {
+                    const store = appState.stores.find(s => s.id === target.dataset.storeId);
+                    if (store && target.value.trim()) {
+                        store.name = target.value.trim();
+                        saveStateToStorage();
+                        renderStoreSelectors();
+                        renderMonthlySection();
+                        renderWeeklySection();
+                        updatePreviewAndSummaryHints();
+                    }
+                }
+            });
+
+            storeListEl.addEventListener('change', (e) => {
+                const target = e.target;
+                if (target.dataset.storeAction === 'change-weather') {
+                    const store = appState.stores.find(s => s.id === target.dataset.storeId);
+                    if (store) {
+                        store.weatherLocationKey = target.value;
+                        if (store.id === appState.currentStoreId) {
+                            appState.weatherLocationKey = target.value;
+                            renderYearMonthSelectors();
+                            fetchWeatherForCurrentMonth(false);
+                        }
+                        saveStateToStorage();
+                    }
+                }
+            });
+
             document.getElementById('yearSelect').addEventListener('change', (e) => {
                 appState.currentYear = Number(e.target.value);
                 appState.selectedWeekFilter = 'all';
@@ -3190,19 +3652,23 @@
             });
 
             document.getElementById('restoreSampleBtn').addEventListener('click', () => {
-                appState.records['2026-10'] = createSampleRecord2026_10();
-                appState.records['2026-09'] = createSampleRecord2026_09();
+                const recordsMap = getActiveStoreRecordsMap();
+                recordsMap['2026-10'] = createSampleRecord2026_10();
+                recordsMap['2026-09'] = createSampleRecord2026_09();
                 appState.weatherCache = Object.assign(createDefaultSampleWeatherCache(), appState.weatherCache);
                 appState.currentYear = 2026;
                 appState.currentMonth = 10;
                 appState.selectedWeekFilter = 'all';
                 saveStateToStorage();
                 renderAll();
-                showToast('2026年9月・10月のサンプルデータを復元しました');
+                showToast(`「${getCurrentStore().name}」に2026年9月・10月のサンプルデータを復元しました`);
             });
 
             document.getElementById('weatherLocationSelect').addEventListener('change', (e) => {
-                appState.weatherLocationKey = e.target.value;
+                const newLoc = e.target.value;
+                appState.weatherLocationKey = newLoc;
+                const store = getCurrentStore();
+                if (store) store.weatherLocationKey = newLoc;
                 saveStateToStorage();
                 renderWeeklySection();
                 fetchWeatherForCurrentMonth(false);
@@ -3425,6 +3891,7 @@
                 const input = document.getElementById('monthlyTopicInput');
                 if (!input.value.trim()) return;
                 addMonthlyTopic(input.value, selectedQuickCategory);
+                renderMonthTabs();
                 input.value = '';
                 input.focus();
                 showToast('Monthlyトピックを追加しました');
@@ -3481,6 +3948,7 @@
                 if (!btn) return;
                 const cat = btn.dataset.hintCategory || selectedQuickCategory;
                 addMonthlyTopic(btn.dataset.hintPromote, cat);
+                renderMonthTabs();
                 showToast(`「${cat}」としてMonthlyトピックへ追加しました`);
             });
 
@@ -3549,6 +4017,7 @@
                 appState.selectedWeekFilter = 'all';
                 saveStateToStorage();
                 renderWeeklySection();
+                applyLayoutAndSectionFilters();
                 updatePreviewAndSummaryHints();
                 showToast(`新しい週（${nextRange}）を追加しました`);
             });
@@ -3558,6 +4027,7 @@
                 if (!btn) return;
                 appState.selectedWeekFilter = btn.dataset.weekFilter;
                 renderWeeklySection();
+                applyLayoutAndSectionFilters();
             });
 
             const weeklyContainer = document.getElementById('weeklyCardsContainer');
@@ -3573,6 +4043,14 @@
 
                     record.weeklyItems[weekIdx].metrics[mKey] = target.value;
                     saveStateToStorage();
+
+                    const clearBtn = target.parentElement?.querySelector(`button[data-week-action="clear-single-metric"]`);
+                    if (clearBtn) {
+                        const hasVal = target.value.trim() !== '';
+                        clearBtn.classList.toggle('opacity-90', hasVal);
+                        clearBtn.classList.toggle('opacity-0', !hasVal);
+                        clearBtn.classList.toggle('pointer-events-none', !hasVal);
+                    }
 
                     [weekIdx, weekIdx + 1].forEach(idx => {
                         const wItem = record.weeklyItems[idx];
@@ -3664,6 +4142,26 @@
 
                 if (action === 'open-weekly-paste') {
                     openBulkPasteModal('weekly', { weekId: btn.dataset.weekId });
+                } else if (action === 'clear-single-metric') {
+                    const wId = btn.dataset.weekId;
+                    const mKey = btn.dataset.weeklyMetricKey;
+                    const week = record.weeklyItems.find(w => w.id === wId);
+                    if (!week) return;
+                    week.metrics[mKey] = '';
+                    saveStateToStorage();
+                    renderWeeklySection();
+                    updatePreviewAndSummaryHints();
+                    const def = WEEKLY_METRIC_DEFS.find(d => d.key === mKey);
+                    showToast(`「${def ? def.label : '項目'}」の値をクリアしました`);
+                } else if (action === 'reset-week-metrics') {
+                    const wId = btn.dataset.weekId;
+                    const week = record.weeklyItems.find(w => w.id === wId);
+                    if (!week) return;
+                    week.metrics = createEmptyWeeklyMetrics();
+                    saveStateToStorage();
+                    renderWeeklySection();
+                    updatePreviewAndSummaryHints();
+                    showToast(`Weekly（${week.range}）の「今週の値」9項目をリセットしました`);
                 } else if (action === 'toggle-metrics') {
                     const wId = btn.dataset.weekId;
                     appState.collapsedMetricsWeeks[wId] = !appState.collapsedMetricsWeeks[wId];
@@ -3674,6 +4172,7 @@
                     appState.selectedWeekFilter = 'all';
                     saveStateToStorage();
                     renderWeeklySection();
+                    applyLayoutAndSectionFilters();
                     updatePreviewAndSummaryHints();
                 } else if (action === 'promote-line') {
                     const cat = btn.dataset.lineCategory || selectedQuickCategory;
@@ -3716,6 +4215,12 @@
                 }
             });
 
+            document.getElementById('includeStoreNameToggle').addEventListener('change', (e) => {
+                appState.includeStoreNameInOutput = e.target.checked;
+                saveStateToStorage();
+                updatePreviewAndSummaryHints();
+            });
+
             document.getElementById('includeCategoryToggle').addEventListener('change', (e) => {
                 appState.includeCategoryInOutput = e.target.checked;
                 saveStateToStorage();
@@ -3752,12 +4257,13 @@
 
             document.getElementById('downloadTxtBtn').addEventListener('click', () => {
                 const record = getCurrentRecord();
+                const store = getCurrentStore();
                 const text = generateFormattedReport();
                 const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `定例報告_${record.year}年${record.month}月.txt`;
+                a.download = `定例報告_${store.name}_${record.year}年${record.month}月.txt`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
