@@ -31,8 +31,8 @@
             color: #0f172a;
         }
         .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
@@ -54,16 +54,16 @@
 <body class="min-h-screen flex flex-col pb-20 md:pb-8">
 
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
-        <div class="w-full px-3 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
+        <div class="w-full px-2.5 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
             <!-- Brand & Title -->
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-2">
                 <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-sm font-extrabold text-xs sm:text-sm shrink-0">
                     定例
                 </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">定例報告トピック管理＆出力ツール</h1>
-                        <span id="saveStatusBadge" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h1 class="text-xs xs:text-sm sm:text-base font-extrabold text-slate-900 tracking-tight truncate">定例報告トピック管理＆出力ツール</h1>
+                        <span id="saveStatusBadge" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>自動保存済
                         </span>
                     </div>
@@ -75,34 +75,34 @@
             <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto justify-between sm:justify-end">
                 <!-- Prev / Year / Month / Next -->
                 <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-                    <button id="prevMonthBtn" type="button" class="p-1.5 rounded-lg hover:bg-white text-slate-600 hover:text-slate-900 transition-colors" title="前月へ">
+                    <button id="prevMonthBtn" type="button" class="p-1 sm:p-1.5 rounded-lg hover:bg-white text-slate-600 hover:text-slate-900 transition-colors" title="前月へ">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <div class="flex items-center gap-1 px-1.5">
+                    <div class="flex items-center gap-0.5 sm:gap-1 px-1">
                         <select id="yearSelect" class="bg-transparent font-bold text-xs sm:text-sm text-slate-900 focus:outline-none cursor-pointer"></select>
-                        <span class="text-xs text-slate-500 font-semibold">年</span>
+                        <span class="text-[11px] text-slate-500 font-semibold">年</span>
                         <select id="monthSelect" class="bg-transparent font-bold text-xs sm:text-sm text-indigo-700 focus:outline-none cursor-pointer"></select>
-                        <span class="text-xs text-slate-500 font-semibold">月</span>
+                        <span class="text-[11px] text-slate-500 font-semibold">月</span>
                     </div>
-                    <button id="nextMonthBtn" type="button" class="p-1.5 rounded-lg hover:bg-white text-slate-600 hover:text-slate-900 transition-colors" title="翌月へ">
+                    <button id="nextMonthBtn" type="button" class="p-1 sm:p-1.5 rounded-lg hover:bg-white text-slate-600 hover:text-slate-900 transition-colors" title="翌月へ">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
 
                 <!-- Layout Mode Switcher -->
-                <div id="layoutModeGroup" class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px] font-semibold">
+                <div id="layoutModeGroup" class="hidden fold:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px] font-semibold">
                     <button type="button" data-layout-mode="auto" class="layout-mode-btn px-2.5 py-1 rounded-lg transition-colors">自動</button>
                     <button type="button" data-layout-mode="split" class="layout-mode-btn px-2.5 py-1 rounded-lg transition-colors">2画面分割</button>
                     <button type="button" data-layout-mode="single" class="layout-mode-btn px-2.5 py-1 rounded-lg transition-colors">1画面</button>
                 </div>
 
                 <div class="flex items-center gap-1.5">
-                    <button id="headerQuickCopyBtn" type="button" class="text-[11px] sm:text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-xl shadow-sm transition-colors flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <button id="headerQuickCopyBtn" type="button" class="text-[11px] sm:text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 sm:px-3 py-1.5 rounded-xl shadow-sm transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         <span class="hidden xs:inline">フォーマットを</span><span>コピー</span>
                     </button>
 
-                    <button id="restoreSampleBtn" type="button" class="text-[11px] font-semibold text-slate-600 hover:text-indigo-700 bg-white hover:bg-indigo-50 border border-slate-200 px-2.5 py-1.5 rounded-xl transition-colors" title="横浜店のサンプルデータ（2026年10月・9月）を初期状態に復元します">
+                    <button id="restoreSampleBtn" type="button" class="text-[11px] font-semibold text-slate-600 hover:text-indigo-700 bg-white hover:bg-indigo-50 border border-slate-200 px-2 sm:px-2.5 py-1.5 rounded-xl transition-colors" title="横浜店のサンプルデータ（2026年9月・10月）を初期状態に復元します">
                         サンプル復元
                     </button>
                 </div>
@@ -110,24 +110,24 @@
         </div>
 
         <!-- Secondary Sub-bar: Main View Tabs & Saved Month Quick Tabs -->
-        <div class="w-full px-3 sm:px-6 lg:px-8 py-2 bg-slate-50/95 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
+        <div class="w-full px-2.5 sm:px-6 lg:px-8 py-2 bg-slate-50/95 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
             <!-- Primary Tab Navigation (Switches Monthly / Weekly / Preview) -->
             <div class="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl text-xs font-extrabold overflow-x-auto max-w-full custom-scrollbar">
-                <button type="button" data-section-filter="all" class="section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                <button type="button" data-section-filter="all" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
                     📋 すべて表示
                 </button>
-                <button type="button" data-section-filter="monthly" class="section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                <button type="button" data-section-filter="monthly" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
                     📊 Monthly
                 </button>
-                <button type="button" data-section-filter="weekly" class="section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                <button type="button" data-section-filter="weekly" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
                     📅 Weekly
                 </button>
-                <button type="button" data-section-filter="preview" class="section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5">
+                <button type="button" data-section-filter="preview" class="section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap flex items-center gap-1">
                     <span>📄 提出フォーマット プレビュー</span>
                 </button>
             </div>
 
-            <!-- Saved Month Quick Tabs -->
+            <!-- Saved Month Quick Tabs (Ordered Oldest -> Newest: 9月 -> 10月 -> 11月) -->
             <div class="flex items-center gap-1.5 overflow-x-auto max-w-full custom-scrollbar py-0.5">
                 <span class="text-[11px] font-bold text-slate-400 shrink-0">記録月:</span>
                 <div id="monthTabsContainer" class="flex items-center gap-1 shrink-0"></div>
@@ -135,51 +135,51 @@
         </div>
     </header>
 
-    <main class="w-full px-3 sm:px-6 lg:px-8 pt-4 flex-1">
+    <main class="w-full px-2 sm:px-6 lg:px-8 pt-3 sm:pt-4 flex-1">
 
         <!-- WORKSPACE CONTAINER: Hidden completely when Preview Tab is selected -->
-        <div id="editorPaneContainer" class="grid grid-cols-1 gap-5 items-start min-w-0">
+        <div id="editorPaneContainer" class="grid grid-cols-1 gap-4 sm:gap-5 items-start min-w-0">
 
             <!-- 1. MONTHLY SECTION CARD -->
             <section id="monthlySectionCard" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-w-0">
                 <!-- Monthly Header -->
-                <div class="px-4 sm:px-5 py-3.5 bg-gradient-to-r from-indigo-50/90 via-white to-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">M</span>
+                <div class="px-3 sm:px-5 py-3 bg-gradient-to-r from-indigo-50/90 via-white to-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">M</span>
                         <div>
-                            <h2 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2 flex-wrap">
+                            <h2 class="text-xs xs:text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-1.5 flex-wrap">
                                 <span>【Monthly】月次トピック・定量実績・目標達成評価</span>
-                                <span id="monthlyCountBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">0件</span>
+                                <span id="monthlyCountBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">0件</span>
                             </h2>
-                            <p class="text-[11px] text-slate-500">定量実績の自動計算（昨対比・達成有無）と月次トピックの一元管理</p>
+                            <p class="text-[11px] text-slate-500 hidden xs:block">定量実績の自動計算（昨対比・達成有無）と月次トピックの一元管理</p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-1.5">
-                        <span id="monthlyAchievementSummaryBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">目標達成 0/0</span>
-                        <button id="toggleMonthlyMetricsBtn" type="button" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1">
+                        <span id="monthlyAchievementSummaryBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">目標達成 0/0</span>
+                        <button id="toggleMonthlyMetricsBtn" type="button" class="text-[11px] sm:text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded-xl transition-colors flex items-center gap-1">
                             <span id="toggleMonthlyMetricsBtnText">定量実績・達成評価 ▲</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Monthly Quantitative Performance & Achievement Evaluation Panel -->
-                <div id="monthlyMetricsPanel" class="border-b border-slate-200 bg-slate-50/70 p-3.5 sm:p-5 space-y-4">
+                <div id="monthlyMetricsPanel" class="border-b border-slate-200 bg-slate-50/70 p-2.5 sm:p-5 space-y-4">
                     <!-- Top Toolbar -->
                     <div class="flex flex-wrap items-center justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="w-1.5 h-4 rounded-full bg-indigo-600"></span>
-                            <h3 class="text-xs sm:text-sm font-extrabold text-slate-900">■ 定量実績（昨対比・現在の数値・去年の数値・目標値・目標達成有無）</h3>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-4 rounded-full bg-indigo-600 shrink-0"></span>
+                            <h3 class="text-xs sm:text-sm font-extrabold text-slate-900">■ 定量実績（昨対比・現在の数値・去年の数値・目標値）</h3>
                         </div>
                         <div class="flex items-center gap-1.5 flex-wrap">
-                            <button id="openMonthlyBulkPasteBtn" type="button" class="text-[11px] font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-sm">
-                                <span>📋 スライドから一括貼り付け（4行×11列対応）</span>
+                            <button id="openMonthlyBulkPasteBtn" type="button" class="text-[11px] font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-sm">
+                                <span>📋 スライドから一括貼り付け</span>
                             </button>
-                            <button id="calcMonthlyRatesBtn" type="button" class="text-[11px] font-bold text-sky-700 bg-white hover:bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="集客数・声かけ数・接客数・Considerationから声かけ率・接客率・ROIを自動計算します">
-                                <span>⚡ 声かけ率・接客率を自動計算</span>
+                            <button id="calcMonthlyRatesBtn" type="button" class="text-[11px] font-bold text-sky-700 bg-white hover:bg-sky-50 border border-sky-200 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="集客数・声かけ数・接客数・Considerationから声かけ率・接客率・ROIを自動計算します">
+                                <span>⚡ 率を自動計算</span>
                             </button>
-                            <button id="promoteMonthlyMetricsSummaryBtn" type="button" class="text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1">
-                                <span>＋実績サマリーをトピックへ追加</span>
+                            <button id="promoteMonthlyMetricsSummaryBtn" type="button" class="text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded-lg transition-colors flex items-center gap-1">
+                                <span>＋サマリーをトピック追加</span>
                             </button>
                         </div>
                     </div>
@@ -190,11 +190,10 @@
                     <!-- 5 Key Evaluation Pillars -->
                     <div class="pt-1 space-y-2.5">
                         <div class="flex flex-wrap items-center justify-between gap-2">
-                            <div class="flex items-center gap-2">
-                                <span class="w-1.5 h-4 rounded-full bg-blue-600"></span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-1.5 h-4 rounded-full bg-blue-600 shrink-0"></span>
                                 <h3 class="text-xs sm:text-sm font-extrabold text-slate-900">■ 実績評価（目標達成有無 ＆ 課題と理由）</h3>
                             </div>
-                            <span class="text-[11px] text-slate-500">※スマートフォンでは縦1列でゆったり表示されます</span>
                         </div>
 
                         <div id="monthlyEvalCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3"></div>
@@ -202,7 +201,7 @@
                 </div>
 
                 <!-- Weekly to Monthly Summary Hint Drawer -->
-                <div id="summaryHintPanel" class="hidden border-b border-amber-200 bg-amber-50/70 px-4 sm:px-5 py-3.5">
+                <div id="summaryHintPanel" class="hidden border-b border-amber-200 bg-amber-50/70 px-3 sm:px-5 py-3">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-xs font-extrabold text-amber-900 flex items-center gap-1.5">
                             <span>💡 Weeklyの記録からMonthlyトピックへワンクリック昇格</span>
@@ -213,8 +212,8 @@
                 </div>
 
                 <!-- Monthly Topic Add Form & 1-Tap Category Pills -->
-                <div class="p-4 sm:p-5 space-y-4">
-                    <form id="addMonthlyForm" class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200/90">
+                <div class="p-3 sm:p-5 space-y-3.5">
+                    <form id="addMonthlyForm" class="space-y-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/90">
                         <div class="flex items-center justify-between gap-2 flex-wrap">
                             <label class="text-xs font-extrabold text-slate-700">新規Monthlyトピックを追加</label>
                             <span class="text-[11px] text-slate-400">Enterで即追加</span>
@@ -228,7 +227,7 @@
                                 id="monthlyTopicInput"
                                 type="text"
                                 placeholder="例: SIMフリー販売の目標台数達成にむけて、カットイン連携でコーナー外からもアプローチを図った"
-                                class="flex-1 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                             />
                             <button
                                 type="submit"
@@ -247,46 +246,46 @@
             <!-- 2. WEEKLY SECTION CARD -->
             <section id="weeklySectionCard" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-w-0">
                 <!-- Weekly Header -->
-                <div class="px-4 sm:px-5 py-3.5 bg-gradient-to-r from-emerald-50/90 via-white to-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">W</span>
-                        <div>
-                            <h2 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2 flex-wrap">
-                                <span>【Weekly】週次実績（先週比）・天気/祝日連休・3項目メモ</span>
-                                <span id="weeklyFilledBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">0/5週</span>
+                <div class="px-3 sm:px-5 py-3 bg-gradient-to-r from-emerald-50/90 via-white to-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">W</span>
+                        <div class="min-w-0">
+                            <h2 class="text-xs xs:text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-1.5 flex-wrap">
+                                <span>【Weekly】週次実績・天気/祝日・3項目メモ</span>
+                                <span id="weeklyFilledBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0">0/5週</span>
                             </h2>
-                            <p class="text-[11px] text-slate-500">週間天気・祝日/連休の自動判定と、「数値の変化理由」「トピック」「課題解決アクション」を週ごとに管理</p>
+                            <p class="text-[11px] text-slate-500 hidden xs:block">週間天気・祝日/連休の自動判定と、「変化理由」「トピック」「課題解決アクション」を週ごとに管理</p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <!-- Weather Location & Fetch Controls -->
-                        <div class="flex items-center bg-sky-50/90 border border-sky-200 rounded-xl p-0.5 gap-1">
-                            <span class="text-[11px] pl-2 font-bold text-sky-800">📍</span>
-                            <select id="weatherLocationSelect" class="text-xs font-bold bg-transparent text-sky-950 py-1 pr-1 focus:outline-none cursor-pointer" title="天気を取得する店舗エリアを選択"></select>
-                            <button id="fetchWeatherBtn" type="button" class="text-[11px] font-extrabold text-white bg-sky-600 hover:bg-sky-700 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-2xs" title="Open-Meteoから当月各週の天気・気温・降水量を自動取得します">
+                        <div class="flex items-center bg-sky-50/90 border border-sky-200 rounded-xl p-0.5 gap-1 max-w-full">
+                            <span class="text-[11px] pl-1.5 font-bold text-sky-800 shrink-0">📍</span>
+                            <select id="weatherLocationSelect" class="text-[11px] sm:text-xs font-bold bg-transparent text-sky-950 py-1 pr-1 focus:outline-none cursor-pointer max-w-[115px] xs:max-w-[160px] truncate" title="天気を取得する店舗エリアを選択"></select>
+                            <button id="fetchWeatherBtn" type="button" class="text-[11px] font-extrabold text-white bg-sky-600 hover:bg-sky-700 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-2xs shrink-0" title="Open-Meteoから当月各週の天気・気温・降水量を自動取得します">
                                 <span id="fetchWeatherBtnLabel">⛅ 天気取得</span>
                             </button>
                         </div>
 
-                        <button id="toggleMetricsMatrixBtn" type="button" class="text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded-xl transition-colors flex items-center gap-1">
-                            <span>📊 週次推移表</span>
+                        <button id="toggleMetricsMatrixBtn" type="button" class="text-[11px] sm:text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded-xl transition-colors flex items-center gap-1">
+                            <span>📊 推移表</span>
                         </button>
-                        <select id="weekStartDaySelect" class="text-xs font-semibold bg-slate-100 border border-slate-200 rounded-xl px-2 py-1.5 text-slate-700 focus:outline-none">
-                            <option value="1">月曜始まり</option>
-                            <option value="0">日曜始まり</option>
+                        <select id="weekStartDaySelect" class="text-[11px] sm:text-xs font-semibold bg-slate-100 border border-slate-200 rounded-xl px-2 py-1.5 text-slate-700 focus:outline-none">
+                            <option value="1">月曜始</option>
+                            <option value="0">日曜始</option>
                         </select>
-                        <button id="autoCalcWeeksBtn" type="button" class="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2.5 py-1.5 rounded-xl transition-colors" title="当月のカレンダーに合わせて日付範囲を再計算します">
-                            日付自動計算
+                        <button id="autoCalcWeeksBtn" type="button" class="text-[11px] sm:text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2 py-1.5 rounded-xl transition-colors" title="当月のカレンダーに合わせて日付範囲を再計算します">
+                            日付計算
                         </button>
-                        <button id="addWeekCardBtn" type="button" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded-xl transition-colors">
-                            ＋ 週を追加
+                        <button id="addWeekCardBtn" type="button" class="text-[11px] sm:text-xs font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded-xl transition-colors">
+                            ＋週追加
                         </button>
                     </div>
                 </div>
 
                 <!-- Weekly Cross-Week Comparison Matrix Drawer -->
-                <div id="weeklyMetricsMatrixPanel" class="hidden border-b border-slate-200 bg-slate-50 p-3.5 sm:p-5 space-y-2.5">
+                <div id="weeklyMetricsMatrixPanel" class="hidden border-b border-slate-200 bg-slate-50 p-2.5 sm:p-5 space-y-2.5">
                     <div class="flex items-center justify-between">
                         <h3 class="text-xs sm:text-sm font-extrabold text-slate-800">📊 週次推移マトリクス（前月最終週〜当月各週の今週の値＆先週比）</h3>
                         <button id="closeMetricsMatrixBtn" type="button" class="text-xs font-bold text-slate-500 hover:text-slate-800 px-2 py-0.5 rounded">閉じる ✕</button>
@@ -295,13 +294,13 @@
                 </div>
 
                 <!-- Week Focus Filter Tabs (All Weeks vs 1W, 2W, 3W...) -->
-                <div class="px-4 sm:px-5 py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto custom-scrollbar">
-                    <div id="weekFocusTabsContainer" class="flex items-center gap-1.5 shrink-0"></div>
-                    <span class="text-[11px] text-slate-400 shrink-0 hidden sm:inline">※天気・祝日バーから変化理由への1タップ引用も可能</span>
+                <div class="px-2.5 sm:px-5 py-2 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto custom-scrollbar">
+                    <div id="weekFocusTabsContainer" class="flex items-center gap-1 shrink-0"></div>
+                    <span class="text-[11px] text-slate-400 shrink-0 hidden md:inline">※天気・祝日バーから変化理由への1タップ引用も可能</span>
                 </div>
 
                 <!-- Weekly Cards List -->
-                <div id="weeklyCardsContainer" class="p-3.5 sm:p-5 space-y-4"></div>
+                <div id="weeklyCardsContainer" class="p-2 sm:p-5 space-y-3.5 sm:space-y-4"></div>
             </section>
         </div>
 
@@ -309,7 +308,7 @@
         <section id="previewPaneContainer" class="hidden min-w-0">
             <div class="bg-slate-900 text-slate-100 rounded-2xl border border-slate-800 shadow-lg overflow-hidden flex flex-col">
                 <!-- Preview Header -->
-                <div class="px-4 sm:px-6 py-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <div class="px-3.5 sm:px-6 py-3.5 sm:py-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 class="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
@@ -330,7 +329,7 @@
                 </div>
 
                 <!-- Format Customization Toggles -->
-                <div class="px-4 sm:px-6 py-3 bg-slate-800/50 border-b border-slate-800 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm text-slate-300">
+                <div class="px-3.5 sm:px-6 py-3 bg-slate-800/50 border-b border-slate-800 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm text-slate-300">
                     <label class="inline-flex items-center gap-2 cursor-pointer select-none">
                         <input id="includeCategoryToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
                         <span>Monthlyに[タグ]を表示</span>
@@ -354,21 +353,21 @@
                 </div>
 
                 <!-- Formatted Output Pre -->
-                <div class="p-4 sm:p-6 flex-1">
-                    <pre id="formattedPreviewArea" class="w-full min-h-[460px] max-h-[78vh] overflow-y-auto custom-scrollbar font-mono text-xs sm:text-sm leading-relaxed text-slate-100 bg-slate-950/80 p-4 sm:p-6 rounded-xl border border-slate-800/90 whitespace-pre-wrap break-words select-all"></pre>
+                <div class="p-3 sm:p-6 flex-1">
+                    <pre id="formattedPreviewArea" class="w-full min-h-[460px] max-h-[78vh] overflow-y-auto custom-scrollbar font-mono text-xs sm:text-sm leading-relaxed text-slate-100 bg-slate-950/80 p-3.5 sm:p-6 rounded-xl border border-slate-800/90 whitespace-pre-wrap break-words select-all"></pre>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- BULK PASTE MODAL -->
-    <div id="bulkPasteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div id="bulkPasteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh]">
             <!-- Modal Header -->
-            <div id="bulkPasteModalHeader" class="px-4 sm:px-5 py-3.5 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2">
+            <div id="bulkPasteModalHeader" class="px-4 sm:px-5 py-3 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
                     <span id="bulkPasteModalBadge" class="px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white font-extrabold text-xs">Monthly</span>
-                    <h3 id="bulkPasteModalTitle" class="text-sm sm:text-base font-extrabold text-slate-900">スライドから一括貼り付け</h3>
+                    <h3 id="bulkPasteModalTitle" class="text-xs xs:text-sm sm:text-base font-extrabold text-slate-900">スライドから一括貼り付け</h3>
                 </div>
                 <button id="closeBulkPasteModalBtn" type="button" class="text-slate-400 hover:text-slate-700 font-bold text-sm px-2 py-1 rounded-lg hover:bg-white/80">
                     ✕
@@ -376,11 +375,11 @@
             </div>
 
             <!-- Modal Body -->
-            <div class="p-4 sm:p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1">
+            <div class="p-3.5 sm:p-5 space-y-3.5 overflow-y-auto custom-scrollbar flex-1">
                 <!-- Target Selector Bar -->
-                <div id="bulkPasteTargetSelectorWrap" class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200">
+                <div id="bulkPasteTargetSelectorWrap" class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
                     <span id="bulkPasteTargetLabel" class="text-xs font-extrabold text-slate-700">貼り付けモード:</span>
-                    <select id="bulkPasteTargetSelect" class="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500"></select>
+                    <select id="bulkPasteTargetSelect" class="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 max-w-full"></select>
                 </div>
 
                 <!-- Paste Textarea -->
@@ -389,7 +388,7 @@
                         <label id="bulkPasteInputHintLabel" for="bulkPasteTextarea" class="text-xs font-extrabold text-slate-700">
                             スライドの表（4行×11列の44セル範囲など）をそのままコピー＆貼り付け
                         </label>
-                        <button id="clearBulkPasteTextBtn" type="button" class="text-[11px] font-semibold text-slate-400 hover:text-rose-600">クリア</button>
+                        <button id="clearBulkPasteTextBtn" type="button" class="text-[11px] font-semibold text-slate-400 hover:text-rose-600 shrink-0">クリア</button>
                     </div>
                     <textarea
                         id="bulkPasteTextarea"
@@ -425,21 +424,21 @@
     </div>
 
     <!-- Mobile Bottom Quick Action Bar -->
-    <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 px-2.5 py-2 flex items-center justify-between gap-2 shadow-lg">
+    <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 px-2 py-1.5 flex items-center justify-between gap-1.5 shadow-lg">
         <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 flex-1 overflow-x-auto">
-            <button type="button" data-section-filter="all" class="section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">すべて</button>
-            <button type="button" data-section-filter="monthly" class="section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">Monthly</button>
-            <button type="button" data-section-filter="weekly" class="section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">Weekly</button>
-            <button type="button" data-section-filter="preview" class="section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">📄 プレビュー</button>
+            <button type="button" data-section-filter="all" class="section-filter-btn flex-1 py-1.5 px-1.5 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">すべて</button>
+            <button type="button" data-section-filter="monthly" class="section-filter-btn flex-1 py-1.5 px-1.5 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">Monthly</button>
+            <button type="button" data-section-filter="weekly" class="section-filter-btn flex-1 py-1.5 px-1.5 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">Weekly</button>
+            <button type="button" data-section-filter="preview" class="section-filter-btn flex-1 py-1.5 px-1.5 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">📄 プレビュー</button>
         </div>
-        <button id="mobileQuickCopyBtn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-xl shadow-sm shrink-0">
+        <button id="mobileQuickCopyBtn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-[11px] px-3 py-2 rounded-xl shadow-sm shrink-0">
             一発コピー
         </button>
     </nav>
 
     <!-- Toast Notification -->
-    <div id="toastContainer" class="fixed bottom-16 fold:bottom-5 right-4 z-50 pointer-events-none transition-all duration-200 opacity-0 translate-y-2">
-        <div id="toastInner" class="bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 flex items-center gap-2">
+    <div id="toastContainer" class="fixed bottom-16 fold:bottom-5 right-3 sm:right-4 z-50 pointer-events-none transition-all duration-200 opacity-0 translate-y-2">
+        <div id="toastInner" class="bg-slate-900 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-lg border border-slate-700 flex items-center gap-2">
             <span id="toastMessage">コピーしました</span>
         </div>
     </div>
@@ -448,8 +447,9 @@
          SCRIPT BLOCK 1: 定数・祝日/連休判定エンジン・天気取得エンジン・状態管理・一括解析
          ===================================================================== -->
     <script>
-        const STORAGE_KEY = 'periodic_report_topic_manager_v7';
+        const STORAGE_KEY = 'periodic_report_topic_manager_v8';
         const LEGACY_STORAGE_KEYS = [
+            'periodic_report_topic_manager_v7',
             'periodic_report_topic_manager_v6',
             'periodic_report_topic_manager_v5',
             'periodic_report_topic_manager_v4'
@@ -457,7 +457,6 @@
         const DEFAULT_YEAR = 2026;
         const DEFAULT_MONTH = 10;
 
-        // 店舗エリア座標定義（Open-Meteo API用）
         const WEATHER_LOCATIONS = [
             { key: 'yokohama', label: '横浜', lat: 35.4658, lon: 139.6223 },
             { key: 'kawasaki', label: '川崎', lat: 35.5308, lon: 139.7029 },
@@ -615,7 +614,6 @@
             addH(3, vernal, '春分の日');
             addH(9, autumnal, '秋分の日');
 
-            // 国民の休日（祝日と祝日に挟まれた平日）
             const startCheck = new Date(y, 0, 2);
             const endCheck = new Date(y, 11, 30);
             for (let cur = new Date(startCheck); cur <= endCheck; cur.setDate(cur.getDate() + 1)) {
@@ -629,7 +627,6 @@
                 }
             }
 
-            // 振替休日
             const baseKeys = Object.keys(map).sort();
             baseKeys.forEach(k => {
                 const parts = k.split('-').map(Number);
@@ -1347,6 +1344,7 @@
             return `${Number(year)}-${String(Number(month)).padStart(2, '0')}`;
         }
 
+        // ユーザーの消去・編集操作を上書きしない安全な正規化関数
         function sanitizeRecord(rec, year, month) {
             const safe = rec && typeof rec === 'object' ? rec : createDefaultRecord(year, month, appState.weekStartDay);
             safe.year = Number(year);
@@ -1390,16 +1388,20 @@
                     if (!w.id) w.id = `w-${year}-${month}-${idx}`;
                     if (typeof w.range !== 'string') w.range = `${idx + 1}W`;
 
+                    // 旧バージョンの単一 `memo` フィールドが残っている場合は初回のみ移行して削除する
                     const hasNewFields = typeof w.changeReason === 'string' || typeof w.topics === 'string' || typeof w.actionItems === 'string';
-                    if (!hasNewFields && typeof w.memo === 'string' && w.memo.trim()) {
+                    if (!hasNewFields && typeof w.memo === 'string') {
                         w.changeReason = '';
                         w.topics = w.memo.trim();
                         w.actionItems = '';
-                    } else {
-                        if (typeof w.changeReason !== 'string') w.changeReason = '';
-                        if (typeof w.topics !== 'string') w.topics = '';
-                        if (typeof w.actionItems !== 'string') w.actionItems = '';
                     }
+                    if ('memo' in w) {
+                        delete w.memo;
+                    }
+
+                    if (typeof w.changeReason !== 'string') w.changeReason = '';
+                    if (typeof w.topics !== 'string') w.topics = '';
+                    if (typeof w.actionItems !== 'string') w.actionItems = '';
 
                     if (!w.metrics || typeof w.metrics !== 'object') {
                         w.metrics = createEmptyWeeklyMetrics();
@@ -1411,24 +1413,6 @@
                         });
                     }
                 });
-
-                // 前回エラー発生時にテストクリックで追加された未入力の重複週（6W以降の "10/1〜10/7" 等）を自動クリーンアップ
-                const placeholderRange = `${Number(month)}/1〜${Number(month)}/7`;
-                safe.weeklyItems = safe.weeklyItems.filter((w, idx) => {
-                    if (idx >= 5 && w.range === placeholderRange && !hasWeekAnyMetric(w) && !hasWeekAnyText(w)) {
-                        return false;
-                    }
-                    return true;
-                });
-
-                // 2026年10月の3Wのサンプル初期データが空になっていた場合は復元補完
-                if (Number(year) === 2026 && Number(month) === 10 && safe.weeklyItems[2]) {
-                    const w3 = safe.weeklyItems[2];
-                    if (!hasWeekAnyMetric(w3) && !hasWeekAnyText(w3)) {
-                        const sample10 = createSampleRecord2026_10();
-                        safe.weeklyItems[2] = sample10.weeklyItems[2];
-                    }
-                }
             }
 
             return safe;
@@ -1444,8 +1428,8 @@
                 } else {
                     appState.records[key] = createDefaultRecord(appState.currentYear, appState.currentMonth, appState.weekStartDay);
                 }
+                appState.records[key] = sanitizeRecord(appState.records[key], appState.currentYear, appState.currentMonth);
             }
-            appState.records[key] = sanitizeRecord(appState.records[key], appState.currentYear, appState.currentMonth);
         }
 
         function getCurrentRecord() {
@@ -1454,12 +1438,16 @@
         }
 
         function loadStateFromStorage() {
+            let loadedFromLegacy = false;
             try {
                 let raw = localStorage.getItem(STORAGE_KEY);
                 if (!raw) {
                     for (const legKey of LEGACY_STORAGE_KEYS) {
                         raw = localStorage.getItem(legKey);
-                        if (raw) break;
+                        if (raw) {
+                            loadedFromLegacy = true;
+                            break;
+                        }
                     }
                 }
                 if (raw) {
@@ -1493,10 +1481,25 @@
                 const parts = k.split('-');
                 const y = Number(parts[0]) || DEFAULT_YEAR;
                 const m = Number(parts[1]) || DEFAULT_MONTH;
-                appState.records[k] = sanitizeRecord(appState.records[k], y, m);
+                const rec = sanitizeRecord(appState.records[k], y, m);
+
+                // 旧ストレージからの移行時のみ、バグ発生時に増えた6W以降の空の重複週を1回だけ整理
+                if (loadedFromLegacy && Array.isArray(rec.weeklyItems) && rec.weeklyItems.length > 5) {
+                    const placeholderRange = `${m}/1〜${m}/7`;
+                    rec.weeklyItems = rec.weeklyItems.filter((w, idx) => {
+                        if (idx >= 5 && w.range === placeholderRange && !hasWeekAnyMetric(w) && !hasWeekAnyText(w)) {
+                            return false;
+                        }
+                        return true;
+                    });
+                }
+                appState.records[k] = rec;
             });
 
             ensureCurrentRecordExists();
+            if (loadedFromLegacy) {
+                saveStateToStorage();
+            }
         }
 
         function saveStateToStorage() {
@@ -1669,7 +1672,7 @@
         }
     </script>
     <!-- =====================================================================
-         SCRIPT BLOCK 2: UI描画（週間天気＆祝日・連休バー・Monthly・Weekly・プレビュー）
+         SCRIPT BLOCK 2: UI描画（スマホ最適化対応の週間天気＆祝日バー・Monthly・Weekly・プレビュー）
          ===================================================================== -->
     <script>
         function getWeatherEntryForDate(locKey, dateKey) {
@@ -1688,7 +1691,7 @@
             const badgesHtml = [];
             cal.holidayStreaks.forEach(streak => {
                 badgesHtml.push(`
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs">
                         <span>🎉 ${escapeHtml(streak.label)}</span>
                     </span>
                 `);
@@ -1697,7 +1700,7 @@
             if (cal.holidayStreaks.length === 0 && cal.holidays.length > 0) {
                 const hText = cal.holidays.map(h => `${h.month}/${h.day}(${h.holidayName})`).join('・');
                 badgesHtml.push(`
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-50 text-rose-700 border border-rose-200">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-extrabold bg-rose-50 text-rose-700 border border-rose-200">
                         <span>🎌 祝日: ${escapeHtml(hText)}</span>
                     </span>
                 `);
@@ -1711,7 +1714,7 @@
 
             const dayPillsHtml = cal.daysInfo.map(d => {
                 const w = getWeatherEntryForDate(locObj.key, d.dateKey);
-                let weatherHtml = `<span class="text-[10px] text-slate-300">未取得</span>`;
+                let weatherHtml = `<span class="text-[9px] text-slate-300">未取得</span>`;
 
                 if (w) {
                     hasAnyWeather = true;
@@ -1734,12 +1737,12 @@
                         : '';
 
                     weatherHtml = `
-                        <div class="flex items-center justify-center gap-1 mt-0.5">
-                            <span class="text-sm leading-none" title="${escapeHtml(meta.label)}">${meta.icon}</span>
+                        <div class="flex items-center justify-center gap-0.5 mt-0.5">
+                            <span class="text-xs sm:text-sm leading-none" title="${escapeHtml(meta.label)}">${meta.icon}</span>
                             <span class="text-[10px] font-mono font-bold text-slate-700">${Math.round(w.max)}°<span class="text-slate-400 font-normal">/${Math.round(w.min)}°</span></span>
                         </div>
                         <div class="h-3.5 flex items-center justify-center mt-0.5">
-                            ${precipBadge || `<span class="text-[9px] text-slate-400">${escapeHtml(meta.label)}</span>`}
+                            ${precipBadge || `<span class="text-[9px] text-slate-400 truncate max-w-full">${escapeHtml(meta.label)}</span>`}
                         </div>
                     `;
                 }
@@ -1758,13 +1761,14 @@
                             ? 'bg-blue-50/40 border-slate-200'
                             : 'bg-white border-slate-200/90';
 
+                // 通常スマホでは w-[62px] shrink-0 で横スクロール可能にし、折りたたみスマホ/PC (fold:680px以上) では均等7分割
                 return `
-                    <div class="rounded-lg border ${cardBgClass} px-1.5 py-1 text-center flex flex-col justify-between min-w-[68px]">
-                        <div class="flex items-center justify-center gap-0.5 text-[10px] ${dayColorClass} leading-tight">
+                    <div class="w-[62px] shrink-0 fold:w-auto fold:flex-1 rounded-lg border ${cardBgClass} px-1 py-1 text-center flex flex-col justify-between">
+                        <div class="flex items-center justify-center gap-0.5 text-[10px] ${dayColorClass} leading-tight whitespace-nowrap">
                             <span class="font-mono">${d.month}/${d.day}</span>
                             <span>(${d.dowLabel})</span>
                         </div>
-                        ${d.holidayName ? `<div class="text-[9px] font-extrabold text-rose-600 bg-rose-100/80 rounded px-1 py-0.2 truncate mt-0.5" title="${escapeHtml(d.holidayName)}">${escapeHtml(d.holidayName)}</div>` : '<div class="h-[13px]"></div>'}
+                        ${d.holidayName ? `<div class="text-[8px] sm:text-[9px] font-extrabold text-rose-600 bg-rose-100/80 rounded px-0.5 py-0.2 truncate mt-0.5" title="${escapeHtml(d.holidayName)}">${escapeHtml(d.holidayName)}</div>` : '<div class="h-[13px]"></div>'}
                         ${weatherHtml}
                     </div>
                 `;
@@ -1774,13 +1778,13 @@
                 if (weekendOrHolidayRainDays.length > 0) {
                     const rNames = weekendOrHolidayRainDays.map(r => r.dayDesc).join('・');
                     badgesHtml.push(`
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-sky-100 text-sky-900 border border-sky-300">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-extrabold bg-sky-100 text-sky-900 border border-sky-300">
                             <span>☔ 週末/祝日雨天 (${escapeHtml(rNames)})</span>
                         </span>
                     `);
                 } else {
                     badgesHtml.push(`
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
                             <span>☀️ 週末/祝日は概ね晴〜曇</span>
                         </span>
                     `);
@@ -1788,7 +1792,7 @@
                 if (tempCount > 0) {
                     const avgMax = (maxTempSum / tempCount).toFixed(1);
                     badgesHtml.push(`
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-white text-slate-600 border border-slate-200">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono font-semibold bg-white text-slate-600 border border-slate-200">
                             <span>🌡️ 週平均最高 ${avgMax}℃</span>
                         </span>
                     `);
@@ -1819,11 +1823,11 @@
                 : `・【カレンダー要因】特段の祝日・連休なし。`;
 
             return `
-                <div class="mb-4 rounded-xl bg-slate-50/90 border border-slate-200/90 p-2.5 sm:p-3 space-y-2">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="mb-3.5 rounded-xl bg-slate-50/90 border border-slate-200/90 p-2 sm:p-3 space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                         <div class="flex items-center gap-1.5 flex-wrap">
                             <span class="text-[11px] font-extrabold text-slate-700 flex items-center gap-1">
-                                <span>🗓️ 週間カレンダー＆天気(${escapeHtml(locObj.label)}):</span>
+                                <span>🗓️ カレンダー＆天気(${escapeHtml(locObj.label)}):</span>
                             </span>
                             ${badgesHtml.length > 0 ? badgesHtml.join('') : '<span class="text-[11px] text-slate-400">祝日・連休なし</span>'}
                         </div>
@@ -1832,15 +1836,15 @@
                             data-week-action="insert-weather-holiday-insight"
                             data-week-id="${week.id}"
                             data-insight-text="${escapeHtml(autoInsightSentence)}"
-                            class="text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shrink-0"
+                            class="self-start sm:self-auto text-[10px] sm:text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shrink-0"
                             title="この週の天候・祝日・連休の分析文を「数値の変化理由」欄へ追記します"
                         >
                             <span>＋天候・連休要因を変化理由へ挿入</span>
                         </button>
                     </div>
 
-                    <!-- 7-Day Mini Calendar & Weather Strip -->
-                    <div class="grid grid-cols-7 gap-1.5 overflow-x-auto custom-scrollbar pb-0.5">
+                    <!-- 7-Day Mini Calendar & Weather Strip (Smooth horizontal scroll on narrow mobile, full width on fold/PC) -->
+                    <div class="flex items-stretch gap-1 sm:gap-1.5 overflow-x-auto custom-scrollbar pb-0.5">
                         ${dayPillsHtml}
                     </div>
                 </div>
@@ -1902,11 +1906,11 @@
                 if (targetTotalCount > 0) {
                     summaryBadge.textContent = `目標達成 ${achievedCount}/${targetTotalCount}項目`;
                     summaryBadge.className = achievedCount >= Math.ceil(targetTotalCount / 2)
-                        ? 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200'
-                        : 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200';
+                        ? 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200'
+                        : 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200';
                 } else {
                     summaryBadge.textContent = '目標未入力';
-                    summaryBadge.className = 'text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200';
+                    summaryBadge.className = 'text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200';
                 }
             }
 
@@ -1934,7 +1938,7 @@
                     });
                 } else {
                     const headerCells = MONTHLY_METRIC_DEFS.map(def => `
-                        <th class="px-2 py-2 text-center border-r border-slate-300 last:border-r-0 min-w-[94px] ${def.headerBg}">
+                        <th class="px-2 py-2 text-center border-r border-slate-300 last:border-r-0 min-w-[90px] ${def.headerBg}">
                             <div class="text-[11px] font-extrabold leading-tight">${escapeHtml(def.label)}</div>
                             ${def.subLabel ? `<div class="text-[9px] font-semibold opacity-75 leading-tight mt-0.5">${escapeHtml(def.subLabel)}</div>` : ''}
                         </th>
@@ -1978,7 +1982,7 @@
                                             data-monthly-field="${fieldKey}"
                                             value="${escapeHtml(rawVal)}"
                                             placeholder="—"
-                                            class="w-full min-w-[56px] text-center font-mono text-xs font-bold text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white border border-transparent focus:border-indigo-500 rounded px-1 py-1 focus:outline-none transition-colors"
+                                            class="w-full min-w-[54px] text-center font-mono text-xs font-bold text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white border border-transparent focus:border-indigo-500 rounded px-1 py-1 focus:outline-none transition-colors"
                                         />
                                         ${unitSuffix ? `<span class="text-[10px] font-mono text-slate-500 select-none">${unitSuffix}</span>` : ''}
                                     </div>
@@ -2003,7 +2007,7 @@
                         <table class="w-full border-collapse text-xs">
                             <thead>
                                 <tr class="border-b border-slate-300">
-                                    <th class="px-2.5 py-2 text-center text-xs font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 min-w-[116px]">
+                                    <th class="px-2 py-2 text-center text-xs font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 min-w-[110px]">
                                         項目
                                     </th>
                                     ${headerCells}
@@ -2011,13 +2015,13 @@
                             </thead>
                             <tbody>
                                 <tr class="border-b border-slate-300">
-                                    <th class="px-2.5 py-1.5 text-center text-[11px] font-extrabold text-indigo-900 bg-indigo-50 border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">
+                                    <th class="px-2 py-1.5 text-center text-[11px] font-extrabold text-indigo-900 bg-indigo-50 border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">
                                         目標達成有無
                                     </th>
                                     ${achievementCells}
                                 </tr>
                                 <tr class="border-b border-slate-200">
-                                    <th class="px-2.5 py-1.5 text-center text-[11px] font-extrabold text-slate-800 bg-slate-100 border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">
+                                    <th class="px-2 py-1.5 text-center text-[11px] font-extrabold text-slate-800 bg-slate-100 border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">
                                         昨対比
                                     </th>
                                     ${yoyCells}
@@ -2099,7 +2103,7 @@
                         }).filter(Boolean).join('');
 
                         return `
-                            <div class="rounded-xl bg-slate-200/75 border border-slate-300/90 p-3 sm:p-3.5 flex flex-col gap-2.5">
+                            <div class="rounded-xl bg-slate-200/75 border border-slate-300/90 p-3 flex flex-col gap-2">
                                 <div class="flex items-center justify-between md:justify-center gap-2">
                                     <div class="font-extrabold text-sm text-slate-800">${escapeHtml(pillar.label)}</div>
                                 </div>
@@ -2181,23 +2185,23 @@
             }
 
             listContainer.innerHTML = record.monthlyTopics.map((topic, index) => `
-                <div class="group flex items-start gap-2.5 p-3 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 shadow-sm transition-all">
+                <div class="group flex items-start gap-2 p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 shadow-sm transition-all">
                     <span class="text-indigo-600 font-extrabold text-sm mt-0.5 select-none">・</span>
                     <div class="flex-1 min-w-0 space-y-1">
-                        <div class="flex items-center gap-2 flex-wrap">
+                        <div class="flex items-center gap-1.5 flex-wrap">
                             ${getCategoryBadgeHtml(topic.category)}
                             <input
                                 type="text"
                                 data-monthly-topic-id="${topic.id}"
                                 value="${escapeHtml(topic.content)}"
-                                class="flex-1 min-w-[180px] text-xs sm:text-sm font-medium text-slate-800 bg-transparent border-b border-transparent focus:border-indigo-400 focus:outline-none py-0.5"
+                                class="flex-1 min-w-[140px] w-full text-xs sm:text-sm font-medium text-slate-800 bg-transparent border-b border-transparent focus:border-indigo-400 focus:outline-none py-0.5"
                             />
                         </div>
                     </div>
-                    <div class="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100">
-                        <button type="button" data-topic-action="up" data-topic-index="${index}" ${index === 0 ? 'disabled' : ''} class="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 disabled:opacity-25" title="上へ移動">▲</button>
-                        <button type="button" data-topic-action="down" data-topic-index="${index}" ${index === record.monthlyTopics.length - 1 ? 'disabled' : ''} class="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 disabled:opacity-25" title="下へ移動">▼</button>
-                        <button type="button" data-topic-action="delete" data-topic-id="${topic.id}" class="p-1 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600" title="削除">✕</button>
+                    <div class="flex items-center gap-0.5 shrink-0">
+                        <button type="button" data-topic-action="up" data-topic-index="${index}" ${index === 0 ? 'disabled' : ''} class="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 disabled:opacity-25 text-xs" title="上へ移動">▲</button>
+                        <button type="button" data-topic-action="down" data-topic-index="${index}" ${index === record.monthlyTopics.length - 1 ? 'disabled' : ''} class="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 disabled:opacity-25 text-xs" title="下へ移動">▼</button>
+                        <button type="button" data-topic-action="delete" data-topic-id="${topic.id}" class="p-1 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600 text-xs" title="削除">✕</button>
                     </div>
                 </div>
             `).join('');
@@ -2232,7 +2236,7 @@
             const isAll = appState.selectedWeekFilter === 'all';
             let html = `
                 <button type="button" data-week-filter="all"
-                    class="px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all ${isAll ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'}">
+                    class="px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-extrabold transition-all whitespace-nowrap ${isAll ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'}">
                     全${record.weeklyItems.length}週
                 </button>
             `;
@@ -2244,7 +2248,7 @@
                 const hasHolidayOrStreak = cal.holidayStreaks.length > 0 || cal.holidays.length > 0;
                 html += `
                     <button type="button" data-week-filter="${idx}"
-                        class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${active ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}">
+                        class="px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1 whitespace-nowrap ${active ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}">
                         <span>${idx + 1}W (${escapeHtml(w.range)})</span>
                         ${hasHolidayOrStreak ? `<span class="text-[10px] ${active ? 'text-rose-200' : 'text-rose-600'}" title="祝日・連休あり">🎌</span>` : ''}
                         ${hasData ? `<span class="w-1.5 h-1.5 rounded-full ${active ? 'bg-white' : 'bg-emerald-500'}"></span>` : ''}
@@ -2265,10 +2269,10 @@
 
             const colHeaders = [];
             if (prevCtx.item) {
-                colHeaders.push(`<th class="px-2.5 py-2 text-center bg-slate-100 border-r border-slate-200 text-[11px] font-bold text-slate-600 min-w-[100px]">前月最終<br><span class="font-mono text-[10px]">${escapeHtml(prevCtx.item.range)}</span></th>`);
+                colHeaders.push(`<th class="px-2 py-2 text-center bg-slate-100 border-r border-slate-200 text-[11px] font-bold text-slate-600 min-w-[92px]">前月最終<br><span class="font-mono text-[10px]">${escapeHtml(prevCtx.item.range)}</span></th>`);
             }
             record.weeklyItems.forEach((w, idx) => {
-                colHeaders.push(`<th class="px-2.5 py-2 text-center bg-emerald-50/70 border-r border-slate-200 last:border-r-0 text-[11px] font-extrabold text-emerald-950 min-w-[115px]">${idx + 1}W<br><span class="font-mono text-[10px] font-semibold">${escapeHtml(w.range)}</span></th>`);
+                colHeaders.push(`<th class="px-2 py-2 text-center bg-emerald-50/70 border-r border-slate-200 last:border-r-0 text-[11px] font-extrabold text-emerald-950 min-w-[105px]">${idx + 1}W<br><span class="font-mono text-[10px] font-semibold">${escapeHtml(w.range)}</span></th>`);
             });
 
             const rowsHtml = WEEKLY_METRIC_DEFS.map(def => {
@@ -2291,7 +2295,7 @@
                 });
                 return `
                     <tr class="border-b border-slate-200 last:border-b-0">
-                        <th class="px-2.5 py-1.5 text-left text-xs font-bold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">${escapeHtml(def.label)}</th>
+                        <th class="px-2 py-1.5 text-left text-[11px] sm:text-xs font-bold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">${escapeHtml(def.label)}</th>
                         ${cells.join('')}
                     </tr>
                 `;
@@ -2301,7 +2305,7 @@
                 <table class="w-full border-collapse text-xs">
                     <thead>
                         <tr class="border-b border-slate-300">
-                            <th class="px-2.5 py-2 text-left text-xs font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10">項目</th>
+                            <th class="px-2 py-2 text-left text-xs font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10">項目</th>
                             ${colHeaders.join('')}
                         </tr>
                     </thead>
@@ -2320,19 +2324,19 @@
             if (lines.length === 0) return '';
 
             return `
-                <div class="pt-1.5 flex items-center gap-1.5 flex-wrap">
-                    <span class="text-[10px] font-bold text-slate-400 shrink-0">＋Monthly(${escapeHtml(fieldDef.defaultCategory)}):</span>
+                <div class="pt-1.5 flex items-center gap-1 flex-wrap">
+                    <span class="text-[10px] font-bold text-slate-400 shrink-0">＋Monthly:</span>
                     ${lines.map(line => `
                         <button
                             type="button"
                             data-week-action="promote-line"
                             data-line-text="${escapeHtml(line)}"
                             data-line-category="${escapeHtml(fieldDef.defaultCategory)}"
-                            class="max-w-full inline-flex items-center gap-1 text-[11px] bg-indigo-50/70 hover:bg-indigo-100 text-indigo-800 border border-indigo-200/80 px-2 py-0.5 rounded-lg transition-colors truncate"
+                            class="max-w-full inline-flex items-center gap-1 text-[10px] sm:text-[11px] bg-indigo-50/70 hover:bg-indigo-100 text-indigo-800 border border-indigo-200/80 px-2 py-0.5 rounded-lg transition-colors truncate"
                             title="「${escapeHtml(fieldDef.defaultCategory)}」タグでMonthlyトピックに追加"
                         >
-                            <span class="font-bold text-indigo-600 shrink-0">＋Monthly</span>
-                            <span class="truncate max-w-[220px] sm:max-w-[340px]">${escapeHtml(line)}</span>
+                            <span class="font-bold text-indigo-600 shrink-0">＋</span>
+                            <span class="truncate max-w-[180px] xs:max-w-[240px] sm:max-w-[340px]">${escapeHtml(line)}</span>
                         </button>
                     `).join('')}
                 </div>
@@ -2380,10 +2384,10 @@
 
                     return `
                         <tr class="border-b border-slate-200/80 last:border-b-0 hover:bg-slate-50/70">
-                            <td class="px-2 py-1.5 font-bold text-slate-700 text-[11px] sm:text-xs whitespace-nowrap">${escapeHtml(def.label)}</td>
-                            <td class="px-1.5 py-1.5 text-right font-mono text-xs text-slate-500 whitespace-nowrap">${formatWeeklyMetricValue(prevRaw, def.type)}</td>
-                            <td class="px-1.5 py-1 text-right">
-                                <div class="inline-flex items-center justify-end gap-0.5 w-full max-w-[84px] ml-auto">
+                            <td class="px-1.5 sm:px-2 py-1.5 font-bold text-slate-700 text-[11px] sm:text-xs truncate" title="${escapeHtml(def.label)}">${escapeHtml(def.label)}</td>
+                            <td class="px-1 sm:px-1.5 py-1.5 text-right font-mono text-[11px] sm:text-xs text-slate-500 whitespace-nowrap">${formatWeeklyMetricValue(prevRaw, def.type)}</td>
+                            <td class="px-1 sm:px-1.5 py-1 text-right">
+                                <div class="inline-flex items-center justify-end gap-0.5 w-full max-w-[76px] sm:max-w-[84px] ml-auto">
                                     <input
                                         type="text"
                                         inputmode="decimal"
@@ -2391,13 +2395,13 @@
                                         data-weekly-metric-key="${def.key}"
                                         value="${escapeHtml(currRaw)}"
                                         placeholder="—"
-                                        class="w-full text-right font-mono text-xs font-bold text-slate-900 bg-white border border-slate-200 focus:border-emerald-500 rounded-md px-1.5 py-1 focus:outline-none"
+                                        class="w-full min-w-0 text-right font-mono text-[11px] sm:text-xs font-bold text-slate-900 bg-white border border-slate-200 focus:border-emerald-500 rounded-md px-1 sm:px-1.5 py-1 focus:outline-none"
                                     />
-                                    ${def.type === 'percent' ? '<span class="text-[10px] font-mono text-slate-400">%</span>' : ''}
+                                    ${def.type === 'percent' ? '<span class="text-[9px] sm:text-[10px] font-mono text-slate-400 shrink-0">%</span>' : ''}
                                 </div>
                             </td>
-                            <td data-weekly-diff-cell="${week.id}-${def.key}" class="px-1.5 py-1.5 text-right font-mono text-[11px]">
-                                <span class="inline-block px-1.5 py-0.5 rounded-md border ${badgeClass} text-[10px] whitespace-nowrap">
+                            <td data-weekly-diff-cell="${week.id}-${def.key}" class="px-1 sm:px-1.5 py-1.5 text-right font-mono text-[10px] sm:text-[11px]">
+                                <span class="inline-block px-1 sm:px-1.5 py-0.5 rounded-md border ${badgeClass} text-[9px] xs:text-[10px] whitespace-nowrap max-w-full truncate">
                                     ${escapeHtml(diff.text)}
                                 </span>
                             </td>
@@ -2408,13 +2412,13 @@
                 const threeFieldsHtml = WEEKLY_TEXT_FIELD_DEFS.map(fieldDef => {
                     const val = week[fieldDef.key] || '';
                     return `
-                        <div class="rounded-xl border border-slate-200/90 bg-slate-50/50 p-3 space-y-1.5">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <label class="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-800">
+                        <div class="rounded-xl border border-slate-200/90 bg-slate-50/50 p-2.5 sm:p-3 space-y-1.5">
+                            <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                                <label class="inline-flex items-center gap-1 text-xs font-extrabold text-slate-800">
                                     <span>${fieldDef.icon}</span>
                                     <span>${escapeHtml(fieldDef.label)}</span>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${fieldDef.badgeClass}">Monthly昇格時: ${escapeHtml(fieldDef.defaultCategory)}</span>
                                 </label>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${fieldDef.badgeClass}">${escapeHtml(fieldDef.defaultCategory)}</span>
                             </div>
                             <textarea
                                 rows="3"
@@ -2422,7 +2426,7 @@
                                 data-week-id="${week.id}"
                                 data-week-field="${fieldDef.key}"
                                 placeholder="${escapeHtml(fieldDef.placeholder)}"
-                                class="w-full rounded-lg border border-slate-300 bg-white p-2.5 text-xs sm:text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 ${fieldDef.borderFocusClass} focus:outline-none transition-colors"
+                                class="w-full rounded-lg border border-slate-300 bg-white p-2 sm:p-2.5 text-xs sm:text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 ${fieldDef.borderFocusClass} focus:outline-none transition-colors"
                             >${escapeHtml(val)}</textarea>
                             <div data-week-chips-container="${week.id}-${fieldDef.key}">
                                 ${buildWeeklyPromoteChipsHtml(week, fieldDef)}
@@ -2433,58 +2437,63 @@
 
                 return `
                     <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                        <!-- Card Header -->
-                        <div class="px-3.5 sm:px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white font-extrabold text-xs">${idx + 1}W</span>
-                                <span class="text-slate-400 font-bold">・</span>
-                                <input
-                                    type="text"
-                                    data-week-action="edit-range"
-                                    data-week-id="${week.id}"
-                                    value="${escapeHtml(week.range)}"
-                                    class="w-32 sm:w-36 font-mono font-extrabold text-xs sm:text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-1 focus:border-emerald-500 focus:outline-none"
-                                />
-                                <span class="text-[11px] text-slate-400 hidden sm:inline">比較: ${escapeHtml(prevCtx.label)}</span>
+                        <!-- Card Header (Optimized for narrow mobile & PC) -->
+                        <div class="px-2.5 sm:px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-col xs:flex-row xs:items-center justify-between gap-2">
+                            <div class="flex items-center justify-between xs:justify-start gap-1.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white font-extrabold text-xs shrink-0">${idx + 1}W</span>
+                                    <input
+                                        type="text"
+                                        data-week-action="edit-range"
+                                        data-week-id="${week.id}"
+                                        value="${escapeHtml(week.range)}"
+                                        class="w-28 sm:w-36 font-mono font-extrabold text-xs sm:text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2 py-1 focus:border-emerald-500 focus:outline-none"
+                                    />
+                                    <span class="text-[10px] sm:text-[11px] text-slate-400 truncate">比較: ${escapeHtml(prevCtx.label)}</span>
+                                </div>
+                                ${record.weeklyItems.length > 1 ? `
+                                    <button type="button" data-week-action="delete-week" data-week-id="${week.id}"
+                                        class="xs:hidden text-xs text-slate-400 hover:text-rose-600 px-1.5 py-0.5 rounded" title="この週を削除">✕</button>
+                                ` : ''}
                             </div>
 
-                            <div class="flex items-center gap-1.5 flex-wrap">
+                            <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap">
                                 <button type="button" data-week-action="open-weekly-paste" data-week-id="${week.id}"
-                                    class="text-[11px] font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1 rounded-lg shadow-xs transition-colors flex items-center gap-1">
-                                    <span>📋 スライドから一括貼り付け</span>
+                                    class="text-[10px] sm:text-[11px] font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 px-2 sm:px-2.5 py-1 rounded-lg shadow-2xs transition-colors flex items-center gap-1">
+                                    <span>📋 一括貼付</span>
                                 </button>
                                 <button type="button" data-week-action="toggle-metrics" data-week-id="${week.id}"
-                                    class="text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg transition-colors">
+                                    class="text-[10px] sm:text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 sm:px-2.5 py-1 rounded-lg transition-colors">
                                     今週の値 ${isMetricsCollapsed ? '▼' : '▲'}
                                 </button>
                                 <button type="button" data-week-action="append-metrics-memo" data-week-idx="${idx}"
-                                    class="text-[11px] font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg transition-colors"
+                                    class="text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 px-2 sm:px-2.5 py-1 rounded-lg transition-colors"
                                     title="先週比の数値サマリーを「数値の変化理由」欄へ追記します">
-                                    先週比を変化理由へ追記
+                                    先週比を追記
                                 </button>
                                 ${record.weeklyItems.length > 1 ? `
                                     <button type="button" data-week-action="delete-week" data-week-id="${week.id}"
-                                        class="text-[11px] text-slate-400 hover:text-rose-600 px-1.5 py-1 rounded" title="この週を削除">✕</button>
+                                        class="hidden xs:inline-block text-[11px] text-slate-400 hover:text-rose-600 px-1.5 py-1 rounded" title="この週を削除">✕</button>
                                 ` : ''}
                             </div>
                         </div>
 
                         <!-- Card Body -->
-                        <div class="p-3.5 sm:p-5">
+                        <div class="p-2.5 sm:p-5">
                             <!-- 週間カレンダー（祝日・連休）＆ 天気コンテキストバー -->
                             ${weatherCalendarBarHtml}
 
-                            <div class="flex flex-col lg:flex-row gap-4 lg:gap-5 items-stretch lg:items-start">
-                                <!-- Compact Metrics Table -->
+                            <div class="flex flex-col lg:flex-row gap-3.5 lg:gap-5 items-stretch lg:items-start">
+                                <!-- Metrics Table: Percentage width on narrow mobile so it never overflows, fixed 380px on PC -->
                                 <div class="${isMetricsCollapsed ? 'hidden' : 'w-full lg:w-[370px] xl:w-[390px] shrink-0'} min-w-0">
-                                    <div class="w-full rounded-xl border border-slate-200 overflow-hidden bg-white">
+                                    <div class="w-full rounded-xl border border-slate-200 overflow-x-auto bg-white custom-scrollbar">
                                         <table class="w-full table-fixed border-collapse text-xs">
                                             <thead>
-                                                <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-extrabold text-slate-700">
-                                                    <th class="w-[116px] px-2 py-2 text-left truncate">項目</th>
-                                                    <th class="w-[60px] px-1.5 py-2 text-right truncate">先週</th>
-                                                    <th class="w-[88px] px-1.5 py-2 text-right text-emerald-800 truncate">今週の値</th>
-                                                    <th class="w-[106px] px-1.5 py-2 text-right truncate">先週比</th>
+                                                <tr class="bg-slate-100 border-b border-slate-200 text-[10px] sm:text-[11px] font-extrabold text-slate-700">
+                                                    <th class="w-[31%] sm:w-[116px] px-1.5 sm:px-2 py-2 text-left truncate">項目</th>
+                                                    <th class="w-[17%] sm:w-[60px] px-1 sm:px-1.5 py-2 text-right truncate">先週</th>
+                                                    <th class="w-[24%] sm:w-[88px] px-1 sm:px-1.5 py-2 text-right text-emerald-800 truncate">今週の値</th>
+                                                    <th class="w-[28%] sm:w-[106px] px-1 sm:px-1.5 py-2 text-right truncate">先週比</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -2495,7 +2504,7 @@
                                 </div>
 
                                 <!-- 3 Divided Weekly Input Fields -->
-                                <div class="flex-1 min-w-0 w-full space-y-3">
+                                <div class="flex-1 min-w-0 w-full space-y-2.5 sm:space-y-3">
                                     ${threeFieldsHtml}
                                 </div>
                             </div>
@@ -2683,12 +2692,13 @@
             document.getElementById('skipEmptyWeeksToggle').checked = Boolean(appState.skipEmptyWeeksInOutput);
         }
 
+        // 記録月タブ：左から右へ「古い月 → 新しい月（例: 9月 → 10月 → 11月）」の昇順で並べる
         function renderMonthTabs() {
             const container = document.getElementById('monthTabsContainer');
             if (!container) return;
 
             const currentKey = getRecordKey(appState.currentYear, appState.currentMonth);
-            const keys = Object.keys(appState.records).sort().reverse();
+            const keys = Object.keys(appState.records).sort();
 
             container.innerHTML = keys.map(key => {
                 const rec = appState.records[key];
@@ -2698,7 +2708,7 @@
                     <button
                         type="button"
                         data-month-key="${key}"
-                        class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                        class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 whitespace-nowrap ${
                             isActive
                                 ? 'bg-indigo-600 text-white shadow-sm'
                                 : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
@@ -2736,9 +2746,9 @@
                 if (editorPane) {
                     const canSplitBothSections = appState.sectionFilter === 'all';
                     if (appState.layoutMode === 'split' && canSplitBothSections) {
-                        editorPane.className = 'grid grid-cols-1 md:grid-cols-2 gap-5 items-start min-w-0';
+                        editorPane.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-start min-w-0';
                     } else {
-                        editorPane.className = 'grid grid-cols-1 gap-5 items-start min-w-0';
+                        editorPane.className = 'grid grid-cols-1 gap-4 sm:gap-5 items-start min-w-0';
                     }
                 }
                 if (monthlyCard) monthlyCard.classList.toggle('hidden', appState.sectionFilter === 'weekly');
@@ -2749,11 +2759,11 @@
                 const active = btn.dataset.sectionFilter === appState.sectionFilter;
                 const isMobileNav = Boolean(btn.closest('#mobileBottomNav'));
                 if (isMobileNav) {
-                    btn.className = `section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap ${
+                    btn.className = `section-filter-btn flex-1 py-1.5 px-1.5 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap ${
                         active ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
                     }`;
                 } else {
-                    btn.className = `section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                    btn.className = `section-filter-btn px-2.5 sm:px-3 py-1.5 rounded-lg transition-all whitespace-nowrap flex items-center gap-1 ${
                         active ? 'bg-indigo-600 text-white shadow-sm font-extrabold' : 'text-slate-600 hover:text-slate-900 font-bold'
                     }`;
                 }
@@ -2918,7 +2928,7 @@
                 bulkPasteModalState.monthlyTarget = options.monthlyTarget || 'all_auto';
                 badge.textContent = 'Monthly 定量実績';
                 badge.className = 'px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white font-extrabold text-xs';
-                header.className = 'px-4 sm:px-5 py-3.5 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2';
+                header.className = 'px-4 sm:px-5 py-3 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2';
                 applyBtn.className = 'px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-colors flex items-center gap-1.5';
                 title.textContent = 'Monthly「定量実績」スライドから一括貼り付け';
                 targetLabel.textContent = '貼り付け対象（自動判別対応）:';
@@ -2937,7 +2947,7 @@
                 bulkPasteModalState.weekId = defaultWeekId;
                 badge.textContent = 'Weekly 今週の値';
                 badge.className = 'px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white font-extrabold text-xs';
-                header.className = 'px-4 sm:px-5 py-3.5 bg-emerald-50/90 border-b border-slate-200 flex items-center justify-between gap-2';
+                header.className = 'px-4 sm:px-5 py-3 bg-emerald-50/90 border-b border-slate-200 flex items-center justify-between gap-2';
                 applyBtn.className = 'px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-colors flex items-center gap-1.5';
                 title.textContent = 'Weekly「今週の値」9項目へ一括貼り付け';
                 targetLabel.textContent = '貼り付け対象の週:';
@@ -3188,7 +3198,7 @@
                 appState.selectedWeekFilter = 'all';
                 saveStateToStorage();
                 renderAll();
-                showToast('2026年10月・9月のサンプルデータを復元しました');
+                showToast('2026年9月・10月のサンプルデータを復元しました');
             });
 
             document.getElementById('weatherLocationSelect').addEventListener('change', (e) => {
@@ -3458,6 +3468,7 @@
                 }
                 saveStateToStorage();
                 renderMonthlySection();
+                renderMonthTabs();
                 updatePreviewAndSummaryHints();
             });
 
@@ -3504,7 +3515,6 @@
                         });
                     }
                 });
-                // 余分な空の週があればカレンダー週数に合わせて整理
                 if (record.weeklyItems.length > ranges.length) {
                     record.weeklyItems = record.weeklyItems.filter((w, idx) => idx < ranges.length || hasWeekAnyMetric(w) || hasWeekAnyText(w));
                 }
@@ -3580,10 +3590,11 @@
                                     : diff.tone === 'down'
                                         ? 'text-rose-700 bg-rose-50 border-rose-200 font-bold'
                                         : 'text-slate-600 bg-slate-100 border-slate-200';
-                            cell.innerHTML = `<span class="inline-block px-1.5 py-0.5 rounded-md border ${badgeClass} text-[10px] whitespace-nowrap">${escapeHtml(diff.text)}</span>`;
+                            cell.innerHTML = `<span class="inline-block px-1 sm:px-1.5 py-0.5 rounded-md border ${badgeClass} text-[9px] xs:text-[10px] whitespace-nowrap max-w-full truncate">${escapeHtml(diff.text)}</span>`;
                         }
                     });
 
+                    renderWeekFocusTabs();
                     renderWeeklyMetricsMatrix();
                     updatePreviewAndSummaryHints();
                 } else if (target.dataset.weekAction === 'edit-range') {
@@ -3605,6 +3616,7 @@
                         if (fieldDef && chipsWrap) {
                             chipsWrap.innerHTML = buildWeeklyPromoteChipsHtml(week, fieldDef);
                         }
+                        renderWeekFocusTabs();
                         updatePreviewAndSummaryHints();
                     }
                 }
@@ -3666,6 +3678,7 @@
                 } else if (action === 'promote-line') {
                     const cat = btn.dataset.lineCategory || selectedQuickCategory;
                     addMonthlyTopic(btn.dataset.lineText, cat);
+                    renderMonthTabs();
                     showToast(`「${cat}」タグでMonthlyトピックへ追加しました`);
                 } else if (action === 'insert-weather-holiday-insight') {
                     const week = record.weeklyItems.find(w => w.id === btn.dataset.weekId);
