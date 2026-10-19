@@ -32,8 +32,8 @@
             color: #0f172a;
         }
         .custom-scrollbar::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
@@ -89,8 +89,8 @@
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
         <div class="w-full uw-container max-w-[1920px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
             <!-- Brand, Title & Store Switcher -->
-            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
-                <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap min-w-0">
+                <div class="flex items-center gap-2 min-w-0">
                     <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-sm font-extrabold text-xs sm:text-sm shrink-0">
                         定例
                     </div>
@@ -108,12 +108,12 @@
                     </div>
                 </div>
 
-                <!-- Store Selector & Store Manager Button -->
-                <div class="flex items-center bg-indigo-50/80 border border-indigo-200/90 rounded-xl p-1 gap-1">
-                    <span class="text-xs pl-1.5">🏬</span>
-                    <select id="storeSelect" class="bg-transparent font-extrabold text-xs sm:text-sm text-indigo-950 focus:outline-none cursor-pointer pr-1 max-w-[140px] sm:max-w-[200px] truncate" title="表示・編集する店舗を切り替え"></select>
-                    <button id="openStoreModalBtn" type="button" class="text-[11px] font-bold text-indigo-700 bg-white hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded-lg transition-colors shrink-0 shadow-2xs" title="店舗の追加・名前変更・削除">
-                        店舗管理
+                <!-- Store Selector & Quick Add / Manage Button -->
+                <div class="flex items-center bg-indigo-50/90 border border-indigo-200 rounded-xl p-1 gap-1 shrink-0 max-w-full">
+                    <span class="text-xs pl-1.5 shrink-0">🏬</span>
+                    <select id="storeSelect" class="bg-transparent font-extrabold text-xs sm:text-sm text-indigo-950 focus:outline-none cursor-pointer pr-1 max-w-[130px] sm:max-w-[180px] truncate" title="表示・編集する店舗を切り替え"></select>
+                    <button id="openStoreModalBtn" type="button" class="text-[11px] font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded-lg transition-colors shrink-0 shadow-2xs flex items-center gap-0.5" title="新規店舗の追加・店舗名の変更・削除">
+                        <span>＋店舗追加・管理</span>
                     </button>
                 </div>
             </div>
@@ -335,16 +335,25 @@
                     </div>
                 </div>
 
-                <!-- Weekly Cross-Week Comparison Matrix Drawer (With Inline Sparklines) -->
-                <div id="weeklyMetricsMatrixPanel" class="hidden border-b border-slate-200 bg-slate-50 p-2.5 sm:p-5 space-y-2.5">
+                <!-- Weekly Cross-Week Comparison Matrix Drawer (Enlarged with Large Inline Sparklines) -->
+                <div id="weeklyMetricsMatrixPanel" class="hidden border-b border-slate-200 bg-slate-50/90 p-3 sm:p-5 space-y-3">
                     <div class="flex items-center justify-between flex-wrap gap-2">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="text-xs sm:text-sm font-extrabold text-slate-800">📈 週次推移マトリクス ＆ インライン・スパークライン</h3>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">右端に折れ線＋ミニバー自動描画</span>
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <h3 class="text-xs sm:text-base font-extrabold text-slate-900 flex items-center gap-1.5">
+                                <span>📈 週次推移マトリクス ＆ インライン・スパークライン</span>
+                            </h3>
+                            <div class="flex items-center gap-2 text-[11px] font-bold">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>期間最高(MAX)
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600">
+                                    <span class="w-2 h-2 rounded-full bg-rose-500"></span>期間最低(MIN)
+                                </span>
+                            </div>
                         </div>
-                        <button id="closeMetricsMatrixBtn" type="button" class="text-xs font-bold text-slate-500 hover:text-slate-800 px-2 py-0.5 rounded">閉じる ✕</button>
+                        <button id="closeMetricsMatrixBtn" type="button" class="text-xs font-bold text-slate-500 hover:text-slate-900 bg-white border border-slate-200 px-3 py-1 rounded-lg shadow-2xs">閉じる ✕</button>
                     </div>
-                    <div id="weeklyMetricsMatrixContainer" class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm custom-scrollbar"></div>
+                    <div id="weeklyMetricsMatrixContainer" class="overflow-x-auto rounded-xl border border-slate-300 bg-white shadow-sm custom-scrollbar"></div>
                 </div>
 
                 <!-- Week Focus Filter Tabs (All Weeks vs 1W, 2W, 3W...) -->
@@ -418,9 +427,9 @@
         </section>
     </main>
 
-    <!-- STORE MANAGEMENT MODAL -->
+    <!-- STORE MANAGEMENT MODAL (見切れ防止の2段グリッド＆レスポンシブ設計) -->
     <div id="storeManagerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="px-4 sm:px-5 py-3.5 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
                     <span class="px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white font-extrabold text-xs">店舗管理</span>
@@ -430,28 +439,38 @@
             </div>
 
             <div class="p-4 sm:p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1">
-                <!-- Add New Store Form -->
-                <form id="addStoreForm" class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
-                    <label class="block text-xs font-extrabold text-slate-700">＋ 新しい店舗を追加</label>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <input
-                            id="newStoreNameInput"
-                            type="text"
-                            placeholder="例: 池袋店 / 梅田店 / 川崎店..."
-                            class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
-                        />
-                        <select id="newStoreWeatherSelect" class="rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs font-bold text-slate-700 focus:border-indigo-500 focus:outline-none"></select>
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-xs transition-colors shrink-0">
-                            追加する
-                        </button>
+                <!-- Add New Store Form (2段構成で追加ボタンが絶対に見切れないレイアウト) -->
+                <form id="addStoreForm" class="bg-indigo-50/50 p-3.5 sm:p-4 rounded-xl border border-indigo-200/80 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label for="newStoreNameInput" class="block text-xs font-extrabold text-indigo-950">＋ 新しい店舗を登録する</label>
+                        <span class="text-[11px] text-indigo-600 font-semibold">店舗ごとに実績・天気を独立管理</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+                        <div class="sm:col-span-5 min-w-0">
+                            <input
+                                id="newStoreNameInput"
+                                type="text"
+                                placeholder="店舗名（例: 池袋店 / 梅田店）"
+                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 placeholder:font-normal focus:border-indigo-500 focus:outline-none"
+                            />
+                        </div>
+                        <div class="sm:col-span-4 min-w-0">
+                            <select id="newStoreWeatherSelect" class="w-full rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs sm:text-sm font-bold text-slate-700 focus:border-indigo-500 focus:outline-none truncate"></select>
+                        </div>
+                        <div class="sm:col-span-3">
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-extrabold text-xs sm:text-sm px-3 py-2 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-1 whitespace-nowrap">
+                                <span>＋ 店舗を追加</span>
+                            </button>
+                        </div>
                     </div>
                 </form>
 
                 <!-- Registered Stores List -->
                 <div class="space-y-2">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-slate-700">登録済み店舗一覧（店舗名・天気エリアの変更可）</span>
-                        <span id="storeCountText" class="text-[11px] font-bold text-slate-400"></span>
+                        <span class="text-xs font-extrabold text-slate-700">登録済み店舗一覧（クリックで切替・名前や天気地域も変更可）</span>
+                        <span id="storeCountText" class="text-[11px] font-bold text-slate-500"></span>
                     </div>
                     <div id="storeListContainer" class="space-y-2"></div>
                 </div>
@@ -459,7 +478,7 @@
 
             <div class="px-4 sm:px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-end">
                 <button id="doneStoreModalBtn" type="button" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold transition-colors">
-                    閉じる
+                    完了して閉じる
                 </button>
             </div>
         </div>
@@ -552,8 +571,9 @@
          SCRIPT BLOCK 1: 定数・複数店舗状態管理・祝日/天気エンジン・一括解析ロジック
          ===================================================================== -->
     <script>
-        const STORAGE_KEY = 'periodic_report_topic_manager_v10';
+        const STORAGE_KEY = 'periodic_report_topic_manager_v11';
         const LEGACY_STORAGE_KEYS = [
+            'periodic_report_topic_manager_v10',
             'periodic_report_topic_manager_v9',
             'periodic_report_topic_manager_v8',
             'periodic_report_topic_manager_v7',
@@ -1814,7 +1834,7 @@
         }
     </script>
     <!-- =====================================================================
-         SCRIPT BLOCK 2: UI描画（インライン・スパークライン・縦1列ウルトラワイド最適化・店舗描画）
+         SCRIPT BLOCK 2: UI描画（大型インライン・スパークライン・縦1列ワイド最適化・店舗管理UI）
          ===================================================================== -->
     <script>
         function getWeatherEntryForDate(locKey, dateKey) {
@@ -1824,14 +1844,14 @@
             return fallbackYokohama || null;
         }
 
-        // 週次推移マトリクス用 インライン・スパークライン（折れ線＋ミニバー）SVG生成
-        function buildInlineSparklineHtml(values) {
+        // 週次推移マトリクス全体のサイズに合わせた大型・高視認性インライン・スパークライン（数値ラベル付き折れ線＋週ラベル付きミニバー）
+        function buildInlineSparklineHtml(values, type, slotLabels = []) {
             const validEntries = values
                 .map((v, idx) => ({ val: parseMetricNum(v), idx }))
                 .filter(e => e.val !== null);
 
             if (validEntries.length === 0) {
-                return `<div class="text-[10px] text-slate-300 font-mono text-center">—</div>`;
+                return `<div class="text-xs text-slate-300 font-mono text-center py-2">—</div>`;
             }
 
             const totalSlots = Math.max(values.length, 2);
@@ -1840,63 +1860,108 @@
             const maxVal = Math.max(...nums);
             const span = maxVal - minVal > 0.0001 ? maxVal - minVal : 1;
 
-            const w = 78;
-            const h = 26;
-            const padX = 5;
-            const padY = 4;
+            const fmtShort = (n) => {
+                if (type === 'percent') return `${Number(n.toFixed(1))}%`;
+                return n.toLocaleString('ja-JP');
+            };
+
+            // 1. 大型インライン折れ線グラフ (幅136px x 高さ44px)
+            const w = 136;
+            const h = 44;
+            const padX = 14;
+            const padTop = 14;
+            const padBottom = 7;
             const innerW = w - padX * 2;
-            const innerH = h - padY * 2;
+            const innerH = h - padTop - padBottom;
 
             const coords = validEntries.map(e => {
                 const x = padX + (totalSlots === 1 ? innerW / 2 : (e.idx / (totalSlots - 1)) * innerW);
                 const norm = maxVal === minVal ? 0.5 : (e.val - minVal) / span;
-                const y = padY + innerH - norm * innerH;
-                return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)), val: e.val };
+                const y = padTop + innerH - norm * innerH;
+                return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)), val: e.val, idx: e.idx };
             });
 
             const pointsAttr = coords.map(c => `${c.x},${c.y}`).join(' ');
             const firstPt = coords[0];
             const lastPt = coords[coords.length - 1];
-            const areaPoints = `${firstPt.x},${h - 2} ${pointsAttr} ${lastPt.x},${h - 2}`;
+            const baselineY = h - 3;
+            const areaPoints = `${firstPt.x},${baselineY} ${pointsAttr} ${lastPt.x},${baselineY}`;
 
             const trendUp = lastPt.val >= firstPt.val;
             const strokeColor = trendUp ? '#0284c7' : '#e11d48';
-            const fillColor = trendUp ? 'rgba(2, 132, 199, 0.14)' : 'rgba(225, 29, 72, 0.12)';
+            const fillColor = trendUp ? 'rgba(2, 132, 199, 0.16)' : 'rgba(225, 29, 72, 0.14)';
 
-            const dotsSvg = coords.map((c, i) => {
+            // 最高値ポイントのインデックスを特定
+            let maxPtIdx = 0;
+            coords.forEach((c, i) => {
+                if (c.val >= coords[maxPtIdx].val) maxPtIdx = i;
+            });
+
+            const dotsAndLabelsSvg = coords.map((c, i) => {
                 const isLast = i === coords.length - 1;
-                const r = isLast ? 2.6 : 1.8;
-                return `<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="${isLast ? strokeColor : '#ffffff'}" stroke="${strokeColor}" stroke-width="1.4" />`;
+                const isMax = i === maxPtIdx && coords.length > 1;
+                const isFirst = i === 0;
+                const dotColor = isMax ? '#10b981' : strokeColor;
+                const r = isLast || isMax ? 3.4 : 2.3;
+
+                let labelSvg = '';
+                if (isLast || (isMax && Math.abs(c.x - lastPt.x) > 26) || (isFirst && coords.length === 2)) {
+                    const labelColor = isMax && !isLast ? '#047857' : '#0f172a';
+                    labelSvg = `<text x="${c.x}" y="${Math.max(9, c.y - 5.5)}" text-anchor="middle" font-size="9.5" font-family="JetBrains Mono, monospace" font-weight="800" fill="${labelColor}">${escapeHtml(fmtShort(c.val))}</text>`;
+                }
+
+                return `
+                    <circle cx="${c.x}" cy="${c.y}" r="${r}" fill="${isLast || isMax ? dotColor : '#ffffff'}" stroke="${dotColor}" stroke-width="1.8" />
+                    ${labelSvg}
+                `;
             }).join('');
 
-            const bw = 60;
-            const bh = 24;
+            // 2. 大型インライン・ミニバー (幅98px x 高さ44px / 週ラベル付き)
+            const bw = 98;
+            const bh = 44;
+            const barBottomY = 32;
+            const maxBarHeight = 25;
             const slotW = bw / totalSlots;
-            const barW = Math.max(4, Math.min(9, slotW - 2.5));
+            const barW = Math.max(7, Math.min(13, slotW - 3.5));
 
             const barsSvg = values.map((v, idx) => {
                 const num = parseMetricNum(v);
                 const x = idx * slotW + (slotW - barW) / 2;
+                const centerX = idx * slotW + slotW / 2;
+                const sLabel = slotLabels[idx] || `${idx}W`;
+
+                const weekLabelSvg = `<text x="${centerX.toFixed(1)}" y="${bh - 2}" text-anchor="middle" font-size="8.5" font-family="Inter, sans-serif" font-weight="700" fill="#64748b">${escapeHtml(sLabel)}</text>`;
+
                 if (num === null) {
-                    return `<rect x="${x.toFixed(1)}" y="${bh - 3}" width="${barW.toFixed(1)}" height="2" rx="1" fill="#e2e8f0" />`;
+                    return `
+                        <rect x="${x.toFixed(1)}" y="${barBottomY - 2}" width="${barW.toFixed(1)}" height="2" rx="1" fill="#e2e8f0" />
+                        ${weekLabelSvg}
+                    `;
                 }
-                const ratio = maxVal === minVal ? 0.65 : 0.22 + ((num - minVal) / span) * 0.78;
-                const barH = Math.max(3, Math.round(ratio * (bh - 4)));
-                const y = bh - 1 - barH;
+                const ratio = maxVal === minVal ? 0.68 : 0.22 + ((num - minVal) / span) * 0.78;
+                const barH = Math.max(4, Math.round(ratio * maxBarHeight));
+                const y = barBottomY - barH;
                 const isMax = num === maxVal && validEntries.length > 1;
                 const isMin = num === minVal && validEntries.length > 2 && minVal !== maxVal;
-                const barFill = isMax ? '#10b981' : isMin ? '#f43f5e' : '#38bdf8';
-                return `<rect x="${x.toFixed(1)}" y="${y}" width="${barW.toFixed(1)}" height="${barH}" rx="1.5" fill="${barFill}" />`;
+                const barFill = isMax ? '#10b981' : isMin ? '#f43f5e' : '#0ea5e9';
+
+                return `
+                    <rect x="${x.toFixed(1)}" y="${y}" width="${barW.toFixed(1)}" height="${barH}" rx="2" fill="${barFill}" />
+                    ${weekLabelSvg}
+                `;
             }).join('');
 
             return `
-                <div class="inline-flex items-center justify-center gap-2 px-1 py-0.5 bg-slate-50/80 rounded-lg border border-slate-200/80">
+                <div class="inline-flex items-center justify-center gap-3 px-2.5 py-1 bg-slate-50/90 rounded-xl border border-slate-200/90 shadow-2xs">
                     <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="overflow-visible shrink-0" aria-label="推移折れ線">
+                        <line x1="${padX}" y1="${baselineY}" x2="${w - padX}" y2="${baselineY}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2,2" />
                         ${coords.length > 1 ? `<polygon points="${areaPoints}" fill="${fillColor}" />` : ''}
-                        ${coords.length > 1 ? `<polyline fill="none" stroke="${strokeColor}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${pointsAttr}" />` : ''}
-                        ${dotsSvg}
+                        ${coords.length > 1 ? `<polyline fill="none" stroke="${strokeColor}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" points="${pointsAttr}" />` : ''}
+                        ${dotsAndLabelsSvg}
                     </svg>
-                    <svg width="${bw}" height="${bh}" viewBox="0 0 ${bw} ${bh}" class="shrink-0" aria-label="推移ミニバー">
+                    <div class="w-px h-8 bg-slate-200 shrink-0"></div>
+                    <svg width="${bw}" height="${bh}" viewBox="0 0 ${bw} ${bh}" class="overflow-visible shrink-0" aria-label="推移ミニバー">
+                        <line x1="2" y1="${barBottomY}" x2="${bw - 2}" y2="${barBottomY}" stroke="#cbd5e1" stroke-width="1" />
                         ${barsSvg}
                     </svg>
                 </div>
@@ -2479,6 +2544,7 @@
             container.innerHTML = html;
         }
 
+        // 大型化・高視認性化した週次推移マトリクス ＆ インライン・スパークライン描画
         function renderWeeklyMetricsMatrix() {
             const panel = document.getElementById('weeklyMetricsMatrixPanel');
             const container = document.getElementById('weeklyMetricsMatrixContainer');
@@ -2488,15 +2554,30 @@
             const prevCtx = getPreviousWeekContext(record, 0);
 
             const colHeaders = [];
+            const slotLabels = [];
+
             if (prevCtx.item) {
-                colHeaders.push(`<th class="px-2 py-2 text-center bg-slate-100 border-r border-slate-200 text-[11px] font-bold text-slate-600 min-w-[92px]">前月最終<br><span class="font-mono text-[10px]">${escapeHtml(prevCtx.item.range)}</span></th>`);
+                slotLabels.push('前');
+                colHeaders.push(`
+                    <th class="px-3 py-2.5 text-center bg-slate-100 border-r border-slate-200 text-xs font-extrabold text-slate-600 min-w-[106px]">
+                        <div>前月最終</div>
+                        <div class="font-mono text-[11px] font-semibold text-slate-500 mt-0.5">${escapeHtml(prevCtx.item.range)}</div>
+                    </th>
+                `);
             }
             record.weeklyItems.forEach((w, idx) => {
-                colHeaders.push(`<th class="px-2 py-2 text-center bg-emerald-50/70 border-r border-slate-200 text-[11px] font-extrabold text-emerald-950 min-w-[102px]">${idx + 1}W<br><span class="font-mono text-[10px] font-semibold">${escapeHtml(w.range)}</span></th>`);
+                slotLabels.push(`${idx + 1}W`);
+                colHeaders.push(`
+                    <th class="px-3 py-2.5 text-center bg-emerald-50/80 border-r border-slate-200 text-xs font-extrabold text-emerald-950 min-w-[116px]">
+                        <div>${idx + 1}W</div>
+                        <div class="font-mono text-[11px] font-semibold text-emerald-700 mt-0.5">${escapeHtml(w.range)}</div>
+                    </th>
+                `);
             });
             colHeaders.push(`
-                <th class="px-3 py-2 text-center bg-indigo-50/80 text-[11px] font-extrabold text-indigo-950 min-w-[165px]">
-                    推移スパークライン<br><span class="text-[9px] font-semibold text-indigo-700">折れ線 ＆ ミニバー</span>
+                <th class="px-4 py-2.5 text-center bg-indigo-50/90 text-xs font-extrabold text-indigo-950 min-w-[280px]">
+                    <div>インライン・スパークライン（推移波形 ＆ 週別バー）</div>
+                    <div class="text-[10px] font-semibold text-indigo-700 mt-0.5">左：折れ線（最高値・直近値ラベル） ／ 右：週別ミニバー</div>
                 </th>
             `);
 
@@ -2507,7 +2588,11 @@
                 if (prevCtx.item) {
                     const pVal = prevCtx.item.metrics?.[def.key];
                     seriesValues.push(pVal);
-                    cells.push(`<td class="px-2 py-1.5 text-center font-mono text-xs text-slate-600 bg-slate-50/70 border-r border-slate-200">${formatWeeklyMetricValue(pVal, def.type)}</td>`);
+                    cells.push(`
+                        <td class="px-3 py-2.5 text-center font-mono text-xs sm:text-sm font-semibold text-slate-600 bg-slate-50/60 border-r border-slate-200 align-middle">
+                            ${formatWeeklyMetricValue(pVal, def.type)}
+                        </td>
+                    `);
                 }
                 record.weeklyItems.forEach((w, idx) => {
                     const pCtx = getPreviousWeekContext(record, idx);
@@ -2515,24 +2600,33 @@
                     seriesValues.push(currVal);
                     const prevVal = pCtx.item ? pCtx.item.metrics?.[def.key] : null;
                     const diff = computeWeeklyDiff(currVal, prevVal, def.type);
-                    const diffCls = diff.tone === 'up' ? 'text-blue-600' : diff.tone === 'down' ? 'text-rose-600' : 'text-slate-400';
+                    const diffBadgeCls = !diff.hasDiff
+                        ? 'text-slate-400'
+                        : diff.tone === 'up'
+                            ? 'text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded'
+                            : diff.tone === 'down'
+                                ? 'text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.2 rounded'
+                                : 'text-slate-500';
+
                     cells.push(`
-                        <td class="px-2 py-1.5 text-center font-mono border-r border-slate-200">
-                            <div class="text-xs font-bold text-slate-900">${formatWeeklyMetricValue(currVal, def.type)}</div>
-                            <div class="text-[10px] font-semibold ${diffCls}">${escapeHtml(diff.text)}</div>
+                        <td class="px-3 py-2 text-center font-mono border-r border-slate-200 align-middle">
+                            <div class="text-xs sm:text-sm font-extrabold text-slate-900">${formatWeeklyMetricValue(currVal, def.type)}</div>
+                            <div class="mt-0.5 text-[10px] sm:text-[11px] font-bold inline-block ${diffBadgeCls} whitespace-nowrap">${escapeHtml(diff.text)}</div>
                         </td>
                     `);
                 });
 
                 const sparklineCell = `
-                    <td class="px-2 py-1 text-center bg-white align-middle">
-                        ${buildInlineSparklineHtml(seriesValues)}
+                    <td class="px-3 py-1.5 text-center bg-white align-middle">
+                        ${buildInlineSparklineHtml(seriesValues, def.type, slotLabels)}
                     </td>
                 `;
 
                 return `
-                    <tr class="border-b border-slate-200 last:border-b-0 hover:bg-slate-50/60">
-                        <th class="px-2.5 py-1.5 text-left text-[11px] sm:text-xs font-bold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">${escapeHtml(def.label)}</th>
+                    <tr class="border-b border-slate-200 last:border-b-0 hover:bg-slate-50/70">
+                        <th class="px-3 py-2.5 text-left text-xs sm:text-sm font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap align-middle">
+                            ${escapeHtml(def.label)}
+                        </th>
                         ${cells.join('')}
                         ${sparklineCell}
                     </tr>
@@ -2540,10 +2634,12 @@
             }).join('');
 
             container.innerHTML = `
-                <table class="w-full border-collapse text-xs">
+                <table class="w-full border-collapse text-xs sm:text-sm">
                     <thead>
                         <tr class="border-b border-slate-300">
-                            <th class="px-2.5 py-2 text-left text-xs font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10">項目</th>
+                            <th class="px-3 py-2.5 text-left text-xs sm:text-sm font-extrabold text-slate-800 bg-white border-r border-slate-300 sticky left-0 z-10 min-w-[130px]">
+                                項目
+                            </th>
                             ${colHeaders.join('')}
                         </tr>
                     </thead>
@@ -2759,7 +2855,7 @@
                                     </div>
                                 </div>
 
-                                <!-- 3 Divided Weekly Input Fields (Side-by-side 3 columns on Ultrawide while keeping cards stacked vertically) -->
+                                <!-- 3 Divided Weekly Input Fields -->
                                 <div class="uw-weekly-fields-grid flex-1 min-w-0 w-full space-y-2.5 sm:space-y-3">
                                     ${threeFieldsHtml}
                                 </div>
@@ -2945,10 +3041,10 @@
                 ).join('');
 
                 return `
-                    <div class="p-3 rounded-xl border ${isCurrent ? 'border-indigo-400 bg-indigo-50/40' : 'border-slate-200 bg-white'} flex flex-wrap items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 flex-1 min-w-[180px]">
+                    <div class="p-3 rounded-xl border ${isCurrent ? 'border-indigo-400 bg-indigo-50/40' : 'border-slate-200 bg-white'} grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                        <div class="sm:col-span-6 flex items-center gap-2 min-w-0">
                             <button type="button" data-store-action="select" data-store-id="${escapeHtml(store.id)}"
-                                class="px-2.5 py-1 rounded-lg text-xs font-extrabold transition-colors shrink-0 ${isCurrent ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+                                class="px-2.5 py-1.5 rounded-lg text-xs font-extrabold transition-colors shrink-0 ${isCurrent ? 'bg-indigo-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
                                 ${isCurrent ? '選択中' : '切替'}
                             </button>
                             <input
@@ -2956,17 +3052,17 @@
                                 data-store-action="rename"
                                 data-store-id="${escapeHtml(store.id)}"
                                 value="${escapeHtml(store.name)}"
-                                class="flex-1 min-w-[100px] text-xs sm:text-sm font-bold text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-1 focus:border-indigo-500 focus:outline-none"
+                                class="w-full min-w-0 text-xs sm:text-sm font-bold text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 focus:border-indigo-500 focus:outline-none"
                             />
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="sm:col-span-6 flex items-center justify-end gap-2 min-w-0">
                             <select data-store-action="change-weather" data-store-id="${escapeHtml(store.id)}"
-                                class="text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg px-2 py-1 focus:outline-none">
+                                class="flex-1 sm:flex-initial min-w-0 max-w-[190px] text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none truncate">
                                 ${locOptions}
                             </select>
                             ${appState.stores.length > 1 ? `
                                 <button type="button" data-store-action="delete" data-store-id="${escapeHtml(store.id)}"
-                                    class="text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg transition-colors" title="この店舗を削除">
+                                    class="text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 px-2.5 py-1.5 rounded-lg transition-colors shrink-0" title="この店舗を削除">
                                     削除
                                 </button>
                             ` : ''}
@@ -3050,7 +3146,6 @@
             }).join('');
         }
 
-        // ウルトラワイドモニターの比率・横幅検知（週カードは常に縦1列に配置し、内部コンテンツのサイズ比率のみを自動調整）
         function applyLayoutAndSectionFilters() {
             const monthlyCard = document.getElementById('monthlySectionCard');
             const weeklyCard = document.getElementById('weeklySectionCard');
@@ -3508,6 +3603,7 @@
             document.getElementById('openStoreModalBtn').addEventListener('click', () => {
                 renderStoreManagerModalList();
                 storeModal.classList.remove('hidden');
+                setTimeout(() => document.getElementById('newStoreNameInput')?.focus(), 50);
             });
             document.getElementById('closeStoreModalBtn').addEventListener('click', () => {
                 storeModal.classList.add('hidden');
@@ -3525,7 +3621,8 @@
                 const weatherSelect = document.getElementById('newStoreWeatherSelect');
                 const name = nameInput.value.trim();
                 if (!name) {
-                    showToast('店舗名を入力してください');
+                    showToast('追加する店舗名を入力してください');
+                    nameInput.focus();
                     return;
                 }
                 const newId = `store-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`;
