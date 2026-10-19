@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>定例報告トピック管理＆フォーマット出力ツール</title>
+    <title>定例報告トピック管理＆出力ツール</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -44,7 +44,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(100, 116, 139, 0.8);
         }
-        /* Hide number spinners where applicable */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -52,28 +51,28 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col pb-20 fold:pb-6">
+<body class="min-h-screen flex flex-col pb-20 md:pb-8">
 
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
-        <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2">
+        <div class="w-full px-3 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
             <!-- Brand & Title -->
             <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-sm font-extrabold text-sm shrink-0">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-sm font-extrabold text-xs sm:text-sm shrink-0">
                     定例
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">定例報告トピック管理＆出力ツール</h1>
-                        <span id="saveStatusBadge" class="hidden xs:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span id="saveStatusBadge" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>自動保存済
                         </span>
                     </div>
-                    <p class="text-[11px] text-slate-500 hidden sm:block">Monthly（定量実績・昨対比・達成評価・トピック）＆ Weekly（先週比・週次メモ）を一元管理</p>
+                    <p class="text-[11px] text-slate-500 hidden md:block">Monthly（定量実績・昨対比・達成評価・トピック）＆ Weekly（先週比・週次メモ）を一元管理</p>
                 </div>
             </div>
 
-            <!-- Controls: Period Selector + Layout Switcher + Reset -->
-            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <!-- Controls: Period Selector, Layout Switcher, and Copy buttons -->
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto justify-between sm:justify-end">
                 <!-- Prev / Year / Month / Next -->
                 <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
                     <button id="prevMonthBtn" type="button" class="p-1.5 rounded-lg hover:bg-white text-slate-600 hover:text-slate-900 transition-colors" title="前月へ">
@@ -90,62 +89,76 @@
                     </button>
                 </div>
 
-                <!-- Layout Mode Switcher (Optimized for Foldables / Tablets / PC) -->
-                <div class="hidden fold:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px] font-semibold">
-                    <button type="button" data-layout-mode="auto" class="layout-mode-btn px-2 py-1 rounded-lg transition-colors">自動</button>
-                    <button type="button" data-layout-mode="split" class="layout-mode-btn px-2 py-1 rounded-lg transition-colors">2画面分割</button>
-                    <button type="button" data-layout-mode="single" class="layout-mode-btn px-2 py-1 rounded-lg transition-colors">1画面</button>
+                <!-- Layout Mode Switcher (Always visible on mobile & PC) -->
+                <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px] font-semibold">
+                    <button type="button" data-layout-mode="auto" class="layout-mode-btn px-2.5 py-1 rounded-lg transition-colors">自動</button>
+                    <button type="button" data-layout-mode="split" class="layout-mode-btn px-2.5 py-1 rounded-lg transition-colors">2画面分割</button>
+                    <button type="button" data-layout-mode="single" class="layout-mode-btn px-2.5 py-1 rounded-lg transition-colors">1画面</button>
                 </div>
 
-                <!-- Sample Restore Button -->
-                <button id="restoreSampleBtn" type="button" class="text-[11px] font-semibold text-slate-600 hover:text-indigo-700 bg-white hover:bg-indigo-50 border border-slate-200 px-2.5 py-1.5 rounded-xl transition-colors" title="横浜店のサンプルデータ（2026年10月・9月）を初期状態に復元します">
-                    サンプル復元
-                </button>
+                <div class="flex items-center gap-1.5">
+                    <button id="headerQuickCopyBtn" type="button" class="text-[11px] sm:text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-xl shadow-sm transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <span class="hidden xs:inline">フォーマットを</span><span>コピー</span>
+                    </button>
+
+                    <button id="restoreSampleBtn" type="button" class="text-[11px] font-semibold text-slate-600 hover:text-indigo-700 bg-white hover:bg-indigo-50 border border-slate-200 px-2.5 py-1.5 rounded-xl transition-colors" title="横浜店のサンプルデータ（2026年10月・9月）を初期状態に復元します">
+                        サンプル復元
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Secondary Sub-bar: Saved Month Tabs & Section Focus Filter -->
-        <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-1.5 bg-slate-50/90 border-t border-slate-200/80 flex items-center justify-between gap-2 overflow-x-auto custom-scrollbar">
-            <div class="flex items-center gap-1.5 shrink-0">
-                <span class="text-[11px] font-bold text-slate-400 mr-1">記録月:</span>
-                <div id="monthTabsContainer" class="flex items-center gap-1"></div>
+        <!-- Secondary Sub-bar: Main View Tabs & Saved Month Quick Tabs -->
+        <div class="w-full px-3 sm:px-6 lg:px-8 py-2 bg-slate-50/95 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
+            <!-- Primary Tab Navigation (Switches Monthly / Weekly / Preview) -->
+            <div class="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl text-xs font-extrabold overflow-x-auto max-w-full custom-scrollbar">
+                <button type="button" data-section-filter="all" class="section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                    📋 すべて表示
+                </button>
+                <button type="button" data-section-filter="monthly" class="section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                    📊 Monthly
+                </button>
+                <button type="button" data-section-filter="weekly" class="section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                    📅 Weekly
+                </button>
+                <button type="button" data-section-filter="preview" class="section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5">
+                    <span>📄 提出フォーマット プレビュー</span>
+                </button>
             </div>
 
-            <div class="flex items-center gap-1 shrink-0 bg-slate-200/70 p-0.5 rounded-lg text-[11px] font-bold">
-                <button type="button" data-section-filter="all" class="section-filter-btn px-2.5 py-1 rounded-md transition-all">すべて表示</button>
-                <button type="button" data-section-filter="monthly" class="section-filter-btn px-2.5 py-1 rounded-md transition-all">Monthly集中</button>
-                <button type="button" data-section-filter="weekly" class="section-filter-btn px-2.5 py-1 rounded-md transition-all">Weekly集中</button>
+            <!-- Saved Month Quick Tabs -->
+            <div class="flex items-center gap-1.5 overflow-x-auto max-w-full custom-scrollbar py-0.5">
+                <span class="text-[11px] font-bold text-slate-400 shrink-0">記録月:</span>
+                <div id="monthTabsContainer" class="flex items-center gap-1 shrink-0"></div>
             </div>
         </div>
     </header>
 
-    <main id="mainWorkspaceGrid" class="max-w-[1600px] w-full mx-auto px-3 sm:px-5 pt-4 grid grid-cols-1 fold:grid-cols-12 gap-5 flex-1 items-start">
+    <main class="w-full px-3 sm:px-6 lg:px-8 pt-4 flex-1">
 
-        <!-- LEFT COLUMN: Editor Pane (Monthly + Weekly) -->
-        <div id="editorPaneContainer" class="fold:col-span-7 lg:col-span-7 xl:col-span-8 space-y-5 min-w-0">
+        <!-- WORKSPACE CONTAINER: Full width, switches between 1-col and 2-col based on layout mode -->
+        <div id="editorPaneContainer" class="grid grid-cols-1 gap-5 items-start min-w-0">
 
             <!-- 1. MONTHLY SECTION CARD -->
-            <section id="monthlySectionCard" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <section id="monthlySectionCard" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-w-0">
                 <!-- Monthly Header -->
                 <div class="px-4 sm:px-5 py-3.5 bg-gradient-to-r from-indigo-50/90 via-white to-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5">
                         <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">M</span>
                         <div>
                             <h2 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2 flex-wrap">
-                                <span>【Monthly】月次実績・トピック</span>
-                                <span id="monthlyCountBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">0件</span>
-                                <span id="monthlyAchievementSummaryBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">目標達成 —/—</span>
+                                <span>【Monthly】月次トピック・定量実績・目標達成評価</span>
+                                <span id="monthlyCountBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">0件</span>
                             </h2>
-                            <p class="text-[11px] text-slate-500">定量実績（現在の数値・去年の数値・目標値・昨対比・達成有無）と実績評価・月次トピック</p>
+                            <p class="text-[11px] text-slate-500">定量実績の自動計算（昨対比・達成有無）と月次トピックの一元管理</p>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <button id="toggleMonthlyMetricsBtn" type="button" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5">
+                        <span id="monthlyAchievementSummaryBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">目標達成 0/0</span>
+                        <button id="toggleMonthlyMetricsBtn" type="button" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1">
                             <span id="toggleMonthlyMetricsBtnText">定量実績・達成評価 ▲</span>
-                        </button>
-                        <button id="toggleHintBtn" type="button" class="text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1">
-                            <span>💡 Weeklyから吸い上げ</span>
                         </button>
                     </div>
                 </div>
@@ -168,10 +181,8 @@
                         </div>
                     </div>
 
-                    <!-- Quantitative Metrics Table Container (11 Metrics matching Yokohama Monthly Format) -->
-                    <div id="monthlyQuantTableContainer" class="overflow-x-auto rounded-xl border border-slate-300 bg-white shadow-sm custom-scrollbar">
-                        <!-- Populated via JS -->
-                    </div>
+                    <!-- Quantitative Metrics Table Container -->
+                    <div id="monthlyQuantTableContainer" class="overflow-x-auto rounded-xl border border-slate-300 bg-white shadow-sm custom-scrollbar"></div>
 
                     <!-- 5 Key Evaluation Pillars (実績評価: 集客 / 声かけ / 接客 / アンケート / Con・PI) -->
                     <div class="pt-1 space-y-2.5">
@@ -180,12 +191,11 @@
                                 <span class="w-1.5 h-4 rounded-full bg-blue-600"></span>
                                 <h3 class="text-xs sm:text-sm font-extrabold text-slate-900">■ 実績評価（目標達成有無 ＆ 課題と理由）</h3>
                             </div>
-                            <span class="text-[11px] text-slate-500">※数値から達成/未達成を自動判定（バッジをクリックして手動切替も可能）</span>
+                            <span class="text-[11px] text-slate-500">※スマートフォンでは縦1列でゆったり表示されます</span>
                         </div>
 
-                        <div id="monthlyEvalCardsContainer" class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2.5">
-                            <!-- Populated via JS -->
-                        </div>
+                        <!-- 1 Column on Portrait Mobile (<768px), multi-column on Tablet/PC -->
+                        <div id="monthlyEvalCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3"></div>
                     </div>
                 </div>
 
@@ -209,9 +219,7 @@
                         </div>
 
                         <!-- 1-Tap Category Quick Pills -->
-                        <div id="categoryQuickPills" class="flex items-center gap-1.5 flex-wrap">
-                            <!-- Populated via JS -->
-                        </div>
+                        <div id="categoryQuickPills" class="flex items-center gap-1.5 flex-wrap"></div>
 
                         <div class="flex flex-col sm:flex-row gap-2">
                             <input
@@ -230,9 +238,7 @@
                     </form>
 
                     <!-- Monthly Topics Bullet List -->
-                    <div id="monthlyListContainer" class="space-y-2">
-                        <!-- Populated via JS -->
-                    </div>
+                    <div id="monthlyListContainer" class="space-y-2"></div>
                 </div>
             </section>
 
@@ -279,37 +285,33 @@
 
                 <!-- Week Focus Filter Tabs (All Weeks vs 1W, 2W, 3W...) -->
                 <div class="px-4 sm:px-5 py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto custom-scrollbar">
-                    <div id="weekFocusTabsContainer" class="flex items-center gap-1.5 shrink-0">
-                        <!-- Populated via JS -->
-                    </div>
+                    <div id="weekFocusTabsContainer" class="flex items-center gap-1.5 shrink-0"></div>
                     <span class="text-[11px] text-slate-400 shrink-0 hidden sm:inline">※各行の「＋Monthly」で月次トピックへ即引用</span>
                 </div>
 
                 <!-- Weekly Cards List -->
-                <div id="weeklyCardsContainer" class="p-4 sm:p-5 space-y-4">
-                    <!-- Populated via JS -->
-                </div>
+                <div id="weeklyCardsContainer" class="p-3.5 sm:p-5 space-y-4"></div>
             </section>
         </div>
 
-        <!-- RIGHT COLUMN: Live Formatted Output & Copy Pane -->
-        <aside id="previewPaneContainer" class="fold:col-span-5 lg:col-span-5 xl:col-span-4 fold:sticky fold:top-24 min-w-0">
+        <!-- 3. TAB-SWITCHED PREVIEW PANE (Full-width when selected via Tab) -->
+        <section id="previewPaneContainer" class="hidden min-w-0">
             <div class="bg-slate-900 text-slate-100 rounded-2xl border border-slate-800 shadow-lg overflow-hidden flex flex-col">
                 <!-- Preview Header -->
-                <div class="px-4 sm:px-5 py-3.5 bg-slate-950/60 border-b border-slate-800 flex items-center justify-between gap-2">
+                <div class="px-4 sm:px-6 py-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-sm font-extrabold text-white flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <h2 class="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                             <span>提出フォーマット プレビュー</span>
                         </h2>
-                        <p id="previewStatsText" class="text-[11px] text-slate-400 mt-0.5">リアルタイム生成中</p>
+                        <p id="previewStatsText" class="text-xs text-slate-400 mt-0.5">リアルタイム生成中</p>
                     </div>
 
-                    <div class="flex items-center gap-1.5">
-                        <button id="downloadTxtBtn" type="button" class="text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-2.5 py-2 rounded-xl transition-colors" title="テキストファイル(.txt)として保存">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button id="downloadTxtBtn" type="button" class="text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-2 rounded-xl transition-colors" title="テキストファイル(.txt)として保存">
                             .txt保存
                         </button>
-                        <button id="copyReportBtn" type="button" class="text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 px-3.5 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1.5">
+                        <button id="copyReportBtn" type="button" class="text-xs sm:text-sm font-extrabold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 px-4 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
                             <span id="copyBtnLabel">クリップボードにコピー</span>
                         </button>
@@ -317,40 +319,42 @@
                 </div>
 
                 <!-- Format Customization Toggles -->
-                <div class="px-4 sm:px-5 py-2.5 bg-slate-800/50 border-b border-slate-800 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-300">
-                    <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
-                        <input id="includeCategoryToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700">
+                <div class="px-4 sm:px-6 py-3 bg-slate-800/50 border-b border-slate-800 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm text-slate-300">
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input id="includeCategoryToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
                         <span>Monthlyに[タグ]を表示</span>
                     </label>
-                    <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
-                        <input id="includeMonthlyMetricsToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700">
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input id="includeMonthlyMetricsToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
                         <span>Monthlyに「定量実績（昨対・達成）」を出力</span>
                     </label>
-                    <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
-                        <input id="includeWeeklyMetricsToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700">
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input id="includeWeeklyMetricsToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
                         <span>Weeklyに「今週の値（先週比）」を出力</span>
                     </label>
-                    <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
-                        <input id="skipEmptyWeeksToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700">
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input id="skipEmptyWeeksToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
                         <span>未入力の週を省略</span>
                     </label>
                 </div>
 
                 <!-- Formatted Output Pre -->
-                <div class="p-4 sm:p-5 flex-1">
-                    <pre id="formattedPreviewArea" class="w-full min-h-[360px] max-h-[68vh] overflow-y-auto custom-scrollbar font-mono text-xs sm:text-[13px] leading-relaxed text-slate-100 bg-slate-950/80 p-4 rounded-xl border border-slate-800/90 whitespace-pre-wrap break-words select-all"></pre>
+                <div class="p-4 sm:p-6 flex-1">
+                    <pre id="formattedPreviewArea" class="w-full min-h-[420px] max-h-[75vh] overflow-y-auto custom-scrollbar font-mono text-xs sm:text-sm leading-relaxed text-slate-100 bg-slate-950/80 p-4 sm:p-6 rounded-xl border border-slate-800/90 whitespace-pre-wrap break-words select-all"></pre>
                 </div>
             </div>
-        </aside>
+        </section>
     </main>
 
-    <!-- Mobile Bottom Quick Action Bar (For Smartphones < 680px) -->
-    <nav id="mobileBottomNav" class="fold:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 px-3 py-2 flex items-center justify-between gap-2 shadow-lg">
-        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 flex-1">
-            <button type="button" data-mobile-pane="editor" class="mobile-pane-btn flex-1 py-1.5 rounded-lg text-xs font-extrabold transition-all">📝 入力・編集</button>
-            <button type="button" data-mobile-pane="preview" class="mobile-pane-btn flex-1 py-1.5 rounded-lg text-xs font-extrabold transition-all">📄 プレビュー</button>
+    <!-- Mobile Bottom Quick Action Bar -->
+    <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 px-2.5 py-2 flex items-center justify-between gap-2 shadow-lg">
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 flex-1 overflow-x-auto">
+            <button type="button" data-section-filter="all" class="section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">すべて</button>
+            <button type="button" data-section-filter="monthly" class="section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">Monthly</button>
+            <button type="button" data-section-filter="weekly" class="section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">Weekly</button>
+            <button type="button" data-section-filter="preview" class="section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap">📄 プレビュー</button>
         </div>
-        <button id="mobileQuickCopyBtn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-sm shrink-0">
+        <button id="mobileQuickCopyBtn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-xl shadow-sm shrink-0">
             一発コピー
         </button>
     </nav>
@@ -366,7 +370,7 @@
         (function () {
             'use strict';
 
-            const STORAGE_KEY = 'periodic_report_topic_manager_v3';
+            const STORAGE_KEY = 'periodic_report_topic_manager_v4';
             const DEFAULT_YEAR = 2026;
             const DEFAULT_MONTH = 10;
 
@@ -380,7 +384,6 @@
                 { value: '什器/運用', label: '什器/運用', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
             ];
 
-            // 9 Weekly metrics ("今週の値" from the Yokohama Weekly report sheet)
             const WEEKLY_METRIC_DEFS = [
                 { key: 'visitors', label: '集客数', type: 'count' },
                 { key: 'approaches', label: '声掛け数', type: 'count' },
@@ -393,7 +396,6 @@
                 { key: 'swingsIos', label: 'スイング数（iOS）', type: 'count' }
             ];
 
-            // 11 Monthly Quantitative Performance metrics from the Yokohama Monthly Format sheet
             const MONTHLY_METRIC_DEFS = [
                 { key: 'roi', label: 'ROI', subLabel: '(集客数×Consideration)', type: 'currency', headerBg: 'bg-amber-100 text-slate-900' },
                 { key: 'visitors', label: '集客数', subLabel: '', type: 'count', headerBg: 'bg-amber-200/80 text-slate-900' },
@@ -408,7 +410,6 @@
                 { key: 'purchaseIntent', label: 'Purchase Intent', subLabel: '', type: 'percent', headerBg: 'bg-sky-200/80 text-slate-900' }
             ];
 
-            // 5 Evaluation Pillars on the right side of the Monthly Format sheet
             const MONTHLY_EVAL_PILLARS = [
                 { key: 'visitors', label: '集客', metricKeys: ['visitors'] },
                 { key: 'approaches', label: '声かけ', metricKeys: ['approaches', 'approachRate'] },
@@ -724,7 +725,6 @@
                 selectedWeekFilter: 'all',
                 sectionFilter: 'all',
                 layoutMode: 'auto',
-                mobileActivePane: 'editor',
                 collapsedMetricsWeeks: {},
                 records: {}
             };
@@ -774,7 +774,7 @@
                 } else {
                     safe.weeklyItems.forEach((w, idx) => {
                         if (!w.id) w.id = `w-${year}-${month}-${idx}`;
-                        if (typeof w.range !== 'string') w.range = `${ idx + 1 }W`;
+                        if (typeof w.range !== 'string') w.range = `${idx + 1}W`;
                         if (typeof w.memo !== 'string') w.memo = '';
                         if (!w.metrics || typeof w.metrics !== 'object') {
                             w.metrics = createEmptyWeeklyMetrics();
@@ -959,7 +959,6 @@
                 });
             }
 
-            // Get previous week item (supports cross-month lookup to previous month's last filled week)
             function getPreviousWeekContext(record, weekIdx) {
                 if (weekIdx > 0) {
                     const prevW = record.weeklyItems[weekIdx - 1];
@@ -1075,7 +1074,6 @@
 
                 if (tableContainer) {
                     if (!fullTableRender && tableContainer.querySelector('table')) {
-                        // In-place update of achievement cells and YoY cells so input focus is never lost
                         MONTHLY_METRIC_DEFS.forEach(def => {
                             const a = analysesMap[def.key];
                             const achCell = tableContainer.querySelector(`[data-monthly-ach-cell="${def.key}"]`);
@@ -1192,7 +1190,6 @@
                     }
                 }
 
-                // Render 5 Evaluation Pillar Cards (only rebuild if fullTableRender is true or container is empty, otherwise update status badges & mini numbers)
                 if (evalContainer) {
                     if (!fullTableRender && evalContainer.children.length === MONTHLY_EVAL_PILLARS.length) {
                         MONTHLY_EVAL_PILLARS.forEach(pillar => {
@@ -1249,9 +1246,8 @@
                                 const def = MONTHLY_METRIC_DEFS.find(d => d.key === mKey);
                                 const entry = record.monthlyMetrics[mKey];
                                 const a = analysesMap[mKey];
-                                if (!def || a.currNum === null) return '';
                                 return `
-                                    <div class="flex items-center justify-between text-[10px] text-slate-600 font-mono">
+                                    <div class="flex items-center justify-between text-xs text-slate-600 font-mono">
                                         <span class="font-sans text-slate-500 truncate mr-1">${escapeHtml(def.label)}</span>
                                         <span>
                                             <strong class="text-slate-900">${formatMonthlyMetricCell(entry.current, def.type)}</strong>
@@ -1262,11 +1258,13 @@
                             }).filter(Boolean).join('');
 
                             return `
-                                <div class="rounded-xl bg-slate-200/75 border border-slate-300/90 p-2.5 flex flex-col gap-2">
-                                    <div class="text-center font-extrabold text-xs text-slate-800">${escapeHtml(pillar.label)}</div>
+                                <div class="rounded-xl bg-slate-200/75 border border-slate-300/90 p-3 sm:p-3.5 flex flex-col gap-2.5">
+                                    <div class="flex items-center justify-between md:justify-center gap-2">
+                                        <div class="font-extrabold text-sm text-slate-800">${escapeHtml(pillar.label)}</div>
+                                    </div>
                                     ${statusBadgeHtml}
-                                    ${metricMiniSummary ? `<div class="bg-white/85 rounded-lg px-2 py-1 space-y-0.5 border border-slate-200/80">${metricMiniSummary}</div>` : ''}
-                                    <div class="text-center text-[10px] font-bold text-slate-600 bg-white/90 rounded py-0.5 border border-slate-200/80">
+                                    ${metricMiniSummary ? `<div class="bg-white/90 rounded-lg px-2.5 py-1.5 space-y-1 border border-slate-200/80">${metricMiniSummary}</div>` : ''}
+                                    <div class="text-center text-[11px] font-bold text-slate-600 bg-white/90 rounded py-1 border border-slate-200/80">
                                         ― 課題と理由 ―
                                     </div>
                                     <textarea
@@ -1274,13 +1272,13 @@
                                         data-eval-action="edit-reason"
                                         data-pillar-key="${pillar.key}"
                                         placeholder="${escapeHtml(pillar.label)}の達成・未達成理由や課題を入力..."
-                                        class="w-full flex-1 rounded-lg bg-white border border-slate-200 p-2 text-[11px] leading-relaxed text-slate-800 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none"
+                                        class="w-full flex-1 rounded-lg bg-white border border-slate-200 p-2.5 text-xs sm:text-[13px] leading-relaxed text-slate-800 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none"
                                     >${escapeHtml(evalObj.reason || '')}</textarea>
                                     <button
                                         type="button"
                                         data-eval-action="promote-reason"
                                         data-pillar-key="${pillar.key}"
-                                        class="w-full py-1 px-2 rounded-lg bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 hover:border-indigo-300 text-[10px] font-bold transition-colors flex items-center justify-center gap-1"
+                                        class="w-full py-1.5 px-2.5 rounded-lg bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 hover:border-indigo-300 text-xs font-bold transition-colors flex items-center justify-center gap-1 shadow-sm"
                                     >
                                         <span>＋「実績評価」トピックへ追加</span>
                                     </button>
@@ -1505,7 +1503,7 @@
                                 <td class="px-2.5 py-1.5 font-bold text-slate-700 text-xs truncate">${escapeHtml(def.label)}</td>
                                 <td class="px-2 py-1.5 text-right font-mono text-xs text-slate-500">${formatWeeklyMetricValue(prevRaw, def.type)}</td>
                                 <td class="px-2 py-1 text-right">
-                                    <div class="inline-flex items-center justify-end gap-0.5 w-full max-w-[110px] ml-auto">
+                                    <div class="inline-flex items-center justify-end gap-0.5 w-full max-w-[95px] ml-auto">
                                         <input
                                             type="text"
                                             inputmode="decimal"
@@ -1518,8 +1516,8 @@
                                         ${def.type === 'percent' ? '<span class="text-[10px] font-mono text-slate-400">%</span>' : ''}
                                     </div>
                                 </td>
-                                <td data-weekly-diff-cell="${week.id}-${def.key}" class="px-2.5 py-1.5 text-right font-mono text-[11px]">
-                                    <span class="inline-block px-2 py-0.5 rounded-md border ${badgeClass}">
+                                <td data-weekly-diff-cell="${week.id}-${def.key}" class="px-2 py-1.5 text-right font-mono text-[11px]">
+                                    <span class="inline-block px-1.5 py-0.5 rounded-md border ${badgeClass} text-[10px] sm:text-[11px] whitespace-nowrap">
                                         ${escapeHtml(diff.text)}
                                     </span>
                                 </td>
@@ -1527,7 +1525,6 @@
                         `;
                     }).join('');
 
-                    // Quick 1-line promotion chips from week memo
                     const memoLines = (week.memo || '')
                         .split(/\r?\n/)
                         .map(l => l.trim().replace(/^[・•\-]\s*/, ''))
@@ -1565,13 +1562,13 @@
                                         value="${escapeHtml(week.range)}"
                                         class="w-32 sm:w-36 font-mono font-extrabold text-xs sm:text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-1 focus:border-emerald-500 focus:outline-none"
                                     />
-                                    <span class="text-[11px] text-slate-400 hidden sm:inline">比較対象: ${escapeHtml(prevCtx.label)}</span>
+                                    <span class="text-[11px] text-slate-400 hidden sm:inline">比較: ${escapeHtml(prevCtx.label)}</span>
                                 </div>
 
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     <button type="button" data-week-action="toggle-metrics" data-week-id="${week.id}"
                                         class="text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg transition-colors">
-                                        今週の値（先週比） ${isMetricsCollapsed ? '▼' : '▲'}
+                                        今週の値 ${isMetricsCollapsed ? '▼' : '▲'}
                                     </button>
                                     <button type="button" data-week-action="append-metrics-memo" data-week-idx="${idx}"
                                         class="text-[11px] font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg transition-colors">
@@ -1583,39 +1580,40 @@
                                     ` : ''}
                                 </div>
                             </div>
-
-                            <!-- Card Body -->
-                            <div class="p-3.5 sm:p-4 space-y-3.5">
-                                <!-- Balanced 4-Column Weekly Metrics Table (max-w-2xl & fixed column proportions) -->
-                                <div class="${isMetricsCollapsed ? 'hidden' : ''}">
-                                    <div class="max-w-2xl rounded-xl border border-slate-200 overflow-hidden bg-white">
-                                        <table class="w-full table-fixed border-collapse">
-                                            <thead>
-                                                <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-extrabold text-slate-700">
-                                                    <th class="w-[30%] px-2.5 py-2 text-left">項目</th>
-                                                    <th class="w-[21%] px-2 py-2 text-right">${escapeHtml(prevCtx.label)}</th>
-                                                    <th class="w-[24%] px-2 py-2 text-right text-emerald-800">今週の値</th>
-                                                    <th class="w-[25%] px-2.5 py-2 text-right">先週比</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                ${metricRowsHtml}
-                                            </tbody>
-                                        </table>
+                            <!-- Card Body: Balanced side-by-side on PC and stacked on mobile -->
+                            <div class="p-3.5 sm:p-5">
+                                <div class="grid grid-cols-1 ${isMetricsCollapsed ? '' : 'xl:grid-cols-12'} gap-4 items-start">
+                                    <!-- Balanced Metrics Table with well-proportioned column widths -->
+                                    <div class="${isMetricsCollapsed ? 'hidden' : 'xl:col-span-6 2xl:col-span-5'} min-w-0">
+                                        <div class="w-full rounded-xl border border-slate-200 overflow-hidden bg-white">
+                                            <table class="w-full table-fixed border-collapse text-xs">
+                                                <thead>
+                                                    <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-extrabold text-slate-700">
+                                                        <th class="w-[30%] px-2.5 py-2 text-left truncate">項目</th>
+                                                        <th class="w-[21%] px-1.5 py-2 text-right truncate">先週</th>
+                                                        <th class="w-[24%] px-2 py-2 text-right text-emerald-800 truncate">今週の値</th>
+                                                        <th class="w-[25%] px-2 py-2 text-right truncate">先週比</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${metricRowsHtml}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Weekly Memo Textarea -->
-                                <div class="space-y-1.5">
-                                    <label class="block text-xs font-bold text-slate-700">数値の変化理由・トピック・課題解決アクション</label>
-                                    <textarea
-                                        rows="4"
-                                        data-week-action="edit-memo"
-                                        data-week-id="${week.id}"
-                                        placeholder="・数値の変化理由や、その週のトピック・課題解決アクションを入力..."
-                                        class="w-full rounded-xl border border-slate-300 bg-slate-50/40 focus:bg-white p-3 text-xs sm:text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none transition-colors"
-                                    >${escapeHtml(week.memo)}</textarea>
-                                    ${lineChipsHtml}
+                                    <!-- Weekly Memo Textarea -->
+                                    <div class="${isMetricsCollapsed ? '' : 'xl:col-span-6 2xl:col-span-7'} space-y-2 min-w-0">
+                                        <label class="block text-xs font-bold text-slate-700">数値の変化理由・トピック・課題解決アクション</label>
+                                        <textarea
+                                            rows="${isMetricsCollapsed ? '4' : '11'}"
+                                            data-week-action="edit-memo"
+                                            data-week-id="${week.id}"
+                                            placeholder="・数値の変化理由や、その週のトピック・課題解決アクションを入力..."
+                                            class="w-full rounded-xl border border-slate-300 bg-slate-50/40 focus:bg-white p-3 text-xs sm:text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none transition-colors"
+                                        >${escapeHtml(week.memo)}</textarea>
+                                        ${lineChipsHtml}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1708,7 +1706,6 @@
                     statsText.textContent = `${record.year}年${record.month}月 / Monthly ${record.monthlyTopics.length}件 / ${text.length}文字`;
                 }
 
-                // Render Weekly -> Monthly Summary Hint Drawer
                 const hintList = document.getElementById('summaryHintList');
                 if (hintList) {
                     const record = getCurrentRecord();
@@ -1807,45 +1804,60 @@
                 const weeklyCard = document.getElementById('weeklySectionCard');
                 const editorPane = document.getElementById('editorPaneContainer');
                 const previewPane = document.getElementById('previewPaneContainer');
+                const evalContainer = document.getElementById('monthlyEvalCardsContainer');
 
-                // Section filter
-                if (monthlyCard && weeklyCard) {
+                const isPreviewTab = appState.sectionFilter === 'preview';
+
+                if (editorPane && previewPane) {
+                    editorPane.classList.toggle('hidden', isPreviewTab);
+                    previewPane.classList.toggle('hidden', !isPreviewTab);
+                }
+
+                if (monthlyCard && weeklyCard && !isPreviewTab) {
                     monthlyCard.classList.toggle('hidden', appState.sectionFilter === 'weekly');
                     weeklyCard.classList.toggle('hidden', appState.sectionFilter === 'monthly');
                 }
+
                 document.querySelectorAll('.section-filter-btn').forEach(btn => {
                     const active = btn.dataset.sectionFilter === appState.sectionFilter;
-                    btn.className = `section-filter-btn px-2.5 py-1 rounded-md transition-all ${active ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`;
+                    const isMobileNav = Boolean(btn.closest('#mobileBottomNav'));
+                    if (isMobileNav) {
+                        btn.className = `section-filter-btn flex-1 py-1.5 px-2 rounded-lg text-[11px] font-extrabold transition-all whitespace-nowrap ${
+                            active ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                        }`;
+                    } else {
+                        btn.className = `section-filter-btn px-3 py-1.5 rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                            active ? 'bg-indigo-600 text-white shadow-sm font-extrabold' : 'text-slate-600 hover:text-slate-900 font-bold'
+                        }`;
+                    }
                 });
 
-                // Layout mode buttons
                 document.querySelectorAll('.layout-mode-btn').forEach(btn => {
                     const active = btn.dataset.layoutMode === appState.layoutMode;
-                    btn.className = `layout-mode-btn px-2 py-1 rounded-lg transition-colors ${active ? 'bg-white text-indigo-700 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'}`;
+                    btn.className = `layout-mode-btn px-2.5 py-1 rounded-lg transition-colors ${
+                        active ? 'bg-white text-indigo-700 shadow-sm font-extrabold' : 'text-slate-600 hover:text-slate-900'
+                    }`;
                 });
 
-                const isFoldOrLarger = window.innerWidth >= 680;
-                if (!isFoldOrLarger) {
-                    // Mobile pane toggle
-                    const showPreview = appState.mobileActivePane === 'preview';
-                    editorPane.classList.toggle('hidden', showPreview);
-                    previewPane.classList.toggle('hidden', !showPreview);
-                } else {
-                    editorPane.classList.remove('hidden');
-                    previewPane.classList.remove('hidden');
-                    if (appState.layoutMode === 'single') {
-                        editorPane.className = 'fold:col-span-12 space-y-5 min-w-0';
-                        previewPane.className = 'fold:col-span-12 min-w-0';
+                if (editorPane) {
+                    const canSplitBothSections = appState.sectionFilter === 'all';
+                    if (appState.layoutMode === 'split' && canSplitBothSections) {
+                        editorPane.className = 'grid grid-cols-1 md:grid-cols-2 gap-5 items-start min-w-0';
                     } else {
-                        editorPane.className = 'fold:col-span-7 lg:col-span-7 xl:col-span-8 space-y-5 min-w-0';
-                        previewPane.className = 'fold:col-span-5 lg:col-span-5 xl:col-span-4 fold:sticky fold:top-24 min-w-0';
+                        editorPane.className = 'grid grid-cols-1 gap-5 items-start min-w-0';
                     }
                 }
 
-                document.querySelectorAll('.mobile-pane-btn').forEach(btn => {
-                    const active = btn.dataset.mobilePane === appState.mobileActivePane;
-                    btn.className = `mobile-pane-btn flex-1 py-1.5 rounded-lg text-xs font-extrabold transition-all ${active ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500'}`;
-                });
+                if (evalContainer) {
+                    if (appState.layoutMode === 'single') {
+                        evalContainer.className = 'grid grid-cols-1 gap-3';
+                    } else if (appState.layoutMode === 'split' && appState.sectionFilter !== 'all') {
+                        evalContainer.className = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3';
+                    } else {
+                        // Portrait smartphone (<768px) is strictly 1 column for readability
+                        evalContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3';
+                    }
+                }
             }
 
             function renderAll() {
@@ -1892,7 +1904,6 @@
             }
 
             function bindEvents() {
-                // Year / Month navigation
                 document.getElementById('yearSelect').addEventListener('change', (e) => {
                     appState.currentYear = Number(e.target.value);
                     appState.selectedWeekFilter = 'all';
@@ -1940,7 +1951,6 @@
                     renderAll();
                 });
 
-                // Restore Sample Data
                 document.getElementById('restoreSampleBtn').addEventListener('click', () => {
                     appState.records['2026-10'] = createSampleRecord2026_10();
                     appState.records['2026-09'] = createSampleRecord2026_09();
@@ -1952,7 +1962,6 @@
                     showToast('2026年10月・9月のサンプルデータを復元しました');
                 });
 
-                // Section filter & Layout mode
                 document.querySelectorAll('.section-filter-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         appState.sectionFilter = btn.dataset.sectionFilter;
@@ -1969,16 +1978,8 @@
                     });
                 });
 
-                document.querySelectorAll('.mobile-pane-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        appState.mobileActivePane = btn.dataset.mobilePane;
-                        applyLayoutAndSectionFilters();
-                    });
-                });
-
                 window.addEventListener('resize', applyLayoutAndSectionFilters);
 
-                // Monthly Quantitative Panel Toggle & Auto-calc
                 document.getElementById('toggleMonthlyMetricsBtn').addEventListener('click', () => {
                     appState.monthlyMetricsCollapsed = !appState.monthlyMetricsCollapsed;
                     saveStateToStorage();
@@ -2037,7 +2038,6 @@
                     }
                 });
 
-                // Monthly Quantitative Table Input (In-place update without losing focus!)
                 const monthlyQuantTable = document.getElementById('monthlyQuantTableContainer');
                 monthlyQuantTable.addEventListener('input', (e) => {
                     const target = e.target;
@@ -2052,7 +2052,6 @@
                     updatePreviewAndSummaryHints();
                 });
 
-                // Multi-cell Paste into Monthly Table
                 monthlyQuantTable.addEventListener('paste', (e) => {
                     const target = e.target;
                     const startMetricKey = target?.dataset?.monthlyMetricKey;
@@ -2083,7 +2082,6 @@
                     showToast(`${tokens.length}項目の数値を一括反映しました`);
                 });
 
-                // Monthly 5 Evaluation Pillar Cards
                 const evalCardsContainer = document.getElementById('monthlyEvalCardsContainer');
                 evalCardsContainer.addEventListener('input', (e) => {
                     const target = e.target;
@@ -2123,7 +2121,6 @@
                     }
                 });
 
-                // Category Quick Pills & Add Monthly Topic Form
                 document.getElementById('categoryQuickPills').addEventListener('click', (e) => {
                     const btn = e.target.closest('button[data-quick-cat]');
                     if (!btn) return;
@@ -2141,7 +2138,6 @@
                     showToast('Monthlyトピックを追加しました');
                 });
 
-                // Monthly Topic List Editing & Actions
                 const monthlyList = document.getElementById('monthlyListContainer');
                 monthlyList.addEventListener('input', (e) => {
                     const topicId = e.target.dataset.monthlyTopicId;
@@ -2183,22 +2179,20 @@
                     updatePreviewAndSummaryHints();
                 });
 
-                // Summary Hint Drawer
                 const hintPanel = document.getElementById('summaryHintPanel');
-                document.getElementById('toggleHintBtn').addEventListener('click', () => {
+                document.getElementById('toggleHintBtn')?.addEventListener('click', () => {
                     hintPanel.classList.toggle('hidden');
                 });
-                document.getElementById('closeHintBtn').addEventListener('click', () => {
+                document.getElementById('closeHintBtn')?.addEventListener('click', () => {
                     hintPanel.classList.add('hidden');
                 });
-                document.getElementById('summaryHintList').addEventListener('click', (e) => {
+                document.getElementById('summaryHintList')?.addEventListener('click', (e) => {
                     const btn = e.target.closest('button[data-hint-promote]');
                     if (!btn) return;
                     addMonthlyTopic(btn.dataset.hintPromote, selectedQuickCategory);
                     showToast('WeeklyメモをMonthlyトピックへ追加しました');
                 });
 
-                // Weekly Controls & Matrix Drawer
                 const matrixPanel = document.getElementById('weeklyMetricsMatrixPanel');
                 document.getElementById('toggleMetricsMatrixBtn').addEventListener('click', () => {
                     matrixPanel.classList.toggle('hidden');
@@ -2255,7 +2249,6 @@
                     renderWeeklySection();
                 });
 
-                // Weekly Cards Input & Actions (In-place WoW update without losing focus!)
                 const weeklyContainer = document.getElementById('weeklyCardsContainer');
                 weeklyContainer.addEventListener('input', (e) => {
                     const target = e.target;
@@ -2270,7 +2263,6 @@
                         record.weeklyItems[weekIdx].metrics[mKey] = target.value;
                         saveStateToStorage();
 
-                        // Update this week's diff cell and next week's diff cell in-place
                         [weekIdx, weekIdx + 1].forEach(idx => {
                             const wItem = record.weeklyItems[idx];
                             if (!wItem) return;
@@ -2287,7 +2279,7 @@
                                         : diff.tone === 'down'
                                             ? 'text-rose-700 bg-rose-50 border-rose-200 font-bold'
                                             : 'text-slate-600 bg-slate-100 border-slate-200';
-                                cell.innerHTML = `<span class="inline-block px-2 py-0.5 rounded-md border ${badgeClass}">${escapeHtml(diff.text)}</span>`;
+                                cell.innerHTML = `<span class="inline-block px-1.5 py-0.5 rounded-md border ${badgeClass} text-[10px] sm:text-[11px] whitespace-nowrap">${escapeHtml(diff.text)}</span>`;
                             }
                         });
 
@@ -2358,7 +2350,6 @@
                     }
                 });
 
-                // Output Toggles & Copy / Download
                 document.getElementById('includeCategoryToggle').addEventListener('change', (e) => {
                     appState.includeCategoryInOutput = e.target.checked;
                     saveStateToStorage();
@@ -2384,6 +2375,7 @@
                 });
 
                 document.getElementById('copyReportBtn').addEventListener('click', copyFormattedText);
+                document.getElementById('headerQuickCopyBtn').addEventListener('click', copyFormattedText);
                 document.getElementById('mobileQuickCopyBtn').addEventListener('click', copyFormattedText);
 
                 document.getElementById('downloadTxtBtn').addEventListener('click', () => {
@@ -2402,7 +2394,6 @@
                 });
             }
 
-            // Initialize App
             loadStateFromStorage();
             bindEvents();
             renderAll();
