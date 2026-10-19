@@ -173,7 +173,7 @@
                         </div>
                         <div class="flex items-center gap-1.5 flex-wrap">
                             <button id="openMonthlyBulkPasteBtn" type="button" class="text-[11px] font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-sm">
-                                <span>📋 スライドから一括貼り付け</span>
+                                <span>📋 スライドから一括貼り付け（4行×11列対応）</span>
                             </button>
                             <button id="calcMonthlyRatesBtn" type="button" class="text-[11px] font-bold text-sky-700 bg-white hover:bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-sm" title="集客数・声かけ数・接客数・Considerationから声かけ率・接客率・ROIを自動計算します">
                                 <span>⚡ 声かけ率・接客率を自動計算</span>
@@ -348,9 +348,9 @@
         </section>
     </main>
 
-    <!-- BULK PASTE MODAL (For Monthly 11 items & Weekly 9 items) -->
+    <!-- BULK PASTE MODAL (Supports Monthly 4-row x 11-col full table paste & Weekly 9-item paste) -->
     <div id="bulkPasteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh]">
             <!-- Modal Header -->
             <div id="bulkPasteModalHeader" class="px-4 sm:px-5 py-3.5 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
@@ -366,36 +366,36 @@
             <div class="p-4 sm:p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1">
                 <!-- Target Selector Bar -->
                 <div id="bulkPasteTargetSelectorWrap" class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200">
-                    <span id="bulkPasteTargetLabel" class="text-xs font-extrabold text-slate-700">反映先の行を選択:</span>
+                    <span id="bulkPasteTargetLabel" class="text-xs font-extrabold text-slate-700">貼り付けモード:</span>
                     <select id="bulkPasteTargetSelect" class="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500"></select>
                 </div>
 
                 <!-- Paste Textarea -->
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between gap-2">
-                        <label for="bulkPasteTextarea" class="text-xs font-extrabold text-slate-700">
-                            スライドや表からコピーした数値をそのまま貼り付け（改行・タブ・カンマ区切り対応）
+                        <label id="bulkPasteInputHintLabel" for="bulkPasteTextarea" class="text-xs font-extrabold text-slate-700">
+                            スライドの表（4行×11列の44セル範囲など）をそのままコピー＆貼り付け
                         </label>
                         <button id="clearBulkPasteTextBtn" type="button" class="text-[11px] font-semibold text-slate-400 hover:text-rose-600">クリア</button>
                     </div>
                     <textarea
                         id="bulkPasteTextarea"
                         rows="6"
-                        placeholder="例（縦並び・横並びどちらも可）:&#10;-¥1,050&#10;203&#10;213&#10;2.2%&#10;-118..."
+                        placeholder=""
                         class="w-full rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white p-3 font-mono text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                     ></textarea>
-                    <p class="text-[11px] text-slate-500">
-                        ※「¥」「%」「,（カンマ）」やマイナス記号が含まれていても自動整形して各入力欄へセットします。「-」「—」は空欄として処理されます。
+                    <p id="bulkPasteSubNote" class="text-[11px] text-slate-500">
+                        ※「昨対比・現在の数値・去年の数値・目標値」の4行×11列（44セル）を一気に貼り付けると、1行目（昨対比）を自動スキップして「現在の数値」「去年の数値」「目標値」へ一括セットし、昨対比と達成判定を自動計算します。
                     </p>
                 </div>
 
                 <!-- Live Mapping Preview -->
                 <div class="space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-extrabold text-slate-700">割り当てプレビュー（上から順番に自動マッピング）</span>
-                        <span id="bulkPasteCountBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">0 / 11 項目</span>
+                    <div class="flex items-center justify-between flex-wrap gap-1">
+                        <span class="text-xs font-extrabold text-slate-700">割り当てプレビュー（反映前の確認）</span>
+                        <span id="bulkPasteCountBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">未入力</span>
                     </div>
-                    <div id="bulkPastePreviewGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                    <div id="bulkPastePreviewGrid" class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 max-h-60 overflow-auto custom-scrollbar"></div>
                 </div>
             </div>
 
@@ -432,7 +432,7 @@
     </div>
 
     <!-- =====================================================================
-         SCRIPT BLOCK 1: 定数定義・状態管理(State)・サンプルデータ・数値計算＆一括解析ロジック
+         SCRIPT BLOCK 1: 定数定義・状態管理(State)・サンプルデータ・数値計算＆2次元一括解析ロジック
          ===================================================================== -->
     <script>
         const STORAGE_KEY = 'periodic_report_topic_manager_v4';
@@ -486,7 +486,7 @@
         let selectedQuickCategory = 'ピックアップ';
         let bulkPasteModalState = {
             mode: 'monthly', // 'monthly' | 'weekly'
-            monthlyField: 'current', // 'current' | 'lastYear' | 'target'
+            monthlyTarget: 'all_auto', // 'all_auto' | 'current' | 'lastYear' | 'target'
             weekId: null
         };
 
@@ -506,46 +506,202 @@
                 .replace(/．/g, '.')
                 .replace(/[￥¥]/g, '¥')
                 .replace(/％/g, '%')
-                .replace(/[−－–▲△]/g, '-');
+                .replace(/[−－–—―ー▲△]/g, '-');
         }
 
         function parseMetricNum(val) {
             if (val === null || val === undefined) return null;
             const norm = normalizeHalfWidth(val);
             const cleaned = norm.replace(/[¥,%、，\s]|pt/gi, '').trim();
-            if (cleaned === '' || cleaned === '-' || cleaned === '—' || cleaned === 'ー') return null;
+            if (cleaned === '' || cleaned === '-' || cleaned === '--') return null;
             const num = Number(cleaned);
             return Number.isFinite(num) ? num : null;
         }
 
+        // スライドの見出し文字（誤って選択された場合）を判定して除外するためのフィルタ
+        function isHeaderOrLabelToken(rawToken) {
+            const t = String(rawToken || '').trim();
+            if (!t) return true;
+            const labelPatterns = [
+                /^(昨対比|現在の数値|現在の数|去年の数値|去年の数|値|目標値|目標達成有無|項目|Yokohama|横浜)$/i,
+                /^(ROI|集客数|声かけ数|声掛け数|声かけ率|接客数|接客率|アンケート数|アンケート回収数|購入意欲向上数|購入意欲向上|Consideration|購入検討数|Purchase\s*Intent|Intent)$/i
+            ];
+            return labelPatterns.some(re => re.test(t));
+        }
+
+        function parseSingleCellToken(rawToken) {
+            const trimmed = String(rawToken || '').trim();
+            if (!trimmed || isHeaderOrLabelToken(trimmed)) return null;
+
+            // 「ー」「―」「—」「-」「なし」単体は空欄プレースホルダー（目標値なし等）として扱う
+            if (/^[-−－–—―ーなしN\/A]+$/i.test(trimmed)) {
+                return { raw: trimmed, value: '', isEmptyPlaceholder: true };
+            }
+            const num = parseMetricNum(trimmed);
+            if (num !== null) {
+                return { raw: trimmed, value: num, isEmptyPlaceholder: false };
+            }
+            return null;
+        }
+
+        // 1次元トークン配列抽出（改行・タブ・カンマすべて対応）
         function parseBulkPasteTokens(rawText) {
             if (!rawText || !String(rawText).trim()) return [];
-            let text = normalizeHalfWidth(rawText).trim();
+            let text = String(rawText).trim();
 
-            // 数値内の桁区切りカンマ (例: -¥1,050 や 12,345) を先に結合し、区切り文字のカンマと区別する
+            // 桁区切りカンマ (例: -¥1,050 や 12,345) を結合
             let prev = '';
             while (prev !== text) {
                 prev = text;
-                text = text.replace(/(\d),(\d{3})(?!\d)/g, '$1$2');
+                text = text.replace(/(\d)[,，](\d{3})(?!\d)/g, '$1$2');
             }
 
             let rawTokens = [];
             if (/[\t\r\n]/.test(text)) {
-                rawTokens = text.split(/[\t\r\n]+/).map(t => t.trim()).filter(t => t.length > 0);
+                rawTokens = text.split(/[\t\r\n]+/).map(t => t.trim()).filter(Boolean);
             } else {
-                rawTokens = text.split(/[,、]+|\s+/).map(t => t.trim()).filter(t => t.length > 0);
+                rawTokens = text.split(/[,、]+|\s+/).map(t => t.trim()).filter(Boolean);
             }
 
-            return rawTokens.map(token => {
-                if (/^[-—ーなしN\/A]+$/i.test(token)) {
-                    return { raw: token, value: '', isEmptyPlaceholder: true };
+            return rawTokens.map(parseSingleCellToken).filter(Boolean);
+        }
+
+        /**
+         * Monthly用 スマート一括解析:
+         * 青枠の4行×11列（44セル: 昨対比・現在の数値・去年の数値・目標値）や
+         * 3行×11列（33セル: 現在の数値・去年の数値・目標値）、または単一行（11セル）を自動判別して返す
+         */
+        function parseMonthlyBulkData(rawText, targetMode = 'all_auto') {
+            const COL_COUNT = MONTHLY_METRIC_DEFS.length; // 11
+            const allTokens = parseBulkPasteTokens(rawText);
+
+            if (allTokens.length === 0) {
+                return { mode: 'empty', rows: {}, totalTokens: 0, description: '未入力' };
+            }
+
+            // 特定の1行のみ指定されている場合
+            if (targetMode === 'current' || targetMode === 'lastYear' || targetMode === 'target') {
+                return {
+                    mode: 'single',
+                    targetField: targetMode,
+                    rows: { [targetMode]: allTokens.slice(0, COL_COUNT) },
+                    totalTokens: allTokens.length,
+                    description: `単一行モード（${Math.min(allTokens.length, COL_COUNT)} / ${COL_COUNT}項目）`
+                };
+            }
+
+            // タブ＋改行による2次元構造の解析を試みる
+            let cleanedText = String(rawText).trim();
+            let prev = '';
+            while (prev !== cleanedText) {
+                prev = cleanedText;
+                cleanedText = cleanedText.replace(/(\d)[,，](\d{3})(?!\d)/g, '$1$2');
+            }
+
+            const rawLines = cleanedText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+            const parsed2DRows = [];
+
+            rawLines.forEach(line => {
+                const cells = line.split(/\t+/).map(parseSingleCellToken).filter(Boolean);
+                if (cells.length >= 6) {
+                    parsed2DRows.push(cells.slice(0, COL_COUNT));
                 }
-                const num = parseMetricNum(token);
-                if (num !== null) {
-                    return { raw: token, value: num, isEmptyPlaceholder: false };
-                }
-                return null;
-            }).filter(Boolean);
+            });
+
+            // ケース1: 2D行として4行以上検出された場合（昨対比 / 現在の数値 / 去年の数値 / 目標値）
+            if (parsed2DRows.length >= 4) {
+                const offset = parsed2DRows.length - 4;
+                return {
+                    mode: 'multi_4rows',
+                    rows: {
+                        yoy: parsed2DRows[offset],
+                        current: parsed2DRows[offset + 1],
+                        lastYear: parsed2DRows[offset + 2],
+                        target: parsed2DRows[offset + 3]
+                    },
+                    totalTokens: allTokens.length,
+                    description: '4行×11列（昨対比・現在の数値・去年の数値・目標値）を一括認識'
+                };
+            }
+
+            // ケース2: 2D行として3行検出された場合（現在の数値 / 去年の数値 / 目標値）
+            if (parsed2DRows.length === 3) {
+                return {
+                    mode: 'multi_3rows',
+                    rows: {
+                        current: parsed2DRows[0],
+                        lastYear: parsed2DRows[1],
+                        target: parsed2DRows[2]
+                    },
+                    totalTokens: allTokens.length,
+                    description: '3行×11列（現在の数値・去年の数値・目標値）を一括認識'
+                };
+            }
+
+            // ケース3: 2D行として2行検出された場合（現在の数値 / 去年の数値）
+            if (parsed2DRows.length === 2) {
+                return {
+                    mode: 'multi_2rows',
+                    rows: {
+                        current: parsed2DRows[0],
+                        lastYear: parsed2DRows[1]
+                    },
+                    totalTokens: allTokens.length,
+                    description: '2行×11列（現在の数値・去年の数値）を一括認識'
+                };
+            }
+
+            // ケース4: スライドからセルごとに改行でフラットにコピーされた場合（トークン総数で11列ずつ自動分割）
+            if (allTokens.length >= COL_COUNT * 3 + 6) {
+                // 44個前後（4行×11列）
+                return {
+                    mode: 'multi_4rows',
+                    rows: {
+                        yoy: allTokens.slice(0, COL_COUNT),
+                        current: allTokens.slice(COL_COUNT, COL_COUNT * 2),
+                        lastYear: allTokens.slice(COL_COUNT * 2, COL_COUNT * 3),
+                        target: allTokens.slice(COL_COUNT * 3, COL_COUNT * 4)
+                    },
+                    totalTokens: allTokens.length,
+                    description: '44セル一括（昨対比・現在の数値・去年の数値・目標値）を自動分割'
+                };
+            }
+
+            if (allTokens.length >= COL_COUNT * 2 + 6) {
+                // 33個前後（3行×11列）
+                return {
+                    mode: 'multi_3rows',
+                    rows: {
+                        current: allTokens.slice(0, COL_COUNT),
+                        lastYear: allTokens.slice(COL_COUNT, COL_COUNT * 2),
+                        target: allTokens.slice(COL_COUNT * 2, COL_COUNT * 3)
+                    },
+                    totalTokens: allTokens.length,
+                    description: '33セル一括（現在の数値・去年の数値・目標値）を自動分割'
+                };
+            }
+
+            if (allTokens.length >= COL_COUNT + 6) {
+                // 22個前後（2行×11列）
+                return {
+                    mode: 'multi_2rows',
+                    rows: {
+                        current: allTokens.slice(0, COL_COUNT),
+                        lastYear: allTokens.slice(COL_COUNT, COL_COUNT * 2)
+                    },
+                    totalTokens: allTokens.length,
+                    description: '22セル一括（現在の数値・去年の数値）を自動分割'
+                };
+            }
+
+            // ケース5: 11個以下（単一行として「現在の数値」へ割り当て）
+            return {
+                mode: 'single',
+                targetField: 'current',
+                rows: { current: allTokens.slice(0, COL_COUNT) },
+                totalTokens: allTokens.length,
+                description: `現在の数値へ割り当て（${Math.min(allTokens.length, COL_COUNT)} / ${COL_COUNT}項目）`
+            };
         }
 
         function createEmptyWeeklyMetrics() {
@@ -1270,7 +1426,7 @@
                                 <th class="px-2 py-1.5 text-center text-[11px] font-extrabold text-slate-800 bg-slate-100 border-r border-slate-300 sticky left-0 z-10 whitespace-nowrap">
                                     <div class="flex items-center justify-between gap-1">
                                         <span>${escapeHtml(rowLabel)}</span>
-                                        <button type="button" data-open-monthly-paste="${fieldKey}" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-1.5 py-0.5 rounded border border-indigo-200 transition-colors" title="この行にスライドから一括貼り付け">貼付</button>
+                                        <button type="button" data-open-monthly-paste="${fieldKey}" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-1.5 py-0.5 rounded border border-indigo-200 transition-colors" title="この行（または表全体）へ一括貼り付け">貼付</button>
                                     </div>
                                 </th>
                                 ${cells}
@@ -1708,7 +1864,7 @@
                         <!-- Card Body: Compact Metrics Table on Left + Expanded Wide Memo Area on Right for PC -->
                         <div class="p-3.5 sm:p-5">
                             <div class="flex flex-col lg:flex-row gap-4 lg:gap-5 items-stretch lg:items-start">
-                                <!-- Compact Metrics Table (Fixed optimal width on PC so 項目 column is never stretched) -->
+                                <!-- Compact Metrics Table -->
                                 <div class="${isMetricsCollapsed ? 'hidden' : 'w-full lg:w-[370px] xl:w-[390px] shrink-0'} min-w-0">
                                     <div class="w-full rounded-xl border border-slate-200 overflow-hidden bg-white">
                                         <table class="w-full table-fixed border-collapse text-xs">
@@ -1727,7 +1883,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Expanded Weekly Memo Textarea (Takes all remaining horizontal width on PC) -->
+                                <!-- Expanded Weekly Memo Textarea -->
                                 <div class="flex-1 min-w-0 w-full space-y-2 flex flex-col">
                                     <div class="flex items-center justify-between gap-2">
                                         <label class="block text-xs font-extrabold text-slate-700">数値の変化理由・トピック・課題解決アクション</label>
@@ -1943,7 +2099,6 @@
             }
 
             if (isPreviewTab) {
-                // 「提出フォーマット プレビュー」タブ選択時はプレビューのみを表示し、Monthly/Weeklyは完全に非表示
                 if (editorPane) editorPane.className = 'hidden';
                 if (monthlyCard) monthlyCard.classList.add('hidden');
                 if (weeklyCard) weeklyCard.classList.add('hidden');
@@ -2006,7 +2161,7 @@
     </script>
 
     <!-- =====================================================================
-         SCRIPT BLOCK 3: イベント制御・一括貼り付けモーダル制御・初期化処理
+         SCRIPT BLOCK 3: イベント制御・4行×11列一括貼り付けモーダル制御・初期化処理
          ===================================================================== -->
     <script>
         let toastTimer = null;
@@ -2021,7 +2176,7 @@
             toastTimer = setTimeout(() => {
                 container.classList.add('opacity-0', 'translate-y-2');
                 container.classList.remove('opacity-100', 'translate-y-0');
-            }, 2200);
+            }, 2400);
         }
 
         function copyFormattedText() {
@@ -2050,26 +2205,31 @@
             const applyBtn = document.getElementById('applyBulkPasteBtn');
             const targetLabel = document.getElementById('bulkPasteTargetLabel');
             const targetSelect = document.getElementById('bulkPasteTargetSelect');
+            const hintLabel = document.getElementById('bulkPasteInputHintLabel');
+            const subNote = document.getElementById('bulkPasteSubNote');
             const textarea = document.getElementById('bulkPasteTextarea');
 
             const record = getCurrentRecord();
             bulkPasteModalState.mode = mode;
 
             if (mode === 'monthly') {
-                bulkPasteModalState.monthlyField = options.monthlyField || 'current';
+                bulkPasteModalState.monthlyTarget = options.monthlyTarget || 'all_auto';
                 badge.textContent = 'Monthly 定量実績';
                 badge.className = 'px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white font-extrabold text-xs';
                 header.className = 'px-4 sm:px-5 py-3.5 bg-indigo-50/90 border-b border-slate-200 flex items-center justify-between gap-2';
                 applyBtn.className = 'px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-colors flex items-center gap-1.5';
-                title.textContent = 'Monthly「定量実績」11項目へ一括貼り付け';
-                targetLabel.textContent = '貼り付け対象の行:';
+                title.textContent = 'Monthly「定量実績」スライドから一括貼り付け';
+                targetLabel.textContent = '貼り付け対象（自動判別対応）:';
                 targetSelect.innerHTML = `
-                    <option value="current">現在の数値（11項目）</option>
-                    <option value="lastYear">去年の数値（11項目）</option>
-                    <option value="target">目標値（11項目）</option>
+                    <option value="all_auto">🔥 表全体を一括反映（4行: 昨対比〜目標値 / 3行: 現在〜目標値 自動判別）</option>
+                    <option value="current">「現在の数値」の行のみ（11項目）</option>
+                    <option value="lastYear">「去年の数値」の行のみ（11項目）</option>
+                    <option value="target">「目標値」の行のみ（11項目）</option>
                 `;
-                targetSelect.value = bulkPasteModalState.monthlyField;
-                textarea.placeholder = '例（ROI〜Purchase Intentの11項目）:\n¥4,982\n885\n862\n97.4%\n284\n32.9%\n176\n127\n83.6%\n105\n69.1%';
+                targetSelect.value = bulkPasteModalState.monthlyTarget;
+                hintLabel.textContent = 'スライドの表で青く選択した4行×11列（44セル）をそのまま貼り付けてください';
+                subNote.textContent = '※「昨対比・現在の数値・去年の数値・目標値」の4行×11列を一気に貼り付けると、1行目（昨対比）を自動スキップして「現在の数値」「去年の数値」「目標値」へ一括セットし、昨対比と目標達成有無を自動計算します。';
+                textarea.placeholder = '例（スライドの4行×11列をそのままコピペ）:\n-¥1,050\t203\t213\t2.2%\t-118\t-29.0%\t42\t7\t-6.0%\t-10\t-16.7%\n¥4,982\t885\t862\t97.4%\t284\t32.9%\t176\t127\t83.6%\t105\t69.1%\n¥6,032\t682\t649\t95.2%\t402\t61.9%\t134\t120\t89.6%\t115\t85.8%\nー\t805\t724\t90.0%\t507\t70.0%\t254\t227\t89.6%\t190\t85.8%';
             } else {
                 const defaultWeekId = options.weekId || (record.weeklyItems[0] && record.weeklyItems[0].id);
                 bulkPasteModalState.weekId = defaultWeekId;
@@ -2083,6 +2243,8 @@
                     `<option value="${escapeHtml(w.id)}">${idx + 1}W（${escapeHtml(w.range)}）</option>`
                 ).join('');
                 targetSelect.value = bulkPasteModalState.weekId;
+                hintLabel.textContent = 'スライドのWeekly表からコピーした9項目（縦並び・横並び両対応）を貼り付け';
+                subNote.textContent = '※上から順番に「集客数」〜「スイング数（iOS）」の9項目へ自動セットし、先週比をリアルタイム再計算します。';
                 textarea.placeholder = '例（集客数〜スイング数(iOS)の9項目）:\n181\n170\n47\n6\n19\n73.68%\n68.42%\n7\n0';
             }
 
@@ -2103,65 +2265,146 @@
             const countBadge = document.getElementById('bulkPasteCountBadge');
             if (!textarea || !previewGrid || !countBadge) return;
 
-            const defs = bulkPasteModalState.mode === 'monthly' ? MONTHLY_METRIC_DEFS : WEEKLY_METRIC_DEFS;
-            const tokens = parseBulkPasteTokens(textarea.value);
+            if (bulkPasteModalState.mode === 'monthly') {
+                const parsed = parseMonthlyBulkData(textarea.value, bulkPasteModalState.monthlyTarget);
+                countBadge.textContent = parsed.description;
+                countBadge.className = parsed.mode !== 'empty'
+                    ? 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800'
+                    : 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600';
 
-            const matchedCount = Math.min(tokens.length, defs.length);
-            countBadge.textContent = `${matchedCount} / ${defs.length} 項目`;
-            countBadge.className = matchedCount > 0
-                ? 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800'
-                : 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600';
+                if (parsed.mode === 'empty') {
+                    previewGrid.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">上のエリアにスライドの表データを貼り付けると、ここに4行×11列の割り当てプレビューが表示されます。</div>`;
+                    return;
+                }
 
-            previewGrid.innerHTML = defs.map((def, idx) => {
-                const tok = tokens[idx];
-                const hasVal = tok !== undefined;
-                const displayVal = !hasVal
-                    ? '未入力'
-                    : tok.isEmptyPlaceholder
-                        ? '空欄(クリア)'
-                        : bulkPasteModalState.mode === 'monthly'
-                            ? formatMonthlyMetricCell(tok.value, def.type)
-                            : formatWeeklyMetricValue(tok.value, def.type);
+                const rowDefs = [];
+                if (parsed.rows.yoy) {
+                    rowDefs.push({ key: 'yoy', label: '昨対比 (スキップ/自動再計算)', badge: 'bg-slate-200 text-slate-600' });
+                }
+                if (parsed.rows.current) {
+                    rowDefs.push({ key: 'current', label: '現在の数値 (反映)', badge: 'bg-indigo-600 text-white' });
+                }
+                if (parsed.rows.lastYear) {
+                    rowDefs.push({ key: 'lastYear', label: '去年の数値 (反映)', badge: 'bg-blue-600 text-white' });
+                }
+                if (parsed.rows.target) {
+                    rowDefs.push({ key: 'target', label: '目標値 (反映)', badge: 'bg-amber-600 text-white' });
+                }
 
-                return `
-                    <div class="px-2.5 py-1.5 rounded-lg border ${hasVal ? 'bg-white border-indigo-200 shadow-2xs' : 'bg-slate-100/70 border-slate-200/70 opacity-60'} flex items-center justify-between gap-1.5 text-xs">
-                        <span class="font-bold text-slate-600 truncate">${idx + 1}. ${escapeHtml(def.label)}</span>
-                        <span class="font-mono font-extrabold ${hasVal ? 'text-indigo-700' : 'text-slate-400'} shrink-0">${escapeHtml(displayVal)}</span>
+                const thCells = MONTHLY_METRIC_DEFS.map(d =>
+                    `<th class="px-2 py-1.5 text-center border-r border-slate-200 last:border-r-0 text-[10px] font-extrabold text-slate-700 bg-slate-100 whitespace-nowrap">${escapeHtml(d.label)}</th>`
+                ).join('');
+
+                const bodyRows = rowDefs.map(rDef => {
+                    const rowTokens = parsed.rows[rDef.key] || [];
+                    const tds = MONTHLY_METRIC_DEFS.map((mDef, idx) => {
+                        const tok = rowTokens[idx];
+                        const valStr = !tok
+                            ? '—'
+                            : tok.isEmptyPlaceholder
+                                ? '空欄(ー)'
+                                : formatMonthlyMetricCell(tok.value, mDef.type);
+                        return `<td class="px-2 py-1.5 text-center font-mono text-[11px] border-r border-slate-200 last:border-r-0 ${rDef.key === 'yoy' ? 'text-slate-400 line-through bg-slate-50' : 'font-bold text-slate-900 bg-white'} whitespace-nowrap">${escapeHtml(valStr)}</td>`;
+                    }).join('');
+
+                    return `
+                        <tr class="border-b border-slate-200 last:border-b-0">
+                            <th class="px-2 py-1.5 text-left border-r border-slate-300 bg-slate-50 sticky left-0 z-10 whitespace-nowrap">
+                                <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-extrabold ${rDef.badge}">${escapeHtml(rDef.label)}</span>
+                            </th>
+                            ${tds}
+                        </tr>
+                    `;
+                }).join('');
+
+                previewGrid.innerHTML = `
+                    <table class="w-full border-collapse text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-300">
+                                <th class="px-2 py-1.5 text-left text-[10px] font-extrabold text-slate-600 bg-slate-100 border-r border-slate-300 sticky left-0 z-10">割り当て行</th>
+                                ${thCells}
+                            </tr>
+                        </thead>
+                        <tbody>${bodyRows}</tbody>
+                    </table>
+                `;
+            } else {
+                const defs = WEEKLY_METRIC_DEFS;
+                const tokens = parseBulkPasteTokens(textarea.value);
+                const matchedCount = Math.min(tokens.length, defs.length);
+                countBadge.textContent = `${matchedCount} / ${defs.length} 項目`;
+                countBadge.className = matchedCount > 0
+                    ? 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800'
+                    : 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600';
+
+                previewGrid.innerHTML = `
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                        ${defs.map((def, idx) => {
+                            const tok = tokens[idx];
+                            const hasVal = tok !== undefined;
+                            const displayVal = !hasVal
+                                ? '未入力'
+                                : tok.isEmptyPlaceholder
+                                    ? '空欄(クリア)'
+                                    : formatWeeklyMetricValue(tok.value, def.type);
+                            return `
+                                <div class="px-2.5 py-1.5 rounded-lg border ${hasVal ? 'bg-white border-emerald-200 shadow-2xs' : 'bg-slate-100/70 border-slate-200/70 opacity-60'} flex items-center justify-between gap-1.5 text-xs">
+                                    <span class="font-bold text-slate-600 truncate">${idx + 1}. ${escapeHtml(def.label)}</span>
+                                    <span class="font-mono font-extrabold ${hasVal ? 'text-emerald-700' : 'text-slate-400'} shrink-0">${escapeHtml(displayVal)}</span>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
-            }).join('');
+            }
+        }
+
+        function applyParsedMonthlyDataToRecord(record, parsed) {
+            let updatedRowsCount = 0;
+            ['current', 'lastYear', 'target'].forEach(fieldKey => {
+                const rowTokens = parsed.rows[fieldKey];
+                if (!rowTokens || rowTokens.length === 0) return;
+                updatedRowsCount += 1;
+                MONTHLY_METRIC_DEFS.forEach((def, idx) => {
+                    if (idx >= rowTokens.length) return;
+                    const tok = rowTokens[idx];
+                    record.monthlyMetrics[def.key][fieldKey] = tok.isEmptyPlaceholder ? '' : tok.value;
+                });
+            });
+            return updatedRowsCount;
         }
 
         function applyBulkPasteValues() {
             const textarea = document.getElementById('bulkPasteTextarea');
             const targetSelect = document.getElementById('bulkPasteTargetSelect');
-            const tokens = parseBulkPasteTokens(textarea ? textarea.value : '');
-
-            if (tokens.length === 0) {
-                showToast('貼り付ける数値データを入力してください');
-                return;
-            }
+            const rawText = textarea ? textarea.value : '';
 
             const record = getCurrentRecord();
 
             if (bulkPasteModalState.mode === 'monthly') {
-                const targetField = targetSelect.value || 'current';
-                let applied = 0;
-                MONTHLY_METRIC_DEFS.forEach((def, idx) => {
-                    if (idx >= tokens.length) return;
-                    const tok = tokens[idx];
-                    record.monthlyMetrics[def.key][targetField] = tok.isEmptyPlaceholder ? '' : tok.value;
-                    applied += 1;
-                });
+                const parsed = parseMonthlyBulkData(rawText, targetSelect.value || 'all_auto');
+                if (parsed.mode === 'empty') {
+                    showToast('貼り付ける数値データを入力してください');
+                    return;
+                }
 
+                const updatedRowsCount = applyParsedMonthlyDataToRecord(record, parsed);
                 saveStateToStorage();
                 renderMonthlyMetricsAndEvaluations(true);
                 updatePreviewAndSummaryHints();
                 closeBulkPasteModal();
 
-                const fieldLabelMap = { current: '現在の数値', lastYear: '去年の数値', target: '目標値' };
-                showToast(`Monthly「${fieldLabelMap[targetField] || targetField}」に${applied}項目を一括反映しました！`);
+                if (updatedRowsCount >= 2) {
+                    showToast(`定量実績（${updatedRowsCount}行×11列）を一括反映し、昨対比・達成評価を更新しました！`);
+                } else {
+                    showToast('定量実績の行データを一括反映しました！');
+                }
             } else {
+                const tokens = parseBulkPasteTokens(rawText);
+                if (tokens.length === 0) {
+                    showToast('貼り付ける数値データを入力してください');
+                    return;
+                }
                 const targetWeekId = targetSelect.value || bulkPasteModalState.weekId;
                 const week = record.weeklyItems.find(w => w.id === targetWeekId);
                 if (!week) {
@@ -2266,7 +2509,7 @@
 
             // Bulk Paste Modal Events
             document.getElementById('openMonthlyBulkPasteBtn').addEventListener('click', () => {
-                openBulkPasteModal('monthly', { monthlyField: 'current' });
+                openBulkPasteModal('monthly', { monthlyTarget: 'all_auto' });
             });
             document.getElementById('closeBulkPasteModalBtn').addEventListener('click', closeBulkPasteModal);
             document.getElementById('cancelBulkPasteBtn').addEventListener('click', closeBulkPasteModal);
@@ -2279,7 +2522,7 @@
             document.getElementById('bulkPasteTextarea').addEventListener('input', renderBulkPastePreview);
             document.getElementById('bulkPasteTargetSelect').addEventListener('change', (e) => {
                 if (bulkPasteModalState.mode === 'monthly') {
-                    bulkPasteModalState.monthlyField = e.target.value;
+                    bulkPasteModalState.monthlyTarget = e.target.value;
                 } else {
                     bulkPasteModalState.weekId = e.target.value;
                 }
@@ -2352,7 +2595,7 @@
             monthlyQuantTable.addEventListener('click', (e) => {
                 const pasteBtn = e.target.closest('button[data-open-monthly-paste]');
                 if (pasteBtn) {
-                    openBulkPasteModal('monthly', { monthlyField: pasteBtn.dataset.openMonthlyPaste });
+                    openBulkPasteModal('monthly', { monthlyTarget: pasteBtn.dataset.openMonthlyPaste });
                 }
             });
 
@@ -2369,6 +2612,7 @@
                 updatePreviewAndSummaryHints();
             });
 
+            // テーブル内のセルで直接 Ctrl+V した場合も4行×11列や複数セル一括貼り付けに対応
             monthlyQuantTable.addEventListener('paste', (e) => {
                 const target = e.target;
                 const startMetricKey = target?.dataset?.monthlyMetricKey;
@@ -2381,6 +2625,18 @@
 
                 e.preventDefault();
                 const record = getCurrentRecord();
+
+                // 2行分以上（17セル以上）ある場合は表全体（複数行）一括貼り付けとして自動処理
+                if (tokens.length >= 17) {
+                    const parsed = parseMonthlyBulkData(pastedText, 'all_auto');
+                    const updatedRows = applyParsedMonthlyDataToRecord(record, parsed);
+                    saveStateToStorage();
+                    renderMonthlyMetricsAndEvaluations(true);
+                    updatePreviewAndSummaryHints();
+                    showToast(`定量実績（${updatedRows}行×11列）を一括反映しました！`);
+                    return;
+                }
+
                 const startIdx = MONTHLY_METRIC_DEFS.findIndex(d => d.key === startMetricKey);
                 if (startIdx === -1) return;
 
