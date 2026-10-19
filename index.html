@@ -67,7 +67,7 @@
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>自動保存済
                         </span>
                     </div>
-                    <p class="text-[11px] text-slate-500 hidden md:block">Monthly（定量実績・昨対比・達成評価・トピック）＆ Weekly（先週比・週次メモ）を一元管理</p>
+                    <p class="text-[11px] text-slate-500 hidden md:block">Monthly（定量実績・昨対比・達成評価・トピック）＆ Weekly（先週比・変化理由・トピック・アクション）を一元管理</p>
                 </div>
             </div>
 
@@ -205,7 +205,7 @@
                 <div id="summaryHintPanel" class="hidden border-b border-amber-200 bg-amber-50/70 px-4 sm:px-5 py-3.5">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-xs font-extrabold text-amber-900 flex items-center gap-1.5">
-                            <span>💡 WeeklyメモからMonthlyトピックへワンクリック昇格</span>
+                            <span>💡 Weeklyの記録からMonthlyトピックへワンクリック昇格</span>
                         </h3>
                         <button id="closeHintBtn" type="button" class="text-xs text-amber-700 hover:text-amber-950 font-bold px-2 py-0.5 rounded hover:bg-amber-100">閉じる ✕</button>
                     </div>
@@ -252,10 +252,10 @@
                         <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm shrink-0">W</span>
                         <div>
                             <h2 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2 flex-wrap">
-                                <span>【Weekly】週次実績（先週比）・振り返りメモ</span>
+                                <span>【Weekly】週次実績（先週比）・変化理由 / トピック / 課題解決アクション</span>
                                 <span id="weeklyFilledBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">0/5週</span>
                             </h2>
-                            <p class="text-[11px] text-slate-500">「今週の値」9項目を先週（前月最終週を含む）と自動比較＆トピック記録</p>
+                            <p class="text-[11px] text-slate-500">「今週の値」9項目と、「数値の変化理由」「トピック」「課題解決アクション」の3項目を週ごとに管理</p>
                         </div>
                     </div>
 
@@ -288,7 +288,7 @@
                 <!-- Week Focus Filter Tabs (All Weeks vs 1W, 2W, 3W...) -->
                 <div class="px-4 sm:px-5 py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto custom-scrollbar">
                     <div id="weekFocusTabsContainer" class="flex items-center gap-1.5 shrink-0"></div>
-                    <span class="text-[11px] text-slate-400 shrink-0 hidden sm:inline">※各行の「＋Monthly」で月次トピックへ即引用</span>
+                    <span class="text-[11px] text-slate-400 shrink-0 hidden sm:inline">※各入力欄の「＋Monthly」で月次トピックへ即引用</span>
                 </div>
 
                 <!-- Weekly Cards List -->
@@ -333,6 +333,10 @@
                     <label class="inline-flex items-center gap-2 cursor-pointer select-none">
                         <input id="includeWeeklyMetricsToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
                         <span>Weeklyに「今週の値（先週比）」を出力</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input id="includeWeeklySectionHeadersToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
+                        <span>Weeklyに項目見出し（変化理由/トピック/アクション）を出力</span>
                     </label>
                     <label class="inline-flex items-center gap-2 cursor-pointer select-none">
                         <input id="skipEmptyWeeksToggle" type="checkbox" class="rounded border-slate-600 text-indigo-500 focus:ring-indigo-500 bg-slate-700 w-4 h-4">
@@ -435,7 +439,8 @@
          SCRIPT BLOCK 1: 定数定義・状態管理(State)・サンプルデータ・数値計算＆2次元一括解析ロジック
          ===================================================================== -->
     <script>
-        const STORAGE_KEY = 'periodic_report_topic_manager_v4';
+        const STORAGE_KEY = 'periodic_report_topic_manager_v5';
+        const LEGACY_STORAGE_KEY = 'periodic_report_topic_manager_v4';
         const DEFAULT_YEAR = 2026;
         const DEFAULT_MONTH = 10;
 
@@ -459,6 +464,40 @@
             { key: 'purchaseIntent', label: 'Purchase Intent', type: 'percent' },
             { key: 'swings', label: 'スイング数', type: 'count' },
             { key: 'swingsIos', label: 'スイング数（iOS）', type: 'count' }
+        ];
+
+        // Weeklyの3分割テキストフィールド定義
+        const WEEKLY_TEXT_FIELD_DEFS = [
+            {
+                key: 'changeReason',
+                label: '数値の変化理由',
+                shortLabel: '変化理由',
+                icon: '📊',
+                defaultCategory: '実績評価',
+                placeholder: '・先週比での増減理由、天候・イベント・客層の変化などを入力...',
+                badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
+                borderFocusClass: 'focus:border-blue-500'
+            },
+            {
+                key: 'topics',
+                label: 'トピック',
+                shortLabel: 'トピック',
+                icon: '💡',
+                defaultCategory: 'ピックアップ',
+                placeholder: '・その週の売場トピック、好調事例、お客様や他社の動向などを入力...',
+                badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+                borderFocusClass: 'focus:border-amber-500'
+            },
+            {
+                key: 'actionItems',
+                label: '課題解決アクション',
+                shortLabel: '課題解決アクション',
+                icon: '🎯',
+                defaultCategory: '施策',
+                placeholder: '・課題に対する改善アクション、スタッフへの落とし込み・運用変更などを入力...',
+                badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+                borderFocusClass: 'focus:border-emerald-500'
+            }
         ];
 
         const MONTHLY_METRIC_DEFS = [
@@ -485,8 +524,8 @@
 
         let selectedQuickCategory = 'ピックアップ';
         let bulkPasteModalState = {
-            mode: 'monthly', // 'monthly' | 'weekly'
-            monthlyTarget: 'all_auto', // 'all_auto' | 'current' | 'lastYear' | 'target'
+            mode: 'monthly',
+            monthlyTarget: 'all_auto',
             weekId: null
         };
 
@@ -518,7 +557,6 @@
             return Number.isFinite(num) ? num : null;
         }
 
-        // スライドの見出し文字（誤って選択された場合）を判定して除外するためのフィルタ
         function isHeaderOrLabelToken(rawToken) {
             const t = String(rawToken || '').trim();
             if (!t) return true;
@@ -533,7 +571,6 @@
             const trimmed = String(rawToken || '').trim();
             if (!trimmed || isHeaderOrLabelToken(trimmed)) return null;
 
-            // 「ー」「―」「—」「-」「なし」単体は空欄プレースホルダー（目標値なし等）として扱う
             if (/^[-−－–—―ーなしN\/A]+$/i.test(trimmed)) {
                 return { raw: trimmed, value: '', isEmptyPlaceholder: true };
             }
@@ -544,12 +581,10 @@
             return null;
         }
 
-        // 1次元トークン配列抽出（改行・タブ・カンマすべて対応）
         function parseBulkPasteTokens(rawText) {
             if (!rawText || !String(rawText).trim()) return [];
             let text = String(rawText).trim();
 
-            // 桁区切りカンマ (例: -¥1,050 や 12,345) を結合
             let prev = '';
             while (prev !== text) {
                 prev = text;
@@ -566,20 +601,14 @@
             return rawTokens.map(parseSingleCellToken).filter(Boolean);
         }
 
-        /**
-         * Monthly用 スマート一括解析:
-         * 青枠の4行×11列（44セル: 昨対比・現在の数値・去年の数値・目標値）や
-         * 3行×11列（33セル: 現在の数値・去年の数値・目標値）、または単一行（11セル）を自動判別して返す
-         */
         function parseMonthlyBulkData(rawText, targetMode = 'all_auto') {
-            const COL_COUNT = MONTHLY_METRIC_DEFS.length; // 11
+            const COL_COUNT = MONTHLY_METRIC_DEFS.length;
             const allTokens = parseBulkPasteTokens(rawText);
 
             if (allTokens.length === 0) {
                 return { mode: 'empty', rows: {}, totalTokens: 0, description: '未入力' };
             }
 
-            // 特定の1行のみ指定されている場合
             if (targetMode === 'current' || targetMode === 'lastYear' || targetMode === 'target') {
                 return {
                     mode: 'single',
@@ -590,7 +619,6 @@
                 };
             }
 
-            // タブ＋改行による2次元構造の解析を試みる
             let cleanedText = String(rawText).trim();
             let prev = '';
             while (prev !== cleanedText) {
@@ -608,7 +636,6 @@
                 }
             });
 
-            // ケース1: 2D行として4行以上検出された場合（昨対比 / 現在の数値 / 去年の数値 / 目標値）
             if (parsed2DRows.length >= 4) {
                 const offset = parsed2DRows.length - 4;
                 return {
@@ -624,7 +651,6 @@
                 };
             }
 
-            // ケース2: 2D行として3行検出された場合（現在の数値 / 去年の数値 / 目標値）
             if (parsed2DRows.length === 3) {
                 return {
                     mode: 'multi_3rows',
@@ -638,7 +664,6 @@
                 };
             }
 
-            // ケース3: 2D行として2行検出された場合（現在の数値 / 去年の数値）
             if (parsed2DRows.length === 2) {
                 return {
                     mode: 'multi_2rows',
@@ -651,9 +676,7 @@
                 };
             }
 
-            // ケース4: スライドからセルごとに改行でフラットにコピーされた場合（トークン総数で11列ずつ自動分割）
             if (allTokens.length >= COL_COUNT * 3 + 6) {
-                // 44個前後（4行×11列）
                 return {
                     mode: 'multi_4rows',
                     rows: {
@@ -668,7 +691,6 @@
             }
 
             if (allTokens.length >= COL_COUNT * 2 + 6) {
-                // 33個前後（3行×11列）
                 return {
                     mode: 'multi_3rows',
                     rows: {
@@ -682,7 +704,6 @@
             }
 
             if (allTokens.length >= COL_COUNT + 6) {
-                // 22個前後（2行×11列）
                 return {
                     mode: 'multi_2rows',
                     rows: {
@@ -694,7 +715,6 @@
                 };
             }
 
-            // ケース5: 11個以下（単一行として「現在の数値」へ割り当て）
             return {
                 mode: 'single',
                 targetField: 'current',
@@ -724,6 +744,11 @@
                 obj[p.key] = { statusOverride: 'auto', reason: '' };
             });
             return obj;
+        }
+
+        function hasWeekAnyText(week) {
+            if (!week) return false;
+            return WEEKLY_TEXT_FIELD_DEFS.some(f => Boolean(week[f.key] && String(week[f.key]).trim()));
         }
 
         function createSampleMonthlyMetrics2026_10() {
@@ -810,7 +835,9 @@
                             swings: 7,
                             swingsIos: 0
                         },
-                        memo: '・9月末はシルバーウィーク明けや悪天候ということもあり数字は伸び悩んだ。\n・10/1に単日SIMフリーが4台販売と好調なスタートダッシュ。\n・10a購入希望のお客様が多いので、改めてアップグレード提案の強化。\n・吉田のアップグレード提案の優良事例をノウハウでの投稿や現場での落とし込みを実施。\n・補償サービス「ワイヤレスゲート」について案内強化。'
+                        changeReason: '・9月末はシルバーウィーク明けや悪天候ということもあり集客・接客数は伸び悩んだ。',
+                        topics: '・10/1に単日SIMフリーが4台販売と好調なスタートダッシュ。\n・10a購入希望のお客様が多い傾向。',
+                        actionItems: '・10a希望層に向けて、改めて上位モデルへのアップグレード提案を強化。\n・吉田のアップグレード提案の優良事例をノウハウ投稿および現場での落とし込みを実施。\n・補償サービス「ワイヤレスゲート」について案内を強化。'
                     },
                     {
                         id: 'w-10-2',
@@ -826,7 +853,9 @@
                             swings: 12,
                             swingsIos: 2
                         },
-                        memo: '・三連休初日にキャリア合同イベントが実施され、コーナー周辺の集客数が増加。\n・SIM単体MNP＋SIMフリーPixelのポイント還元訴求が奏功し、iOSからのスイングが2件成約。'
+                        changeReason: '・三連休初日にキャリア合同イベントが実施され、コーナー周辺の集客数・接客数ともに先週比で増加。',
+                        topics: '・SIM単体MNP＋SIMフリーPixelのポイント還元訴求が奏功し、iOSからのスイングが2件成約。',
+                        actionItems: '・キャリアスタッフとのトスアップ連携を継続し、コーナー外からの誘導を強化。'
                     },
                     {
                         id: 'w-10-3',
@@ -842,19 +871,25 @@
                             swings: 15,
                             swingsIos: 3
                         },
-                        memo: '・キャリア側SIMフリー什器への立ち位置変更テストを実施したが、キャリアスタッフと誤認され避けられるケースが見られたため従来配置へ軌道修正。\n・人気カラーの在庫偏りについてスタッフからヒアリング実施。'
+                        changeReason: '・集客数は微減したものの、購買意欲の高い層への深い接客が増えアンケート回収数・スイング数が向上。',
+                        topics: '・キャリア側SIMフリー什器への立ち位置変更テストを実施したが、キャリアスタッフと誤認され避けられるケースが見られた。',
+                        actionItems: '・立ち位置を従来配置へ即座に軌道修正し接客機会を確保。\n・人気カラーの在庫偏りについてスタッフからヒアリングを実施し運用確認。'
                     },
                     {
                         id: 'w-10-4',
                         range: '10/19〜10/25',
                         metrics: createEmptyWeeklyMetrics(),
-                        memo: ''
+                        changeReason: '',
+                        topics: '',
+                        actionItems: ''
                     },
                     {
                         id: 'w-10-5',
                         range: '10/26〜11/1',
                         metrics: createEmptyWeeklyMetrics(),
-                        memo: ''
+                        changeReason: '',
+                        topics: '',
+                        actionItems: ''
                     }
                 ]
             };
@@ -895,13 +930,17 @@
                         id: 'w-09-1',
                         range: '8/31〜9/6',
                         metrics: createEmptyWeeklyMetrics(),
-                        memo: '・月初は新学期・決算期に向けた売場メンテナンスを実施。'
+                        changeReason: '',
+                        topics: '・月初は新学期・決算期に向けた売場メンテナンスを実施。',
+                        actionItems: ''
                     },
                     {
                         id: 'w-09-2',
                         range: '9/7〜9/13',
                         metrics: createEmptyWeeklyMetrics(),
-                        memo: '・iPhone新機種発表に伴い比較検討層の来訪が増加。'
+                        changeReason: '・iPhone新機種発表に伴い比較検討層の来訪が増加。',
+                        topics: '',
+                        actionItems: ''
                     },
                     {
                         id: 'w-09-3',
@@ -917,7 +956,9 @@
                             swings: 9,
                             swingsIos: 2
                         },
-                        memo: '・シルバーウィーク前半で家族連れの集客が好調。'
+                        changeReason: '・シルバーウィーク前半で家族連れの集客が好調。',
+                        topics: '',
+                        actionItems: ''
                     },
                     {
                         id: 'w-09-4',
@@ -933,7 +974,9 @@
                             swings: 6,
                             swingsIos: 0
                         },
-                        memo: '・SIMフリー販売を重視し、温度感の低そうなお客様（Fold体験客など）への声掛けを簡単に済ませることが多くなったため接客数が低下。\n・上記に伴い横浜店でのアンケート訴求層への接客機会が減りアンケート回収数が低下。\n・台風の影響で横浜店で全館停電があったりなど、集客と勤怠にマイナスの影響が大きかった。\n・iPhoneユーザーのPixelを候補に考える層は増加傾向。'
+                        changeReason: '・SIMフリー販売を重視し、温度感の低そうなお客様（Fold体験客など）への声掛けを簡単に済ませることが多くなったため接客数・アンケート回収数が低下。\n・台風の影響で横浜店で全館停電があり、集客と勤怠にマイナスの影響が大きかった。',
+                        topics: '・iPhoneユーザーのPixelを候補に考える層は増加傾向。',
+                        actionItems: '・温度感の見極めを行いつつ、短時間接客でもアンケート回収へ繋げる声掛けフローを再徹底。'
                     }
                 ]
             };
@@ -974,7 +1017,9 @@
                     id: `w-${year}-${month}-${idx}-${Date.now()}`,
                     range,
                     metrics: createEmptyWeeklyMetrics(),
-                    memo: ''
+                    changeReason: '',
+                    topics: '',
+                    actionItems: ''
                 }))
             };
         }
@@ -986,6 +1031,7 @@
             includeCategoryInOutput: false,
             includeMonthlyMetricsInOutput: false,
             includeWeeklyMetricsInOutput: false,
+            includeWeeklySectionHeadersInOutput: false,
             skipEmptyWeeksInOutput: false,
             monthlyMetricsCollapsed: false,
             selectedWeekFilter: 'all',
@@ -1041,7 +1087,19 @@
                 safe.weeklyItems.forEach((w, idx) => {
                     if (!w.id) w.id = `w-${year}-${month}-${idx}`;
                     if (typeof w.range !== 'string') w.range = `${idx + 1}W`;
-                    if (typeof w.memo !== 'string') w.memo = '';
+
+                    // 旧バージョンの単一 `memo` フィールドがある場合の自動マイグレーション
+                    const hasNewFields = typeof w.changeReason === 'string' || typeof w.topics === 'string' || typeof w.actionItems === 'string';
+                    if (!hasNewFields && typeof w.memo === 'string' && w.memo.trim()) {
+                        w.changeReason = '';
+                        w.topics = w.memo.trim();
+                        w.actionItems = '';
+                    } else {
+                        if (typeof w.changeReason !== 'string') w.changeReason = '';
+                        if (typeof w.topics !== 'string') w.topics = '';
+                        if (typeof w.actionItems !== 'string') w.actionItems = '';
+                    }
+
                     if (!w.metrics || typeof w.metrics !== 'object') {
                         w.metrics = createEmptyWeeklyMetrics();
                     } else {
@@ -1078,7 +1136,10 @@
 
         function loadStateFromStorage() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
+                let raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) {
+                    raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+                }
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (parsed && typeof parsed === 'object') {
@@ -1279,7 +1340,7 @@
         }
     </script>
     <!-- =====================================================================
-         SCRIPT BLOCK 2: UI描画（Monthly・Weekly・プレビュー生成・レイアウト切替）
+         SCRIPT BLOCK 2: UI描画（Monthly・Weekly3項目分割・プレビュー生成・レイアウト切替）
          ===================================================================== -->
     <script>
         function buildAchievementCellHtml(analysis) {
@@ -1609,7 +1670,7 @@
             if (record.monthlyTopics.length === 0) {
                 listContainer.innerHTML = `
                     <div class="text-center py-6 px-4 rounded-xl border border-dashed border-slate-200 text-xs text-slate-400">
-                        月次トピックはまだありません。上の入力欄から追加するか、実績評価・Weeklyメモから「＋トピックへ追加」してください。
+                        月次トピックはまだありません。上の入力欄から追加するか、実績評価・Weeklyの各項目から「＋Monthly」ボタンを押してください。
                     </div>
                 `;
                 return;
@@ -1667,7 +1728,7 @@
 
             record.weeklyItems.forEach((w, idx) => {
                 const active = String(appState.selectedWeekFilter) === String(idx);
-                const hasData = Boolean((w.memo && w.memo.trim()) || WEEKLY_METRIC_DEFS.some(d => parseMetricNum(w.metrics?.[d.key]) !== null));
+                const hasData = Boolean(hasWeekAnyText(w) || WEEKLY_METRIC_DEFS.some(d => parseMetricNum(w.metrics?.[d.key]) !== null));
                 html += `
                     <button type="button" data-week-filter="${idx}"
                         class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${active ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}">
@@ -1735,6 +1796,35 @@
             `;
         }
 
+        function buildWeeklyPromoteChipsHtml(week, fieldDef) {
+            const rawText = week[fieldDef.key] || '';
+            const lines = rawText
+                .split(/\r?\n/)
+                .map(l => l.trim().replace(/^[・•\-]\s*/, ''))
+                .filter(Boolean);
+
+            if (lines.length === 0) return '';
+
+            return `
+                <div class="pt-1.5 flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold text-slate-400 shrink-0">＋Monthly(${escapeHtml(fieldDef.defaultCategory)}):</span>
+                    ${lines.map(line => `
+                        <button
+                            type="button"
+                            data-week-action="promote-line"
+                            data-line-text="${escapeHtml(line)}"
+                            data-line-category="${escapeHtml(fieldDef.defaultCategory)}"
+                            class="max-w-full inline-flex items-center gap-1 text-[11px] bg-indigo-50/70 hover:bg-indigo-100 text-indigo-800 border border-indigo-200/80 px-2 py-0.5 rounded-lg transition-colors truncate"
+                            title="「${escapeHtml(fieldDef.defaultCategory)}」タグでMonthlyトピックに追加"
+                        >
+                            <span class="font-bold text-indigo-600 shrink-0">＋Monthly</span>
+                            <span class="truncate max-w-[220px] sm:max-w-[340px]">${escapeHtml(line)}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         function renderWeeklySection() {
             const record = getCurrentRecord();
             const container = document.getElementById('weeklyCardsContainer');
@@ -1744,7 +1834,7 @@
             renderWeeklyMetricsMatrix();
 
             const filledCount = record.weeklyItems.filter(w =>
-                (w.memo && w.memo.trim().length > 0) ||
+                hasWeekAnyText(w) ||
                 WEEKLY_METRIC_DEFS.some(d => parseMetricNum(w.metrics?.[d.key]) !== null)
             ).length;
 
@@ -1801,28 +1891,32 @@
                     `;
                 }).join('');
 
-                const memoLines = (week.memo || '')
-                    .split(/\r?\n/)
-                    .map(l => l.trim().replace(/^[・•\-]\s*/, ''))
-                    .filter(Boolean);
-
-                const lineChipsHtml = memoLines.length > 0 ? `
-                    <div class="pt-2 border-t border-slate-100 flex items-center gap-1.5 flex-wrap">
-                        <span class="text-[10px] font-bold text-slate-400">1タップでMonthlyへ昇格:</span>
-                        ${memoLines.map(line => `
-                            <button
-                                type="button"
-                                data-week-action="promote-line"
-                                data-line-text="${escapeHtml(line)}"
-                                class="max-w-full inline-flex items-center gap-1 text-[11px] bg-indigo-50/70 hover:bg-indigo-100 text-indigo-800 border border-indigo-200/80 px-2 py-0.5 rounded-lg transition-colors truncate"
-                                title="この行をMonthlyトピックに追加"
-                            >
-                                <span class="font-bold text-indigo-600 shrink-0">＋Monthly</span>
-                                <span class="truncate max-w-[240px] sm:max-w-[380px]">${escapeHtml(line)}</span>
-                            </button>
-                        `).join('')}
-                    </div>
-                ` : '';
+                // 3つの個別入力欄（①数値の変化理由 / ②トピック / ③課題解決アクション）
+                const threeFieldsHtml = WEEKLY_TEXT_FIELD_DEFS.map(fieldDef => {
+                    const val = week[fieldDef.key] || '';
+                    return `
+                        <div class="rounded-xl border border-slate-200/90 bg-slate-50/50 p-3 space-y-1.5">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <label class="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-800">
+                                    <span>${fieldDef.icon}</span>
+                                    <span>${escapeHtml(fieldDef.label)}</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${fieldDef.badgeClass}">Monthly昇格時: ${escapeHtml(fieldDef.defaultCategory)}</span>
+                                </label>
+                            </div>
+                            <textarea
+                                rows="3"
+                                data-week-action="edit-text-field"
+                                data-week-id="${week.id}"
+                                data-week-field="${fieldDef.key}"
+                                placeholder="${escapeHtml(fieldDef.placeholder)}"
+                                class="w-full rounded-lg border border-slate-300 bg-white p-2.5 text-xs sm:text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 ${fieldDef.borderFocusClass} focus:outline-none transition-colors"
+                            >${escapeHtml(val)}</textarea>
+                            <div data-week-chips-container="${week.id}-${fieldDef.key}">
+                                ${buildWeeklyPromoteChipsHtml(week, fieldDef)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
 
                 return `
                     <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -1851,8 +1945,9 @@
                                     今週の値 ${isMetricsCollapsed ? '▼' : '▲'}
                                 </button>
                                 <button type="button" data-week-action="append-metrics-memo" data-week-idx="${idx}"
-                                    class="text-[11px] font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg transition-colors">
-                                    先週比をメモへ追記
+                                    class="text-[11px] font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg transition-colors"
+                                    title="先週比の数値サマリーを「数値の変化理由」欄へ追記します">
+                                    先週比を変化理由へ追記
                                 </button>
                                 ${record.weeklyItems.length > 1 ? `
                                     <button type="button" data-week-action="delete-week" data-week-id="${week.id}"
@@ -1861,7 +1956,7 @@
                             </div>
                         </div>
 
-                        <!-- Card Body: Compact Metrics Table on Left + Expanded Wide Memo Area on Right for PC -->
+                        <!-- Card Body: Compact Metrics Table on Left + 3 Individual Text Sections on Right for PC -->
                         <div class="p-3.5 sm:p-5">
                             <div class="flex flex-col lg:flex-row gap-4 lg:gap-5 items-stretch lg:items-start">
                                 <!-- Compact Metrics Table -->
@@ -1883,26 +1978,23 @@
                                     </div>
                                 </div>
 
-                                <!-- Expanded Weekly Memo Textarea -->
-                                <div class="flex-1 min-w-0 w-full space-y-2 flex flex-col">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <label class="block text-xs font-extrabold text-slate-700">数値の変化理由・トピック・課題解決アクション</label>
-                                        <span class="text-[11px] text-slate-400 hidden sm:inline">改行ごとに「＋Monthly」ボタンが自動生成されます</span>
-                                    </div>
-                                    <textarea
-                                        rows="${isMetricsCollapsed ? '5' : '12'}"
-                                        data-week-action="edit-memo"
-                                        data-week-id="${week.id}"
-                                        placeholder="・数値の変化理由や、その週のトピック・課題解決アクションを入力..."
-                                        class="w-full flex-1 min-h-[220px] rounded-xl border border-slate-300 bg-slate-50/40 focus:bg-white p-3.5 text-xs sm:text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none transition-colors"
-                                    >${escapeHtml(week.memo)}</textarea>
-                                    ${lineChipsHtml}
+                                <!-- 3 Divided Weekly Input Fields (Takes all remaining horizontal width on PC) -->
+                                <div class="flex-1 min-w-0 w-full space-y-3">
+                                    ${threeFieldsHtml}
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        function formatBulletLines(rawText) {
+            return String(rawText || '')
+                .split(/\r?\n/)
+                .map(l => l.trim())
+                .filter(Boolean)
+                .map(l => (/^[・•\-]/.test(l) ? l : `・${l}`));
         }
 
         function generateFormattedReport() {
@@ -1944,9 +2036,9 @@
             lines.push(`【Weekly】`);
 
             record.weeklyItems.forEach((week, idx) => {
-                const hasMemo = Boolean(week.memo && week.memo.trim());
+                const hasText = hasWeekAnyText(week);
                 const hasMetrics = WEEKLY_METRIC_DEFS.some(d => parseMetricNum(week.metrics?.[d.key]) !== null);
-                if (appState.skipEmptyWeeksInOutput && !hasMemo && !hasMetrics) {
+                if (appState.skipEmptyWeeksInOutput && !hasText && !hasMetrics) {
                     return;
                 }
 
@@ -1969,9 +2061,15 @@
                     }
                 }
 
-                if (hasMemo) {
-                    lines.push(week.memo.trim());
-                }
+                WEEKLY_TEXT_FIELD_DEFS.forEach(fieldDef => {
+                    const fieldLines = formatBulletLines(week[fieldDef.key]);
+                    if (fieldLines.length > 0) {
+                        if (appState.includeWeeklySectionHeadersInOutput) {
+                            lines.push(`[${fieldDef.label}]`);
+                        }
+                        fieldLines.forEach(l => lines.push(l));
+                    }
+                });
             });
 
             return lines.join('\n');
@@ -1995,22 +2093,29 @@
                 const record = getCurrentRecord();
                 const candidates = [];
                 record.weeklyItems.forEach(w => {
-                    const lines = (w.memo || '').split(/\r?\n/).map(l => l.trim().replace(/^[・•\-]\s*/, '')).filter(Boolean);
-                    lines.forEach(line => {
-                        candidates.push({ range: w.range, line });
+                    WEEKLY_TEXT_FIELD_DEFS.forEach(fieldDef => {
+                        const lines = (w[fieldDef.key] || '').split(/\r?\n/).map(l => l.trim().replace(/^[・•\-]\s*/, '')).filter(Boolean);
+                        lines.forEach(line => {
+                            candidates.push({
+                                range: w.range,
+                                fieldLabel: fieldDef.shortLabel,
+                                category: fieldDef.defaultCategory,
+                                line
+                            });
+                        });
                     });
                 });
 
                 if (candidates.length === 0) {
-                    hintList.innerHTML = `<p class="text-xs text-amber-800/70">Weeklyメモを入力すると、ここに要約候補が表示されます。</p>`;
+                    hintList.innerHTML = `<p class="text-xs text-amber-800/70">Weeklyの各項目を入力すると、ここにMonthly昇格候補が表示されます。</p>`;
                 } else {
                     hintList.innerHTML = candidates.map(c => `
                         <div class="flex items-center justify-between gap-2 bg-white/90 px-3 py-1.5 rounded-lg border border-amber-200/80 text-xs">
                             <div class="min-w-0 flex-1">
-                                <span class="font-mono text-[10px] font-bold text-amber-700 mr-1.5">[${escapeHtml(c.range)}]</span>
+                                <span class="font-mono text-[10px] font-bold text-amber-700 mr-1">[${escapeHtml(c.range)} / ${escapeHtml(c.fieldLabel)}]</span>
                                 <span class="text-slate-800">${escapeHtml(c.line)}</span>
                             </div>
-                            <button type="button" data-hint-promote="${escapeHtml(c.line)}"
+                            <button type="button" data-hint-promote="${escapeHtml(c.line)}" data-hint-category="${escapeHtml(c.category)}"
                                 class="shrink-0 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] px-2.5 py-1 rounded-md transition-colors">
                                 ＋Monthlyへ追加
                             </button>
@@ -2052,6 +2157,7 @@
             document.getElementById('includeCategoryToggle').checked = Boolean(appState.includeCategoryInOutput);
             document.getElementById('includeMonthlyMetricsToggle').checked = Boolean(appState.includeMonthlyMetricsInOutput);
             document.getElementById('includeWeeklyMetricsToggle').checked = Boolean(appState.includeWeeklyMetricsInOutput);
+            document.getElementById('includeWeeklySectionHeadersToggle').checked = Boolean(appState.includeWeeklySectionHeadersInOutput);
             document.getElementById('skipEmptyWeeksToggle').checked = Boolean(appState.skipEmptyWeeksInOutput);
         }
 
@@ -2612,7 +2718,6 @@
                 updatePreviewAndSummaryHints();
             });
 
-            // テーブル内のセルで直接 Ctrl+V した場合も4行×11列や複数セル一括貼り付けに対応
             monthlyQuantTable.addEventListener('paste', (e) => {
                 const target = e.target;
                 const startMetricKey = target?.dataset?.monthlyMetricKey;
@@ -2626,7 +2731,6 @@
                 e.preventDefault();
                 const record = getCurrentRecord();
 
-                // 2行分以上（17セル以上）ある場合は表全体（複数行）一括貼り付けとして自動処理
                 if (tokens.length >= 17) {
                     const parsed = parseMonthlyBulkData(pastedText, 'all_auto');
                     const updatedRows = applyParsedMonthlyDataToRecord(record, parsed);
@@ -2756,8 +2860,9 @@
             document.getElementById('summaryHintList')?.addEventListener('click', (e) => {
                 const btn = e.target.closest('button[data-hint-promote]');
                 if (!btn) return;
-                addMonthlyTopic(btn.dataset.hintPromote, selectedQuickCategory);
-                showToast('WeeklyメモをMonthlyトピックへ追加しました');
+                const cat = btn.dataset.hintCategory || selectedQuickCategory;
+                addMonthlyTopic(btn.dataset.hintPromote, cat);
+                showToast(`「${cat}」としてMonthlyトピックへ追加しました`);
             });
 
             const matrixPanel = document.getElementById('weeklyMetricsMatrixPanel');
@@ -2785,7 +2890,9 @@
                             id: `w-${Date.now()}-${idx}`,
                             range: r,
                             metrics: createEmptyWeeklyMetrics(),
-                            memo: ''
+                            changeReason: '',
+                            topics: '',
+                            actionItems: ''
                         });
                     }
                 });
@@ -2801,7 +2908,9 @@
                     id: `w-${Date.now()}`,
                     range: `${record.month}/1〜${record.month}/7`,
                     metrics: createEmptyWeeklyMetrics(),
-                    memo: ''
+                    changeReason: '',
+                    topics: '',
+                    actionItems: ''
                 });
                 appState.selectedWeekFilter = 'all';
                 saveStateToStorage();
@@ -2860,11 +2969,17 @@
                         renderWeekFocusTabs();
                         updatePreviewAndSummaryHints();
                     }
-                } else if (target.dataset.weekAction === 'edit-memo') {
+                } else if (target.dataset.weekAction === 'edit-text-field') {
                     const week = record.weeklyItems.find(w => w.id === target.dataset.weekId);
-                    if (week) {
-                        week.memo = target.value;
+                    const fieldKey = target.dataset.weekField;
+                    if (week && fieldKey) {
+                        week[fieldKey] = target.value;
                         saveStateToStorage();
+                        const fieldDef = WEEKLY_TEXT_FIELD_DEFS.find(f => f.key === fieldKey);
+                        const chipsWrap = weeklyContainer.querySelector(`[data-week-chips-container="${week.id}-${fieldKey}"]`);
+                        if (fieldDef && chipsWrap) {
+                            chipsWrap.innerHTML = buildWeeklyPromoteChipsHtml(week, fieldDef);
+                        }
                         updatePreviewAndSummaryHints();
                     }
                 }
@@ -2918,8 +3033,9 @@
                     renderWeeklySection();
                     updatePreviewAndSummaryHints();
                 } else if (action === 'promote-line') {
-                    addMonthlyTopic(btn.dataset.lineText, selectedQuickCategory);
-                    showToast('Monthlyトピックへ追加しました');
+                    const cat = btn.dataset.lineCategory || selectedQuickCategory;
+                    addMonthlyTopic(btn.dataset.lineText, cat);
+                    showToast(`「${cat}」タグでMonthlyトピックへ追加しました`);
                 } else if (action === 'append-metrics-memo') {
                     const idx = Number(btn.dataset.weekIdx);
                     const week = record.weeklyItems[idx];
@@ -2938,12 +3054,12 @@
                         showToast('先に「今週の値」を入力してください');
                         return;
                     }
-                    const line = `・【今週の値】${parts.join(' / ')}`;
-                    week.memo = week.memo ? `${week.memo.trim()}\n${line}` : line;
+                    const line = `・【先週比サマリー】${parts.join(' / ')}`;
+                    week.changeReason = week.changeReason ? `${week.changeReason.trim()}\n${line}` : line;
                     saveStateToStorage();
                     renderWeeklySection();
                     updatePreviewAndSummaryHints();
-                    showToast('先週比サマリーを週次メモへ追記しました');
+                    showToast('先週比サマリーを「数値の変化理由」へ追記しました');
                 }
             });
 
@@ -2961,6 +3077,12 @@
 
             document.getElementById('includeWeeklyMetricsToggle').addEventListener('change', (e) => {
                 appState.includeWeeklyMetricsInOutput = e.target.checked;
+                saveStateToStorage();
+                updatePreviewAndSummaryHints();
+            });
+
+            document.getElementById('includeWeeklySectionHeadersToggle').addEventListener('change', (e) => {
+                appState.includeWeeklySectionHeadersInOutput = e.target.checked;
                 saveStateToStorage();
                 updatePreviewAndSummaryHints();
             });
