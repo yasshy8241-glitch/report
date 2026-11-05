@@ -153,7 +153,7 @@
                     <div id="googleUserBadge" class="hidden items-center gap-1.5 bg-slate-100 border border-slate-200 rounded-xl px-2 py-1">
                         <img id="googleUserAvatar" src="" alt="" class="w-4 h-4 rounded-full hidden" />
                         <span id="googleUserName" class="text-[11px] font-bold text-slate-700 max-w-[90px] truncate"></span>
-                        <button id="forceCloudSyncBtn" type="button" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 px-1 py-0.5 rounded hover:bg-white transition-colors" title="今すぐクラウドへ手動同期">🔄</button>
+                        <button id="forceCloudSyncBtn" type="button" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 px-1 py-0.5 rounded hover:bg-white transition-colors" title="クラウドと今すぐ手動同期">🔄</button>
                         <button id="googleLogoutBtn" type="button" class="text-[10px] font-semibold text-slate-400 hover:text-rose-600 px-1 py-0.5 rounded hover:bg-white transition-colors" title="ログアウト（端末内保存モードへ切替）">ログアウト</button>
                     </div>
                 </div>
@@ -541,12 +541,10 @@
                 </div>
 
                 <!-- Live Mapping Preview -->
-                <div class="space-y-1.5">
-                    <div class="flex items-center justify-between flex-wrap gap-1">
-                        <span class="text-xs font-extrabold text-slate-700">割り当てプレビュー（反映前の確認）</span>
-                        <span id="bulkPasteCountBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">未入力</span>
-                    </div>
-                    <div id="bulkPastePreviewGrid" class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 max-h-60 overflow-auto custom-scrollbar"></div>
+                <div id="bulkPastePreviewGrid" class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 max-h-60 overflow-auto custom-scrollbar"></div>
+                <div class="flex items-center justify-between flex-wrap gap-1">
+                    <span class="text-xs font-extrabold text-slate-700">割り当てプレビュー（反映前の確認）</span>
+                    <span id="bulkPasteCountBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">未入力</span>
                 </div>
             </div>
 
@@ -922,6 +920,13 @@
 
         function createDefaultSampleWeatherCache() {
             const sampleYokohama = {
+                '2026-09-07': { code: 1, max: 30, min: 23, precip: 0 },
+                '2026-09-08': { code: 1, max: 30, min: 23, precip: 0 },
+                '2026-09-09': { code: 2, max: 29, min: 22, precip: 0 },
+                '2026-09-10': { code: 1, max: 29, min: 22, precip: 0 },
+                '2026-09-11': { code: 1, max: 30, min: 22, precip: 0 },
+                '2026-09-12': { code: 0, max: 31, min: 23, precip: 0 },
+                '2026-09-13': { code: 1, max: 29, min: 22, precip: 0 },
                 '2026-09-14': { code: 1, max: 29, min: 22, precip: 0 },
                 '2026-09-15': { code: 1, max: 28, min: 21, precip: 0 },
                 '2026-09-16': { code: 2, max: 27, min: 21, precip: 0 },
@@ -963,7 +968,14 @@
                 '2026-10-22': { code: 3, max: 19, min: 12, precip: 1.0 },
                 '2026-10-23': { code: 1, max: 21, min: 13, precip: 0 },
                 '2026-10-24': { code: 0, max: 22, min: 13, precip: 0 },
-                '2026-10-25': { code: 1, max: 21, min: 13, precip: 0 }
+                '2026-10-25': { code: 1, max: 21, min: 13, precip: 0 },
+                '2026-10-26': { code: 1, max: 21, min: 13, precip: 0 },
+                '2026-10-27': { code: 2, max: 20, min: 12, precip: 0 },
+                '2026-10-28': { code: 1, max: 21, min: 12, precip: 0 },
+                '2026-10-29': { code: 3, max: 18, min: 11, precip: 1.0 },
+                '2026-10-30': { code: 1, max: 20, min: 12, precip: 0 },
+                '2026-10-31': { code: 0, max: 21, min: 12, precip: 0 },
+                '2026-11-01': { code: 1, max: 20, min: 12, precip: 0 }
             };
             const cache = {};
             Object.keys(sampleYokohama).forEach(dateStr => {
@@ -1230,6 +1242,7 @@
             };
         }
 
+        // 2026年10月サンプル（1W: 10/5〜10/11、2W: 10/12〜10/18、3W: 10/19〜10/25、4W: 10/26〜11/1）
         function createSampleRecord2026_10() {
             return {
                 year: 2026,
@@ -1261,24 +1274,6 @@
                 weeklyItems: [
                     {
                         id: 'w-10-1',
-                        range: '9/28〜10/4',
-                        metrics: {
-                            visitors: 181,
-                            approaches: 170,
-                            interactions: 47,
-                            interactionsIos: 6,
-                            surveys: 19,
-                            consideration: 73.68,
-                            purchaseIntent: 68.42,
-                            swings: 7,
-                            swingsIos: 0
-                        },
-                        changeReason: '・9月末はシルバーウィーク明けや悪天候ということもあり集客・接客数は伸び悩んだ。',
-                        topics: '・10/1に単日SIMフリーが4台販売と好調なスタートダッシュ。\n・10a購入希望のお客様が多い傾向。',
-                        actionItems: '・10a希望層に向けて、改めて上位モデルへのアップグレード提案を強化。\n・吉田のアップグレード提案の優良事例をノウハウ投稿および現場での落とし込みを実施。\n・補償サービス「ワイヤレスゲート」について案内を強化。'
-                    },
-                    {
-                        id: 'w-10-2',
                         range: '10/5〜10/11',
                         metrics: {
                             visitors: 195,
@@ -1292,11 +1287,11 @@
                             swingsIos: 2
                         },
                         changeReason: '・三連休初日にキャリア合同イベントが実施され、コーナー周辺の集客数・接客数ともに先週比で増加。',
-                        topics: '・SIM単体MNP＋SIMフリーPixelのポイント還元訴求が奏功し、iOSからのスイングが2件成約。',
-                        actionItems: '・キャリアスタッフとのトスアップ連携を継続し、コーナー外からの誘導を強化。'
+                        topics: '・SIM単体MNP＋SIMフリーPixelのポイント還元訴求が奏功し、iOSからのスイングが2件成約。\n・10a購入希望のお客様が多い傾向。',
+                        actionItems: '・10a希望層に向けて、改めて上位モデルへのアップグレード提案を強化。\n・吉田のアップグレード提案の優良事例をノウハウ投稿および現場での落とし込みを実施。\n・補償サービス「ワイヤレスゲート」について案内を強化。'
                     },
                     {
-                        id: 'w-10-3',
+                        id: 'w-10-2',
                         range: '10/12〜10/18',
                         metrics: {
                             visitors: 178,
@@ -1314,7 +1309,7 @@
                         actionItems: '・立ち位置を従来配置へ即座に軌道修正し接客機会を確保。\n・人気カラーの在庫偏りについてスタッフからヒアリングを実施し運用確認。'
                     },
                     {
-                        id: 'w-10-4',
+                        id: 'w-10-3',
                         range: '10/19〜10/25',
                         metrics: createEmptyWeeklyMetrics(),
                         changeReason: '',
@@ -1322,7 +1317,7 @@
                         actionItems: ''
                     },
                     {
-                        id: 'w-10-5',
+                        id: 'w-10-4',
                         range: '10/26〜11/1',
                         metrics: createEmptyWeeklyMetrics(),
                         changeReason: '',
@@ -1333,6 +1328,7 @@
             };
         }
 
+        // 2026年9月サンプル（1W: 9/7〜9/13、2W: 9/14〜9/20、3W: 9/21〜9/27、4W: 9/28〜10/4）
         function createSampleRecord2026_09() {
             return {
                 year: 2026,
@@ -1366,22 +1362,14 @@
                 weeklyItems: [
                     {
                         id: 'w-09-1',
-                        range: '8/31〜9/6',
+                        range: '9/7〜9/13',
                         metrics: createEmptyWeeklyMetrics(),
-                        changeReason: '',
-                        topics: '・月初は新学期・決算期に向けた売場メンテナンスを実施。',
+                        changeReason: '・iPhone新機種発表に伴い比較検討層の来訪が増加。',
+                        topics: '・新学期・決算期に向けた売場メンテナンスを実施。',
                         actionItems: ''
                     },
                     {
                         id: 'w-09-2',
-                        range: '9/7〜9/13',
-                        metrics: createEmptyWeeklyMetrics(),
-                        changeReason: '・iPhone新機種発表に伴い比較検討層の来訪が増加。',
-                        topics: '',
-                        actionItems: ''
-                    },
-                    {
-                        id: 'w-09-3',
                         range: '9/14〜9/20',
                         metrics: {
                             visitors: 192,
@@ -1399,7 +1387,7 @@
                         actionItems: ''
                     },
                     {
-                        id: 'w-09-4',
+                        id: 'w-09-3',
                         range: '9/21〜9/27',
                         metrics: {
                             visitors: 156,
@@ -1415,19 +1403,38 @@
                         changeReason: '・SIMフリー販売を重視し、温度感の低そうなお客様（Fold体験客など）への声掛けを簡単に済ませることが多くなったため接客数・アンケート回収数が低下。\n・台風の影響で横浜店で全館停電があり、集客と勤怠にマイナスの影響が大きかった。',
                         topics: '・iPhoneユーザーのPixelを候補に考える層は増加傾向。',
                         actionItems: '・温度感の見極めを行いつつ、短時間接客でもアンケート回収へ繋げる声掛けフローを再徹底。'
+                    },
+                    {
+                        id: 'w-09-4',
+                        range: '9/28〜10/4',
+                        metrics: {
+                            visitors: 181,
+                            approaches: 170,
+                            interactions: 47,
+                            interactionsIos: 6,
+                            surveys: 19,
+                            consideration: 73.68,
+                            purchaseIntent: 68.42,
+                            swings: 7,
+                            swingsIos: 0
+                        },
+                        changeReason: '・9月末はシルバーウィーク明けや悪天候ということもあり集客・接客数は伸び悩んだ。',
+                        topics: '・10/1に単日SIMフリーが4台販売と好調なスタートダッシュ。',
+                        actionItems: '・キャリアスタッフとのトスアップ連携を継続し、コーナー外からの誘導を強化。'
                     }
                 ]
             };
         }
 
+        // 月の週範囲を計算：その月の第1月曜日（日曜始まりの場合は第1日曜日）を1Wの開始日とし、前月最終週との重複を防止
         function calculateMonthWeekRanges(year, month, weekStartDay = 1) {
             const y = Number(year);
             const m = Number(month);
             const firstDay = new Date(y, m - 1, 1);
             const lastDay = new Date(y, m, 0);
 
-            const startOffset = (firstDay.getDay() - Number(weekStartDay) + 7) % 7;
-            const firstWeekStart = new Date(y, m - 1, 1 - startOffset);
+            const offsetToFirstStartDay = (Number(weekStartDay) - firstDay.getDay() + 7) % 7;
+            const firstWeekStart = new Date(y, m - 1, 1 + offsetToFirstStartDay);
 
             const ranges = [];
             let cursor = new Date(firstWeekStart);
@@ -1485,7 +1492,8 @@
             selectedWeekFilter: 'all',
             sectionFilter: 'all',
             layoutMode: 'auto',
-            collapsedMetricsWeeks: {}
+            collapsedMetricsWeeks: {},
+            updatedAt: 0
         };
 
         function getCurrentStore() {
@@ -1515,6 +1523,63 @@
             return `${Number(year)}-${String(Number(month)).padStart(2, '0')}`;
         }
 
+        // 旧計算式（前月始まりの1W）になっている既存データを自動補正するヘルパー
+        function migrateOverlappingWeeksIfNeeded(safe, year, month) {
+            if (!Array.isArray(safe.weeklyItems) || safe.weeklyItems.length === 0) return;
+
+            const expectedRanges = calculateMonthWeekRanges(year, month, appState.weekStartDay || 1);
+            if (expectedRanges.length === 0) return;
+
+            const firstWeek = safe.weeklyItems[0];
+            const firstMatch = String(firstWeek?.range || '').match(/^(\d{1,2})\s*\/\s*(\d{1,2})/);
+            if (!firstMatch) return;
+
+            const startMonthOfFirstWeek = Number(firstMatch[1]);
+            // 1Wの開始月が当月と異なる（＝前月末から始まっている旧形式）場合
+            if (startMonthOfFirstWeek !== Number(month)) {
+                const allWeeksEmpty = safe.weeklyItems.every(w => !hasWeekAnyText(w) && !hasWeekAnyMetric(w));
+                if (allWeeksEmpty) {
+                    // まだ何も入力されていない月（例：開いただけで自動生成された11月など）は新しい正しい週リストで再構築
+                    safe.weeklyItems = expectedRanges.map((range, idx) => ({
+                        id: `w-${year}-${month}-${idx}-${Date.now()}`,
+                        range,
+                        metrics: createEmptyWeeklyMetrics(),
+                        changeReason: '',
+                        topics: '',
+                        actionItems: ''
+                    }));
+                    return;
+                }
+
+                // 1W（前月始まり）が空欄なら削除し、末尾に不足している当月週を追加
+                if (!hasWeekAnyText(firstWeek) && !hasWeekAnyMetric(firstWeek)) {
+                    safe.weeklyItems.shift();
+                } else if (safe.weeklyItems.length > expectedRanges.length) {
+                    // 旧2026-10サンプルのように末尾に空週が余っている場合は末尾の空週を詰めて日付を当月基準に合わせる
+                    const lastWeek = safe.weeklyItems[safe.weeklyItems.length - 1];
+                    if (!hasWeekAnyText(lastWeek) && !hasWeekAnyMetric(lastWeek)) {
+                        safe.weeklyItems.pop();
+                    }
+                }
+
+                // 各週のrangeを新しい当月基準に揃え、足りない週があれば末尾に追加
+                expectedRanges.forEach((r, idx) => {
+                    if (safe.weeklyItems[idx]) {
+                        safe.weeklyItems[idx].range = r;
+                    } else {
+                        safe.weeklyItems.push({
+                            id: `w-${year}-${month}-${idx}-${Date.now()}`,
+                            range: r,
+                            metrics: createEmptyWeeklyMetrics(),
+                            changeReason: '',
+                            topics: '',
+                            actionItems: ''
+                        });
+                    }
+                });
+            }
+        }
+
         function sanitizeRecord(rec, year, month) {
             const safe = rec && typeof rec === 'object' ? rec : createDefaultRecord(year, month, appState.weekStartDay);
             safe.year = Number(year);
@@ -1542,6 +1607,9 @@
                 MONTHLY_EVAL_PILLARS.forEach(p => {
                     if (!safe.monthlyEvaluations[p.key] || typeof safe.monthlyEvaluations[p.key] !== 'object') {
                         safe.monthlyEvaluations[p.key] = { statusOverride: 'auto', reason: '' };
+                    } else {
+                        if (!safe.monthlyEvaluations[p.key].statusOverride) safe.monthlyEvaluations[p.key].statusOverride = 'auto';
+                        if (typeof safe.monthlyEvaluations[p.key].reason !== 'string') safe.monthlyEvaluations[p.key].reason = '';
                     }
                 });
             }
@@ -1582,6 +1650,9 @@
                         });
                     }
                 });
+
+                // 前月と被っている旧式の週データを自動補正
+                migrateOverlappingWeeksIfNeeded(safe, year, month);
             }
 
             return safe;
@@ -1609,7 +1680,6 @@
             return recordsMap[getRecordKey(appState.currentYear, appState.currentMonth)];
         }
 
-        // 状態オブジェクト全体を安全に正規化する共通関数（localStorage読み込み・Firestore受信の双方で使用）
         function normalizeFullAppState() {
             if (!Array.isArray(appState.stores) || appState.stores.length === 0) {
                 appState.stores = [
@@ -1708,13 +1778,20 @@
 
             normalizeFullAppState();
             if (loadedFromLegacy) {
-                saveStateToStorage({ skipCloud: true });
+                saveStateToStorage({ skipCloud: true, markUpdated: false });
             }
         }
 
+        // markUpdated: ユーザーの操作による保存時は true（デフォルト）、起動時の自動天気取得などは false にしてタイムスタンプ逆転を防止
         function saveStateToStorage(options = {}) {
             try {
-                appState.updatedAt = Date.now();
+                const markUpdated = options.markUpdated !== false;
+                if (markUpdated && !isApplyingRemoteState) {
+                    const now = Date.now();
+                    appState.updatedAt = now;
+                    const currRec = getCurrentRecord();
+                    if (currRec) currRec.updatedAt = now;
+                }
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
                 if (!window.isCloudLoggedIn) {
                     updateSaveStatusBadge('local_saved');
@@ -3325,54 +3402,71 @@
             return Boolean(el.isContentEditable);
         }
 
-        // 画面上の全入力フィールドの現在値をメモリ上のレコードへ同期するヘルパー
+        // 画面上の全入力フィールドの現在値をメモリ上のレコードへ同期するヘルパー（差分があったかどうかを返す）
         function flushActiveDomInputsToState() {
             const record = getCurrentRecord();
+            let hasChanged = false;
 
             document.querySelectorAll('input[data-monthly-metric-key]').forEach(inp => {
                 const mKey = inp.dataset.monthlyMetricKey;
                 const fKey = inp.dataset.monthlyField;
                 if (mKey && fKey && record.monthlyMetrics[mKey]) {
-                    record.monthlyMetrics[mKey][fKey] = inp.value;
+                    if (String(record.monthlyMetrics[mKey][fKey] ?? '') !== inp.value) {
+                        record.monthlyMetrics[mKey][fKey] = inp.value;
+                        hasChanged = true;
+                    }
                 }
             });
 
             document.querySelectorAll('textarea[data-eval-action="edit-reason"]').forEach(ta => {
                 const pKey = ta.dataset.pillarKey;
                 if (pKey && record.monthlyEvaluations[pKey]) {
-                    record.monthlyEvaluations[pKey].reason = ta.value;
+                    if (String(record.monthlyEvaluations[pKey].reason ?? '') !== ta.value) {
+                        record.monthlyEvaluations[pKey].reason = ta.value;
+                        hasChanged = true;
+                    }
                 }
             });
 
             document.querySelectorAll('input[data-monthly-topic-id]').forEach(inp => {
                 const tId = inp.dataset.monthlyTopicId;
                 const found = record.monthlyTopics.find(t => t.id === tId);
-                if (found) found.content = inp.value;
+                if (found && String(found.content ?? '') !== inp.value) {
+                    found.content = inp.value;
+                    hasChanged = true;
+                }
             });
 
             document.querySelectorAll('input[data-weekly-metric-key]').forEach(inp => {
                 const wId = inp.dataset.weekId;
                 const mKey = inp.dataset.weeklyMetricKey;
                 const week = record.weeklyItems.find(w => w.id === wId);
-                if (week && mKey) {
+                if (week && mKey && String(week.metrics[mKey] ?? '') !== inp.value) {
                     week.metrics[mKey] = inp.value;
+                    hasChanged = true;
                 }
             });
 
             document.querySelectorAll('input[data-week-action="edit-range"]').forEach(inp => {
                 const wId = inp.dataset.weekId;
                 const week = record.weeklyItems.find(w => w.id === wId);
-                if (week) week.range = inp.value;
+                if (week && String(week.range ?? '') !== inp.value) {
+                    week.range = inp.value;
+                    hasChanged = true;
+                }
             });
 
             document.querySelectorAll('textarea[data-week-action="edit-text-field"]').forEach(ta => {
                 const wId = ta.dataset.weekId;
                 const fKey = ta.dataset.weekField;
                 const week = record.weeklyItems.find(w => w.id === wId);
-                if (week && fKey) {
+                if (week && fKey && String(week[fKey] ?? '') !== ta.value) {
                     week[fKey] = ta.value;
+                    hasChanged = true;
                 }
             });
+
+            return hasChanged;
         }
 
         function switchStore(storeId) {
@@ -3443,7 +3537,8 @@
                     });
                 }
 
-                saveStateToStorage();
+                // 自動取得時はタイムスタンプやクラウドを更新せず、手動ボタン押下時のみ保存・同期する
+                saveStateToStorage({ skipCloud: silent, markUpdated: !silent });
                 renderWeeklySection();
                 if (!silent) {
                     if (count > 0) {
@@ -3464,8 +3559,8 @@
         }
 
         function copyFormattedText() {
-            flushActiveDomInputsToState();
-            saveStateToStorage();
+            const changed = flushActiveDomInputsToState();
+            saveStateToStorage({ markUpdated: changed });
             updatePreviewAndSummaryHints();
             const text = generateFormattedReport();
             const temp = document.createElement('textarea');
@@ -3718,11 +3813,36 @@
             }
         }
 
+        // 当月の週範囲を第1月曜（または第1日曜）基準で再計算し反映する共通関数
+        function recalculateCurrentRecordWeekRanges() {
+            const record = getCurrentRecord();
+            const ranges = calculateMonthWeekRanges(record.year, record.month, appState.weekStartDay);
+            ranges.forEach((r, idx) => {
+                if (record.weeklyItems[idx]) {
+                    record.weeklyItems[idx].range = r;
+                } else {
+                    record.weeklyItems.push({
+                        id: `w-${Date.now()}-${idx}`,
+                        range: r,
+                        metrics: createEmptyWeeklyMetrics(),
+                        changeReason: '',
+                        topics: '',
+                        actionItems: ''
+                    });
+                }
+            });
+            if (record.weeklyItems.length > ranges.length) {
+                record.weeklyItems = record.weeklyItems.filter((w, idx) => idx < ranges.length || hasWeekAnyMetric(w) || hasWeekAnyText(w));
+            }
+        }
+
         function bindEvents() {
-            // ページ離脱・非表示時にも確実に保存
+            // ページ離脱時は「未確定の入力変更があった場合のみ」保存する（開いて閉じただけの端末が最新タイムスタンプになるのを防止）
             window.addEventListener('beforeunload', () => {
-                flushActiveDomInputsToState();
-                saveStateToStorage();
+                const changed = flushActiveDomInputsToState();
+                if (changed) {
+                    saveStateToStorage({ markUpdated: true });
+                }
             });
 
             // 入力欄からフォーカスが外れた際、保留中のクラウド更新があれば安全に反映
@@ -3836,54 +3956,54 @@
             });
 
             document.getElementById('yearSelect').addEventListener('change', (e) => {
-                flushActiveDomInputsToState();
+                const changed = flushActiveDomInputsToState();
                 appState.currentYear = Number(e.target.value);
                 appState.selectedWeekFilter = 'all';
-                saveStateToStorage();
+                saveStateToStorage({ markUpdated: changed });
                 renderAll();
             });
 
             document.getElementById('monthSelect').addEventListener('change', (e) => {
-                flushActiveDomInputsToState();
+                const changed = flushActiveDomInputsToState();
                 appState.currentMonth = Number(e.target.value);
                 appState.selectedWeekFilter = 'all';
-                saveStateToStorage();
+                saveStateToStorage({ markUpdated: changed });
                 renderAll();
             });
 
             document.getElementById('prevMonthBtn').addEventListener('click', () => {
-                flushActiveDomInputsToState();
+                const changed = flushActiveDomInputsToState();
                 let y = Number(appState.currentYear);
                 let m = Number(appState.currentMonth) - 1;
                 if (m < 1) { m = 12; y -= 1; }
                 appState.currentYear = y;
                 appState.currentMonth = m;
                 appState.selectedWeekFilter = 'all';
-                saveStateToStorage();
+                saveStateToStorage({ markUpdated: changed });
                 renderAll();
             });
 
             document.getElementById('nextMonthBtn').addEventListener('click', () => {
-                flushActiveDomInputsToState();
+                const changed = flushActiveDomInputsToState();
                 let y = Number(appState.currentYear);
                 let m = Number(appState.currentMonth) + 1;
                 if (m > 12) { m = 1; y += 1; }
                 appState.currentYear = y;
                 appState.currentMonth = m;
                 appState.selectedWeekFilter = 'all';
-                saveStateToStorage();
+                saveStateToStorage({ markUpdated: changed });
                 renderAll();
             });
 
             document.getElementById('monthTabsContainer').addEventListener('click', (e) => {
                 const btn = e.target.closest('button[data-month-key]');
                 if (!btn) return;
-                flushActiveDomInputsToState();
+                const changed = flushActiveDomInputsToState();
                 const parts = btn.dataset.monthKey.split('-');
                 appState.currentYear = Number(parts[0]);
                 appState.currentMonth = Number(parts[1]);
                 appState.selectedWeekFilter = 'all';
-                saveStateToStorage();
+                saveStateToStorage({ markUpdated: changed });
                 renderAll();
             });
 
@@ -3918,9 +4038,9 @@
 
             document.querySelectorAll('.section-filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    flushActiveDomInputsToState();
+                    const changed = flushActiveDomInputsToState();
                     appState.sectionFilter = btn.dataset.sectionFilter;
-                    saveStateToStorage();
+                    saveStateToStorage({ markUpdated: changed, skipCloud: !changed });
                     updatePreviewAndSummaryHints();
                     applyLayoutAndSectionFilters();
                 });
@@ -3928,9 +4048,9 @@
 
             document.querySelectorAll('.layout-mode-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    flushActiveDomInputsToState();
+                    const changed = flushActiveDomInputsToState();
                     appState.layoutMode = btn.dataset.layoutMode;
-                    saveStateToStorage();
+                    saveStateToStorage({ markUpdated: changed, skipCloud: !changed });
                     applyLayoutAndSectionFilters();
                 });
             });
@@ -3963,9 +4083,9 @@
             });
 
             document.getElementById('toggleMonthlyMetricsBtn').addEventListener('click', () => {
-                flushActiveDomInputsToState();
+                const changed = flushActiveDomInputsToState();
                 appState.monthlyMetricsCollapsed = !appState.monthlyMetricsCollapsed;
-                saveStateToStorage();
+                saveStateToStorage({ markUpdated: changed, skipCloud: !changed });
                 renderMonthlyMetricsAndEvaluations(false);
             });
 
@@ -4031,7 +4151,6 @@
                 }
             });
 
-            // Monthly数値入力: 入力中は保存せず、フォーカスが外れた確定時(change)に保存・再計算
             monthlyQuantTable.addEventListener('change', (e) => {
                 const target = e.target;
                 const metricKey = target.dataset.monthlyMetricKey;
@@ -4083,7 +4202,6 @@
                 showToast(`${tokens.length}項目の数値を一括反映しました`);
             });
 
-            // 実績評価の理由テキストエリア: 入力中は保存せず、フォーカス解除(change)時に保存
             const evalCardsContainer = document.getElementById('monthlyEvalCardsContainer');
             evalCardsContainer.addEventListener('change', (e) => {
                 const target = e.target;
@@ -4224,31 +4342,18 @@
             });
 
             document.getElementById('weekStartDaySelect').addEventListener('change', (e) => {
+                flushActiveDomInputsToState();
                 appState.weekStartDay = Number(e.target.value);
+                recalculateCurrentRecordWeekRanges();
                 saveStateToStorage();
+                renderWeeklySection();
+                updatePreviewAndSummaryHints();
+                showToast('開始曜日に合わせて週の日付範囲を再計算しました');
             });
 
             document.getElementById('autoCalcWeeksBtn').addEventListener('click', () => {
                 flushActiveDomInputsToState();
-                const record = getCurrentRecord();
-                const ranges = calculateMonthWeekRanges(record.year, record.month, appState.weekStartDay);
-                ranges.forEach((r, idx) => {
-                    if (record.weeklyItems[idx]) {
-                        record.weeklyItems[idx].range = r;
-                    } else {
-                        record.weeklyItems.push({
-                            id: `w-${Date.now()}-${idx}`,
-                            range: r,
-                            metrics: createEmptyWeeklyMetrics(),
-                            changeReason: '',
-                            topics: '',
-                            actionItems: ''
-                        });
-                    }
-                });
-                if (record.weeklyItems.length > ranges.length) {
-                    record.weeklyItems = record.weeklyItems.filter((w, idx) => idx < ranges.length || hasWeekAnyMetric(w) || hasWeekAnyText(w));
-                }
+                recalculateCurrentRecordWeekRanges();
                 saveStateToStorage();
                 renderWeeklySection();
                 updatePreviewAndSummaryHints();
@@ -4289,8 +4394,8 @@
             document.getElementById('weekFocusTabsContainer').addEventListener('click', (e) => {
                 const btn = e.target.closest('button[data-week-filter]');
                 if (!btn) return;
-                flushActiveDomInputsToState();
-                saveStateToStorage();
+                const changed = flushActiveDomInputsToState();
+                saveStateToStorage({ markUpdated: changed, skipCloud: !changed });
                 appState.selectedWeekFilter = btn.dataset.weekFilter;
                 renderWeeklySection();
                 applyLayoutAndSectionFilters();
@@ -4426,7 +4531,7 @@
                 } else if (action === 'toggle-metrics') {
                     const wId = btn.dataset.weekId;
                     appState.collapsedMetricsWeeks[wId] = !appState.collapsedMetricsWeeks[wId];
-                    saveStateToStorage();
+                    saveStateToStorage({ markUpdated: false, skipCloud: true });
                     renderWeeklySection();
                 } else if (action === 'delete-week') {
                     record.weeklyItems = record.weeklyItems.filter(w => w.id !== btn.dataset.weekId);
@@ -4517,8 +4622,8 @@
             document.getElementById('mobileQuickCopyBtn').addEventListener('click', copyFormattedText);
 
             document.getElementById('downloadTxtBtn').addEventListener('click', () => {
-                flushActiveDomInputsToState();
-                saveStateToStorage();
+                const changed = flushActiveDomInputsToState();
+                saveStateToStorage({ markUpdated: changed });
                 const record = getCurrentRecord();
                 const store = getCurrentStore();
                 const text = generateFormattedReport();
@@ -4542,7 +4647,7 @@
     </script>
 
     <!-- =====================================================================
-         SCRIPT BLOCK 4: Firebase Google認証 ＆ 締め出し防止リアルタイム同期エンジン
+         SCRIPT BLOCK 4: Firebase Google認証 ＆ 複数端末リアルタイム同期エンジン
          ===================================================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -4582,8 +4687,10 @@
         let unsubscribeSnapshot = null;
         let cloudSaveTimer = null;
         let pendingRemotePayload = null;
+        // 起動直後の未同期状態での誤送信を防ぐロックフラグ
+        let isInitialCloudSyncCompleted = false;
 
-        // サンプル初期状態と同一かどうかを判定（新しい端末の初期サンプルがクラウドの実データを上書きするのを防ぐ）
+        // サンプル初期状態または未入力状態かどうかを判定
         function isDefaultSampleOrEmptyRecord(storeId, monthKey, rec) {
             if (!rec || typeof rec !== 'object') return true;
             const cleanJson = (r) => JSON.stringify({
@@ -4591,8 +4698,7 @@
                 monthlyEvaluations: r.monthlyEvaluations,
                 monthlyTopics: (r.monthlyTopics || []).map(t => ({ category: t.category, content: t.content })),
                 weeklyItems: (r.weeklyItems || []).map(w => ({
-                    range: w.range,
-                    metrics: w.metrics,
+                     metrics: w.metrics,
                     changeReason: w.changeReason,
                     topics: w.topics,
                     actionItems: w.actionItems
@@ -4613,7 +4719,7 @@
             return !(hasTopics || hasMetrics || hasEvals || hasWeekly);
         }
 
-        // 初回ログイン時にローカルデータとクラウドデータを安全にマージ（どちらの端末の入力も消さない）
+        // ローカルデータとクラウドデータを月単位・店舗単位のタイムスタンプで比較して安全にマージ
         function mergeLocalAndCloudStates(localSt, cloudSt) {
             if (!cloudSt || typeof cloudSt !== 'object') return localSt;
 
@@ -4622,20 +4728,19 @@
                 if (s && s.id) mergedStoresMap.set(s.id, s);
             });
             (Array.isArray(localSt.stores) ? localSt.stores : []).forEach(s => {
-                if (s && s.id) mergedStoresMap.set(s.id, s);
+                if (s && s.id && !mergedStoresMap.has(s.id)) mergedStoresMap.set(s.id, s);
             });
             const mergedStores = Array.from(mergedStoresMap.values());
 
             const mergedStoreRecords = {};
+            const cloudBaseRecords = cloudSt.storeRecords || (cloudSt.records ? { 'store-yokohama': cloudSt.records } : {});
             const allStoreIds = new Set([
-                ...Object.keys(cloudSt.storeRecords || {}),
-                ...Object.keys(localSt.storeRecords || {}),
-                ...(cloudSt.records ? ['store-yokohama'] : [])
+                ...Object.keys(cloudBaseRecords),
+                ...Object.keys(localSt.storeRecords || {})
             ]);
 
-            const cloudBaseRecords = cloudSt.storeRecords || (cloudSt.records ? { 'store-yokohama': cloudSt.records } : {});
-            const cloudTime = Number(cloudSt.updatedAt) || 0;
-            const localTime = Number(localSt.updatedAt) || 0;
+            const cloudGlobalTime = Number(cloudSt.updatedAt) || 0;
+            const localGlobalTime = Number(localSt.updatedAt) || 0;
 
             allStoreIds.forEach(storeId => {
                 mergedStoreRecords[storeId] = {};
@@ -4658,24 +4763,29 @@
                         } else if (cIsDefault && !lIsDefault) {
                             mergedStoreRecords[storeId][mKey] = lRec;
                         } else {
-                            mergedStoreRecords[storeId][mKey] = (cloudTime >= localTime) ? cRec : lRec;
+                            const cRecTime = Number(cRec.updatedAt) || cloudGlobalTime;
+                            const lRecTime = Number(lRec.updatedAt) || localGlobalTime;
+                            // 別端末で開いた際にクラウドの最新データを優先
+                            mergedStoreRecords[storeId][mKey] = (lRecTime > cRecTime) ? lRec : cRec;
                         }
                     }
                 });
             });
 
-            const preferCloudMeta = cloudTime >= localTime;
-            const baseMeta = preferCloudMeta ? Object.assign({}, localSt, cloudSt) : Object.assign({}, cloudSt, localSt);
+            const preferLocalMeta = localGlobalTime > cloudGlobalTime;
+            const baseMeta = preferLocalMeta ? Object.assign({}, cloudSt, localSt) : Object.assign({}, localSt, cloudSt);
             baseMeta.stores = mergedStores;
             baseMeta.storeRecords = mergedStoreRecords;
             baseMeta.weatherCache = Object.assign({}, cloudSt.weatherCache || {}, localSt.weatherCache || {});
+            baseMeta.updatedAt = Math.max(cloudGlobalTime, localGlobalTime, Date.now());
             return baseMeta;
         }
 
+        // Firestoreが拒否する undefined を完全に除去したペイロードを作成
         function buildCloudPayload() {
             const writeId = `${CLIENT_INSTANCE_ID}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
             lastLocalWriteId = writeId;
-            return {
+            const rawPayload = {
                 currentStoreId: appState.currentStoreId || 'store-yokohama',
                 stores: appState.stores || [],
                 storeRecords: appState.storeRecords || {},
@@ -4691,16 +4801,23 @@
                 includeWeeklySectionHeadersInOutput: Boolean(appState.includeWeeklySectionHeadersInOutput),
                 skipEmptyWeeksInOutput: Boolean(appState.skipEmptyWeeksInOutput),
                 monthlyMetricsCollapsed: Boolean(appState.monthlyMetricsCollapsed),
-                updatedAt: Date.now(),
+                updatedAt: Number(appState.updatedAt) || Date.now(),
                 lastWriterClient: CLIENT_INSTANCE_ID,
                 lastWriteId: writeId
             };
+            return JSON.parse(JSON.stringify(rawPayload));
         }
 
         async function pushStateToCloudNow(showSuccessToast = false) {
-            if (!currentUser) return;
+            if (!currentUser || !isInitialCloudSyncCompleted) return;
             try {
-                flushActiveDomInputsToState();
+                const changed = flushActiveDomInputsToState();
+                if (changed) {
+                    const now = Date.now();
+                    appState.updatedAt = now;
+                    const currRec = getCurrentRecord();
+                    if (currRec) currRec.updatedAt = now;
+                }
                 updateSaveStatusBadge('syncing', '☁️ 同期中...');
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const payload = buildCloudPayload();
@@ -4711,21 +4828,27 @@
                 }
             } catch (err) {
                 console.error('Firestore save error:', err);
-                updateSaveStatusBadge('error', '⚠️ 同期エラー(端末保存済)');
-                if (showSuccessToast) {
-                    showToast('クラウド同期に失敗しました（端末には保存されています）');
+                const errCode = err?.code || '';
+                if (errCode === 'permission-denied') {
+                    updateSaveStatusBadge('error', '⚠️ 権限エラー(Rules要確認)');
+                    showToast('Firestoreの書き込み権限がありません（セキュリティルールを確認してください）');
+                } else {
+                    updateSaveStatusBadge('error', '⚠️ 同期エラー(端末保存済)');
+                    if (showSuccessToast) {
+                        showToast('クラウド同期に失敗しました（端末には保存されています）');
+                    }
                 }
             }
         }
 
-        // デバウンス付きクラウド保存（連続操作時も通信をまとめて負荷と競合を防止）
+        // デバウンス付きクラウド保存
         window.triggerCloudSave = function() {
-            if (!currentUser || isApplyingRemoteState) return;
+            if (!currentUser || !isInitialCloudSyncCompleted || isApplyingRemoteState) return;
             updateSaveStatusBadge('syncing', '☁️ 同期待機中...');
             if (cloudSaveTimer) clearTimeout(cloudSaveTimer);
             cloudSaveTimer = setTimeout(() => {
                 pushStateToCloudNow(false);
-            }, 600);
+            }, 450);
         };
 
         // クラウドからの変更データを安全に画面へ反映する関数
@@ -4770,7 +4893,7 @@
                 window.isCloudLoggedIn = true;
                 loginBtn?.classList.add('hidden');
                 userBadge?.classList.remove('hidden');
-                userBadge?.classList.add(' inline-flex');
+                userBadge?.classList.add('inline-flex');
                 if (nameEl) {
                     nameEl.textContent = user.displayName || user.email || 'ログイン中';
                 }
@@ -4785,6 +4908,7 @@
                 updateSaveStatusBadge('cloud_saved', '☁️ クラウド同期済');
             } else {
                 window.isCloudLoggedIn = false;
+                isInitialCloudSyncCompleted = false;
                 loginBtn?.classList.remove('hidden');
                 userBadge?.classList.add('hidden');
                 userBadge?.classList.remove('inline-flex');
@@ -4797,9 +4921,10 @@
                 unsubscribeSnapshot();
                 unsubscribeSnapshot = null;
             }
+            isInitialCloudSyncCompleted = false;
 
             const userDocRef = doc(db, 'users', user.uid);
-            updateSaveStatusBadge('syncing', '☁️ データ照合中...');
+            updateSaveStatusBadge('syncing', '☁️ クラウド読込中...');
 
             try {
                 const snap = await getDoc(userDocRef);
@@ -4807,12 +4932,16 @@
                     const cloudData = snap.data();
                     const merged = mergeLocalAndCloudStates(appState, cloudData);
                     applyRemotePayloadToApp(merged);
+                    isInitialCloudSyncCompleted = true;
                     await pushStateToCloudNow(false);
                 } else {
+                    isInitialCloudSyncCompleted = true;
+                    appState.updatedAt = Date.now();
                     await pushStateToCloudNow(false);
                 }
             } catch (err) {
                 console.warn('Initial cloud sync check warning:', err);
+                isInitialCloudSyncCompleted = true;
             }
 
             // リアルタイム監視開始（自分の書き込みエコーは無視し、入力中はフォーカス解除まで待機）
@@ -4841,7 +4970,24 @@
             });
         }
 
-        // リダイレクトログイン結果のハンドリング
+        // 別端末で編集したあとにこの端末の画面を開き直した際、最新データを自動でチェック
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && currentUser && isInitialCloudSyncCompleted && !isUserEditingInput()) {
+                try {
+                    const userDocRef = doc(db, 'users', currentUser.uid);
+                    const snap = await getDoc(userDocRef);
+                    if (snap.exists()) {
+                        const cloudData = snap.data();
+                        if (cloudData && cloudData.lastWriteId !== lastLocalWriteId && Number(cloudData.updatedAt || 0) > Number(appState.updatedAt || 0)) {
+                            applyRemotePayloadToApp(cloudData);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Visibility sync check failed:', e);
+                }
+            }
+        });
+
         getRedirectResult(auth).catch((err) => {
             console.warn('Redirect sign-in error:', err);
         });
@@ -4852,6 +4998,7 @@
             if (user) {
                 setupUserCloudSync(user);
             } else {
+                isInitialCloudSyncCompleted = false;
                 if (unsubscribeSnapshot) {
                     unsubscribeSnapshot();
                     unsubscribeSnapshot = null;
@@ -4860,8 +5007,8 @@
         });
 
         document.getElementById('googleLoginBtn')?.addEventListener('click', async () => {
-            flushActiveDomInputsToState();
-            saveStateToStorage({ skipCloud: true });
+            const changed = flushActiveDomInputsToState();
+            saveStateToStorage({ skipCloud: true, markUpdated: changed });
             try {
                 await signInWithPopup(auth, provider);
                 showToast('Googleアカウントで同期を開始しました！');
@@ -4878,15 +5025,37 @@
             }
         });
 
-        document.getElementById('forceCloudSyncBtn')?.addEventListener('click', () => {
-            flushActiveDomInputsToState();
-            saveStateToStorage({ skipCloud: true });
-            pushStateToCloudNow(true);
+        // 手動同期ボタン（🔄）：クラウドとローカルの最新状態を比較・統合して即座に同期
+        document.getElementById('forceCloudSyncBtn')?.addEventListener('click', async () => {
+            if (!currentUser) return;
+            const changed = flushActiveDomInputsToState();
+            if (changed) {
+                const now = Date.now();
+                appState.updatedAt = now;
+                const currRec = getCurrentRecord();
+                if (currRec) currRec.updatedAt = now;
+            }
+            saveStateToStorage({ skipCloud: true, markUpdated: changed });
+
+            try {
+                updateSaveStatusBadge('syncing', '☁️ 最新データ照合中...');
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const snap = await getDoc(userDocRef);
+                if (snap.exists()) {
+                    const merged = mergeLocalAndCloudStates(appState, snap.data());
+                    applyRemotePayloadToApp(merged);
+                }
+                isInitialCloudSyncCompleted = true;
+                await pushStateToCloudNow(true);
+            } catch (err) {
+                console.error('Manual sync error:', err);
+                showToast('手動同期に失敗しました');
+            }
         });
 
         document.getElementById('googleLogoutBtn')?.addEventListener('click', async () => {
-            flushActiveDomInputsToState();
-            saveStateToStorage({ skipCloud: true });
+            const changed = flushActiveDomInputsToState();
+            saveStateToStorage({ skipCloud: true, markUpdated: changed });
             try {
                 await signOut(auth);
                 showToast('ログアウトしました（現在は端末内保存モードです）');
